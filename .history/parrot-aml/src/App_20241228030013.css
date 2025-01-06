@@ -1,0 +1,26 @@
+/* src/App.css */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+.main-parent {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+}
+
+.main-interface {
+  flex: 1;
+  background-color: #314a57;
+  padding: 0px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

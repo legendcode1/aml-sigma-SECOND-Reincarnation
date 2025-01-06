@@ -1,0 +1,18 @@
+{
+    "sourceFile": "parrot-aml/src/Component/NewReport.jsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1736110267786,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1736110267786,
+            "name": "Commit-0",
+            "content": "import React from 'react';\r\nimport '../StyleSheet/NewReport.css'; // Update the CSS file import\r\nimport send from '../assets/newreport/send.png'; // Update the image path\r\n\r\nconst NewReport = ({ searchParams, handleInputChange, saveData }) => {\r\n  const handleSave = () => {\r\n    saveData(searchParams);\r\n  };\r\n\r\n  return (\r\n    <div className=\"new-report-container\">\r\n      <div className=\"search-sect-padding\">\r\n        <div className=\"search-sect\">\r\n          <h1 className=\"search-title\">Search a target</h1>\r\n          <div className=\"search-bars\">\r\n            <div className=\"name-bar\">\r\n              <div className=\"search-input-container\">\r\n                <input\r\n                  type=\"text\"\r\n                  name=\"name\"\r\n                  placeholder=\"Search a name...\"\r\n                  value={searchParams.name}\r\n                  onChange={handleInputChange}\r\n                  className=\"search-input\"\r\n                />\r\n                <button className=\"search-icon\" onClick={handleSave}>\r\n                  <img \r\n                    src={send}\r\n                    alt=\"send\"\r\n                  />\r\n                </button>\r\n              </div>\r\n            </div>\r\n            <div className=\"search-bar\">\r\n              <div className=\"age-input-container\">\r\n                <input\r\n                  type=\"text\"\r\n                  name=\"age\"\r\n                  placeholder=\"Age\"\r\n                  value={searchParams.age}\r\n                  onChange={handleInputChange}\r\n                  className=\"search-input\"\r\n                />\r\n              </div>\r\n              <div className=\"occupation-input-container\">\r\n                <input\r\n                  type=\"text\"\r\n                  name=\"occupation\"\r\n                  placeholder=\"Occupation\"\r\n                  value={searchParams.occupation}\r\n                  onChange={handleInputChange}\r\n                  className=\"search-input\"\r\n                />\r\n              </div>\r\n            </div>\r\n          </div>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default NewReport;\r\n"
+        }
+    ]
+}

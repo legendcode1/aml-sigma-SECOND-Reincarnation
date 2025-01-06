@@ -1,0 +1,26 @@
+{
+    "sourceFile": "parrot-aml/src/App.jsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1735329591986,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1735329601520,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,23 +3,21 @@\n import LeftBar from './Component/LeftBar'; // Ensure correct import path\n import MainInterface from './Component/MainInterface'; // Import MainInterface\n \n const App = () => {\n-  const initialSearchParams = {\n+  const [searchParams, setSearchParams] = useState({\n     name: '',\n     age: '',\n     occupation: ''\n-  };\n+  });\n \n-  const [searchParams, setSearchParams] = useState(initialSearchParams);\n   const [savedItems, setSavedItems] = useState([]);\n   const [submitted, setSubmitted] = useState(false);\n \n   const saveData = () => {\n     if (searchParams.name.trim()) {\n       setSavedItems((prevItems) => [...prevItems, searchParams]);\n       setSubmitted(true);\n-      setSearchParams(initialSearchParams); // Reset the form inputs\n     }\n   };\n \n   const handleInputChange = (e) => {\n@@ -29,15 +27,13 @@\n       [name]: value\n     }));\n   };\n \n-  const toggleState = () => {\n-    setSubmitted(!submitted);\n-  };\n-\n   return (\n     <div className=\"main-parent\">\n-      <LeftBar savedItems={savedItems} toggleState={toggleState} />\n+      <div className=\"left-bar\">\n+        <LeftBar savedItems={savedItems} />\n+      </div>\n       <MainInterface\n         submitted={submitted}\n         searchParams={searchParams}\n         handleInputChange={handleInputChange}\n"
+                },
+                {
+                    "date": 1735333157790,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -42,5 +42,5 @@\n     </div>\n   );\n };\n \n-export default App;\n+export default App;\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1735329591986,
+            "name": "Commit-0",
+            "content": "import React, { useState } from 'react';\nimport './App.css'; // Import global styles\nimport LeftBar from './Component/LeftBar'; // Ensure correct import path\nimport MainInterface from './Component/MainInterface'; // Import MainInterface\n\nconst App = () => {\n  const initialSearchParams = {\n    name: '',\n    age: '',\n    occupation: ''\n  };\n\n  const [searchParams, setSearchParams] = useState(initialSearchParams);\n  const [savedItems, setSavedItems] = useState([]);\n  const [submitted, setSubmitted] = useState(false);\n\n  const saveData = () => {\n    if (searchParams.name.trim()) {\n      setSavedItems((prevItems) => [...prevItems, searchParams]);\n      setSubmitted(true);\n      setSearchParams(initialSearchParams); // Reset the form inputs\n    }\n  };\n\n  const handleInputChange = (e) => {\n    const { name, value } = e.target;\n    setSearchParams(prev => ({\n      ...prev,\n      [name]: value\n    }));\n  };\n\n  const toggleState = () => {\n    setSubmitted(!submitted);\n  };\n\n  return (\n    <div className=\"main-parent\">\n      <LeftBar savedItems={savedItems} toggleState={toggleState} />\n      <MainInterface\n        submitted={submitted}\n        searchParams={searchParams}\n        handleInputChange={handleInputChange}\n        saveData={saveData}\n      />\n    </div>\n  );\n};\n\nexport default App;\n"
+        }
+    ]
+}

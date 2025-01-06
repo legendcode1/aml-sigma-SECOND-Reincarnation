@@ -1,0 +1,9 @@
+.main-interface {
+    flex: 1;
+    background-color: #314a57;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
