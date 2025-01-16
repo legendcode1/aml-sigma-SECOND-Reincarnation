@@ -1,30 +1,19 @@
 import React from 'react';
 import '../StyleSheet/NewReport.css'; // Update the CSS file import
 import send from '../assets/newreport/send.png'; // Update the image path
-import { firestore } from '../firebase'; // Update the path
+import {firebase} from '../firebase'; // Update the path
 import { addDoc, collection } from 'firebase/firestore';
 
 const NewReport = ({ searchParams, handleInputChange, saveData }) => {
 
-  const ref = collection(firestore, 'messages');
+  const ref = collection(firebase, 'messages');
 
-  const handleSave = async () => {
+  const handleSave = () => {
     saveData(searchParams);
     console.log(searchParams);
-
-    let data = {
-      name: searchParams.name,
-      age: searchParams.age,
-      occupation: searchParams.occupation
-    };
-
-    try {
-      await addDoc(ref, data);
-      console.log("Document successfully written!");
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
   };
+
+  
 
   return (
     <div className="new-report-container">
