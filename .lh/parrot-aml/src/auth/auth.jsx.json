@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 8,
+            "activePatchIndex": 14,
             "patches": [
                 {
                     "date": 1736966845685,
@@ -40,6 +40,30 @@
                 {
                     "date": 1736971239944,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -32,10 +32,10 @@\n   }\r\n \r\n   const client_id = domainClientMapping[domain]; // Get the client_id based on the domain\r\n \r\n-    // Output the client_id to the console\r\n-    console.log(\"Client ID: \", client_id);\r\n+  // Output the client_id to the console\r\n+  console.log(\"Client ID: \", client_id);\r\n \r\n   try {\r\n     // Authenticate the user with Firebase\r\n     const userCredential = await signInWithEmailAndPassword(auth, email, password);\r\n"
+                },
+                {
+                    "date": 1737025501889,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,12 +17,19 @@\n const auth = getAuth(app);\r\n \r\n // Domain-to-client_id mapping\r\n const domainClientMapping = {\r\n-  'transinergi.com': 'client-id-transinergi',\r\n-  'datum.com': 'client-id-datum'\r\n+  'transinergi.com': {\r\n+    clientId: 'client-id-transinergi',\r\n+    companyName: 'trans sinergi'\r\n+  },\r\n+  'datum.com': {\r\n+    clientId: 'client-id-datum',\r\n+    companyName: 'DatumCorp'\r\n+  }\r\n };\r\n \r\n+\r\n // Function to handle login\r\n export const loginUser = async (email, password) => {\r\n   const domain = email.split('@')[1]; // Extract the domain part of the email\r\n \r\n"
+                },
+                {
+                    "date": 1737039478841,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -19,17 +19,16 @@\n // Domain-to-client_id mapping\r\n const domainClientMapping = {\r\n   'transinergi.com': {\r\n     clientId: 'client-id-transinergi',\r\n-    companyName: 'trans sinergi'\r\n+    companyName: 'Trans Sinergi'\r\n   },\r\n   'datum.com': {\r\n     clientId: 'client-id-datum',\r\n     companyName: 'DatumCorp'\r\n   }\r\n };\r\n \r\n-\r\n // Function to handle login\r\n export const loginUser = async (email, password) => {\r\n   const domain = email.split('@')[1]; // Extract the domain part of the email\r\n \r\n@@ -37,20 +36,22 @@\n   if (!domainClientMapping[domain]) {\r\n     throw new Error('This email domain is not allowed.');\r\n   }\r\n \r\n-  const client_id = domainClientMapping[domain]; // Get the client_id based on the domain\r\n+  const { clientId, companyName } = domainClientMapping[domain]; // Get clientId and companyName based on the domain\r\n \r\n-  // Output the client_id to the console\r\n-  console.log(\"Client ID: \", client_id);\r\n+  // Output the clientId and companyName to the console\r\n+  console.log(\"Client ID: \", clientId);\r\n+  console.log(\"Company Name: \", companyName);\r\n \r\n   try {\r\n     // Authenticate the user with Firebase\r\n     const userCredential = await signInWithEmailAndPassword(auth, email, password);\r\n     const user = userCredential.user;\r\n \r\n-    // Store the client_id for the session (use localStorage, React context, etc.)\r\n-    localStorage.setItem('client_id', client_id);\r\n+    // Store the client_id and company_name for the session\r\n+    localStorage.setItem('client_id', clientId);\r\n+    localStorage.setItem('company_name', companyName); // Store companyName in localStorage\r\n \r\n     // Return user data (or redirect, or whatever you need)\r\n     return user;\r\n   } catch (error) {\r\n"
+                },
+                {
+                    "date": 1737040623518,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -18,13 +18,13 @@\n \r\n // Domain-to-client_id mapping\r\n const domainClientMapping = {\r\n   'transinergi.com': {\r\n-    clientId: 'client-id-transinergi',\r\n+    clientId: 'client-id-transinergi116',\r\n     companyName: 'Trans Sinergi'\r\n   },\r\n   'datum.com': {\r\n-    clientId: 'client-id-datum',\r\n+    clientId: 'client-id-datum116',\r\n     companyName: 'DatumCorp'\r\n   }\r\n };\r\n \r\n"
+                },
+                {
+                    "date": 1737045846961,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -38,12 +38,8 @@\n   }\r\n \r\n   const { clientId, companyName } = domainClientMapping[domain]; // Get clientId and companyName based on the domain\r\n \r\n-  // Output the clientId and companyName to the console\r\n-  console.log(\"Client ID: \", clientId);\r\n-  console.log(\"Company Name: \", companyName);\r\n-\r\n   try {\r\n     // Authenticate the user with Firebase\r\n     const userCredential = await signInWithEmailAndPassword(auth, email, password);\r\n     const user = userCredential.user;\r\n"
+                },
+                {
+                    "date": 1737048036894,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -47,10 +47,20 @@\n     // Store the client_id and company_name for the session\r\n     localStorage.setItem('client_id', clientId);\r\n     localStorage.setItem('company_name', companyName); // Store companyName in localStorage\r\n \r\n-    // Return user data (or redirect, or whatever you need)\r\n+    // Redirect to dashboard after successful login\r\n+    window.location.href = '/dashboard'; // Example: Redirect to dashboard\r\n+\r\n+    // Return user data\r\n     return user;\r\n   } catch (error) {\r\n-    throw new Error('Login failed: ' + error.message);\r\n+    // Improved error handling\r\n+    if (error.code === 'auth/user-not-found') {\r\n+      throw new Error('User not found. Please check your email or sign up.');\r\n+    } else if (error.code === 'auth/wrong-password') {\r\n+      throw new Error('Incorrect password. Please try again.');\r\n+    } else {\r\n+      throw new Error('Login failed: ' + error.message);\r\n+    }\r\n   }\r\n };\r\n"
+                },
+                {
+                    "date": 1737048756341,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -38,17 +38,28 @@\n   }\r\n \r\n   const { clientId, companyName } = domainClientMapping[domain]; // Get clientId and companyName based on the domain\r\n \r\n+  // Debugging outputs\r\n+  console.log('clientId:', clientId);\r\n+  console.log('companyName:', companyName);\r\n+\r\n   try {\r\n     // Authenticate the user with Firebase\r\n     const userCredential = await signInWithEmailAndPassword(auth, email, password);\r\n     const user = userCredential.user;\r\n \r\n+    // Debugging output for successful authentication\r\n+    console.log('User authenticated:', user);\r\n+\r\n     // Store the client_id and company_name for the session\r\n     localStorage.setItem('client_id', clientId);\r\n     localStorage.setItem('company_name', companyName); // Store companyName in localStorage\r\n \r\n+    // Debugging output after storing in localStorage\r\n+    console.log('Stored client_id:', localStorage.getItem('client_id'));\r\n+    console.log('Stored company_name:', localStorage.getItem('company_name'));\r\n+\r\n     // Redirect to dashboard after successful login\r\n     window.location.href = '/dashboard'; // Example: Redirect to dashboard\r\n \r\n     // Return user data\r\n"
                 }
             ],
             "date": 1736966845685,

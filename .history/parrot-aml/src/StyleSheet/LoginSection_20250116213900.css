@@ -1,0 +1,30 @@
+.login-section {
+  display: flex; /* Enable Flexbox */
+  align-items: center; /* Vertically align items in the center */
+  justify-content: space-between; /* Space between elements for proper layout */
+  width: 1400px; /* Set a fixed width */
+  height: 76px; /* Maintain the desired height */
+  padding: 0 20px; /* Horizontal padding for spacing */
+}
+
+.login-text {
+  font-size: 24px; /* Keep a readable font size */
+  font-weight: bold; /* Bold font for emphasis */
+  color: #000; /* Black color for text */
+  margin-right: auto; /* Push this text to the left */
+}
+
+.login-icon {
+  width: 76px; /* Maintain the icon size */
+  height: 76px; /* Maintain the icon size */
+  border-radius: 50%; /* Make the icon circular */
+  margin-left: 20px; /* Add spacing between the icon and adjacent elements */
+}
+
+.WelcomeText {
+  font-size: 24px; /* Match the size of .login-text */
+  font-weight: bold; /* Keep bold for consistency */
+  color: #fff; /* Use a slightly softer color for the welcome text */
+  margin: 0 auto; /* Center the text in its container */
+  text-align: center; /* Align the text centrally */
+}

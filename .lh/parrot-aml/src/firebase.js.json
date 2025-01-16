@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 10,
+            "activePatchIndex": 11,
             "patches": [
                 {
                     "date": 1736173187302,
@@ -48,6 +48,10 @@
                 {
                     "date": 1736968416878,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -28,5 +28,5 @@\n const analytics = getAnalytics(app);\r\n \r\n // Export Firestore and other Firebase services\r\n export const firestore = getFirestore(app);\r\n-export { app, analytics };\n\\ No newline at end of file\n+export { app, analytics };\r\n"
+                },
+                {
+                    "date": 1737041151581,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,15 +1,16 @@\n // Import necessary Firebase functions\r\n import { initializeApp, getApp, getApps } from 'firebase/app';\r\n import { getAnalytics } from 'firebase/analytics';\r\n import { getFirestore } from 'firebase/firestore';\r\n+import { getAuth } from 'firebase/auth';  // Add Firebase Authentication\r\n \r\n // Your Firebase configuration\r\n const firebaseConfig = {\r\n   apiKey: \"AIzaSyBfku8hikwXrII_Uv2u0pL6-f0a0a0mKr8\",\r\n   authDomain: \"datumcorp-aml.firebaseapp.com\",\r\n   projectId: \"datumcorp-aml\",\r\n-  storageBucket: \"datumcorp-aml.appspot.com\",  // Fix the storageBucket URL (should end with .appspot.com)\r\n+  storageBucket: \"datumcorp-aml.appspot.com\",\r\n   messagingSenderId: \"710428028162\",\r\n   appId: \"1:710428028162:web:486e3aad77de49d0d8261b\",\r\n   measurementId: \"G-KSL9Y2V3HX\"\r\n };\r\n@@ -26,7 +27,10 @@\n \r\n // Initialize Firebase Analytics (optional, remove if not using)\r\n const analytics = getAnalytics(app);\r\n \r\n-// Export Firestore and other Firebase services\r\n+// Initialize Firebase Auth\r\n+const auth = getAuth(app); // Initialize Auth service\r\n+\r\n+// Export Firestore, Auth, and other Firebase services\r\n export const firestore = getFirestore(app);\r\n-export { app, analytics };\r\n+export { app, analytics, auth };\r\n"
                 }
             ],
             "date": 1736173187301,

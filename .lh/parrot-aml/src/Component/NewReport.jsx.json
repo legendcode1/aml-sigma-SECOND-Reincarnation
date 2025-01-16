@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 8,
+            "activePatchIndex": 9,
             "patches": [
                 {
                     "date": 1736110267786,
@@ -40,6 +40,10 @@
                 {
                     "date": 1736175403511,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,36 +1,32 @@\n import React from 'react';\r\n import '../StyleSheet/NewReport.css'; // Update the CSS file import\r\n import send from '../assets/newreport/send.png'; // Update the image path\r\n-import {firebase} from '../firebase'; // Update the path\r\n+import { firestore } from '../firebase'; // Update the path\r\n import { addDoc, collection } from 'firebase/firestore';\r\n \r\n const NewReport = ({ searchParams, handleInputChange, saveData }) => {\r\n \r\n-  const ref = collection(firebase, 'messages');\r\n+  const ref = collection(firestore, 'messages');\r\n \r\n-  const handleSave = () => {\r\n+  const handleSave = async () => {\r\n     saveData(searchParams);\r\n     console.log(searchParams);\r\n-  };\r\n \r\n-  \r\n-  let data = {\r\n-    name: searchParams.name,\r\n-    age: searchParams.age,\r\n-    occupation: searchParams.occupation\r\n-  }\r\n+    let data = {\r\n+      name: searchParams.name,\r\n+      age: searchParams.age,\r\n+      occupation: searchParams.occupation\r\n+    };\r\n \r\n+    try {\r\n+      await addDoc(ref, data);\r\n+      console.log(\"Document successfully written!\");\r\n+    } catch (e) {\r\n+      console.error(\"Error adding document: \", e);\r\n+    }\r\n+  };\r\n \r\n-  try {\r\n-    addDoc(ref, data);\r\n-  }\r\n-\r\n-  catch (e) {\r\n-    console.error(\"Error adding document: \", e);\r\n-  }\r\n-\r\n-\r\n   return (\r\n     <div className=\"new-report-container\">\r\n       <div className=\"search-sect-padding\">\r\n         <div className=\"search-sect\">\r\n@@ -82,5 +78,5 @@\n     </div>\r\n   );\r\n };\r\n \r\n-export default NewReport;\r\n+export default NewReport;\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1737041315345,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n import React from 'react';\r\n import '../StyleSheet/NewReport.css'; // Update the CSS file import\r\n import send from '../assets/newreport/send.png'; // Update the image path\r\n-import { firestore } from '../firebase'; // Update the path\r\n+import { firestore } from '../firebase/firebase'; // Update the path\r\n import { addDoc, collection } from 'firebase/firestore';\r\n \r\n const NewReport = ({ searchParams, handleInputChange, saveData }) => {\r\n \r\n"
                 }
             ],
             "date": 1736110267786,

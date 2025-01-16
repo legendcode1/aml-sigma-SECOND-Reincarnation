@@ -1,0 +1,18 @@
+{
+    "sourceFile": "parrot-aml/src/firebase/firebase.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1737041504567,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1737041504567,
+            "name": "Commit-0",
+            "content": "// src/firebase/firebase.js\r\nimport { initializeApp, getApp, getApps } from 'firebase/app';\r\nimport { getAnalytics } from 'firebase/analytics';\r\nimport { getAuth } from 'firebase/auth'; // Add authentication\r\nimport { getFirestore } from 'firebase/firestore'; // Add Firestore\r\n\r\nconst firebaseConfig = {\r\n  apiKey: \"AIzaSyBfku8hikwXrII_Uv2u0pL6-f0a0a0mKr8\",\r\n  authDomain: \"datumcorp-aml.firebaseapp.com\",\r\n  projectId: \"datumcorp-aml\",\r\n  storageBucket: \"datumcorp-aml.appspot.com\",\r\n  messagingSenderId: \"710428028162\",\r\n  appId: \"1:710428028162:web:486e3aad77de49d0d8261b\",\r\n  measurementId: \"G-KSL9Y2V3HX\"\r\n};\r\n\r\n// Initialize Firebase only if not already initialized\r\nlet app;\r\nif (getApps().length === 0) {\r\n  app = initializeApp(firebaseConfig);\r\n} else {\r\n  app = getApp();\r\n}\r\n\r\nconst analytics = getAnalytics(app);\r\nconst auth = getAuth(app); // Initialize Auth service\r\nconst firestore = getFirestore(app); // Initialize Firestore\r\n\r\nexport { app, auth, analytics, firestore };\r\n"
+        }
+    ]
+}

@@ -1,14 +1,14 @@
-// Import necessary Firebase functions
+// src/firebase/firebase.js
 import { initializeApp, getApp, getApps } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
-import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth'; // Add authentication
+import { getFirestore } from 'firebase/firestore'; // Add Firestore
 
-// Your Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBfku8hikwXrII_Uv2u0pL6-f0a0a0mKr8",
   authDomain: "datumcorp-aml.firebaseapp.com",
   projectId: "datumcorp-aml",
-  storageBucket: "datumcorp-aml.appspot.com",  // Fix the storageBucket URL (should end with .appspot.com)
+  storageBucket: "datumcorp-aml.appspot.com",
   messagingSenderId: "710428028162",
   appId: "1:710428028162:web:486e3aad77de49d0d8261b",
   measurementId: "G-KSL9Y2V3HX"
@@ -17,16 +17,13 @@ const firebaseConfig = {
 // Initialize Firebase only if not already initialized
 let app;
 if (getApps().length === 0) {
-  // Initialize Firebase
   app = initializeApp(firebaseConfig);
 } else {
-  // If already initialized, get the existing app
   app = getApp();
 }
 
-// Initialize Firebase Analytics (optional, remove if not using)
 const analytics = getAnalytics(app);
+const auth = getAuth(app); // Initialize Auth service
+const firestore = getFirestore(app); // Initialize Firestore
 
-// Export Firestore and other Firebase services
-export const firestore = getFirestore(app);
-export { app, analytics };
+export { app, auth, analytics, firestore };

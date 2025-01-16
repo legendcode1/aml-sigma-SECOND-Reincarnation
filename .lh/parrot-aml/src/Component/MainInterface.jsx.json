@@ -1,0 +1,18 @@
+{
+    "sourceFile": "parrot-aml/src/Component/MainInterface.jsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1737032636938,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1737032636938,
+            "name": "Commit-0",
+            "content": "import React, { useEffect, useState } from 'react';\r\nimport '../StyleSheet/MainInterface.css'; // Import the CSS file\r\nimport ChatBot from './ChatBot'; // Import the ChatBot component\r\nimport MainLayout from './MainLayout'; // Import the MainLayout component\r\nimport LoginSection from './LoginSection'; // Import the reusable LoginSection component\r\nimport { useNavigate } from 'react-router-dom'; // To handle redirection\r\nimport { getAuth, onAuthStateChanged } from 'firebase/auth'; // Firebase authentication\r\n\r\nconst MainInterface = ({ submitted, searchParams, handleInputChange, saveData }) => {\r\n  const navigate = useNavigate();\r\n  const [user, setUser] = useState(null); // Store authenticated user information\r\n\r\n  useEffect(() => {\r\n    const auth = getAuth(); // Initialize Firebase authentication\r\n    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {\r\n      if (!currentUser) {\r\n        // If the user is not logged in, redirect to the login page\r\n        navigate('/login');\r\n      } else {\r\n        setUser(currentUser); // Set user data\r\n      }\r\n    });\r\n\r\n    return () => unsubscribe(); // Clean up the subscription\r\n  }, [navigate]);\r\n\r\n  return (\r\n    <div className=\"main-interface\">\r\n      {/* Login Section */}\r\n      <div className=\"login-section\">\r\n        <LoginSection \r\n          loginText={user ? `Welcome, ${user.displayName || \"User\"}` : \"Please Log In\"}\r\n          onClick={() => console.log(\"Login section clicked!\")}\r\n        />\r\n      </div>\r\n\r\n      {/* Main Content */}\r\n      <MainLayout>\r\n        <ChatBot \r\n          submitted={submitted}\r\n          searchParams={searchParams}\r\n          handleInputChange={handleInputChange}\r\n          saveData={saveData}\r\n        />\r\n      </MainLayout>\r\n\r\n      {/* Add other features like dashboard, save to PDF, etc. here */}\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default MainInterface;\r\n"
+        }
+    ]
+}

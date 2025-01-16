@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 28,
+            "activePatchIndex": 30,
             "patches": [
                 {
                     "date": 1736063194183,
@@ -120,6 +120,14 @@
                 {
                     "date": 1736100398048,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -17,9 +17,9 @@\n   return (\r\n     <div>\r\n       <div className=\"logo-container\">\r\n         <img src={datum} alt=\"Datumm Logo\" className=\"logo\" />\r\n-        <img src={plusIcon} alt=\"Plus\" className=\"icon\" />\r\n+        <img src={plusIcon} alt=\"Plus\" className=\"plus-icon\" />\r\n       </div>\r\n       <hr />\r\n       <div className=\"nav-links\">\r\n         <button>Dashboard</button>\r\n"
+                },
+                {
+                    "date": 1737023976666,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,11 +1,11 @@\n import React from 'react';\r\n import '../StyleSheet/LeftBar.css'; // Ensure the path is correct\r\n-import sortIcon from '../assets/leftbar/sort.png'; // Ensure the correct path\r\n-import plusIcon from '../assets/leftbar/plus-sign.png';\r\n-import datum from '../assets/leftbar/datum.png';\r\n-import highrisk from '../assets/leftbar/high-risk.png';\r\n-import fav from '../assets/leftbar/star.png';\r\n+import sortIcon from 'public/leftbar/sort.png'; // Ensure the correct path\r\n+import plusIcon from 'public/leftbar/plus-sign.png';\r\n+import datum from 'public/leftbar/datum.png';\r\n+import highrisk from 'public/leftbar/high-risk.png';\r\n+import fav from 'public/leftbar/star.png';\r\n \r\n const HighRiskBadge = () => (\r\n   <div className=\"risk-badge\">\r\n     <img src={highrisk} alt=\"Risk\" className=\"risk-bg\" />\r\n"
+                },
+                {
+                    "date": 1737024324531,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,11 +1,11 @@\n import React from 'react';\r\n import '../StyleSheet/LeftBar.css'; // Ensure the path is correct\r\n-import sortIcon from 'public/leftbar/sort.png'; // Ensure the correct path\r\n-import plusIcon from 'public/leftbar/plus-sign.png';\r\n-import datum from 'public/leftbar/datum.png';\r\n-import highrisk from 'public/leftbar/high-risk.png';\r\n-import fav from 'public/leftbar/star.png';\r\n+import sortIcon from '/leftbar/sort.png'; // Ensure the correct path\r\n+import plusIcon from '/leftbar/plus-sign.png';\r\n+import datum from '/leftbar/datum.png';\r\n+import highrisk from '/leftbar/high-risk.png';\r\n+import fav from '/leftbar/star.png';\r\n \r\n const HighRiskBadge = () => (\r\n   <div className=\"risk-badge\">\r\n     <img src={highrisk} alt=\"Risk\" className=\"risk-bg\" />\r\n"
                 }
             ],
             "date": 1736063194183,

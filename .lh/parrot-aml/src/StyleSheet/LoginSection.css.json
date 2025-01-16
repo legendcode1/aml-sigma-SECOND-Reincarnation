@@ -1,0 +1,62 @@
+{
+    "sourceFile": "parrot-aml/src/StyleSheet/LoginSection.css",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 11,
+            "patches": [
+                {
+                    "date": 1737025806857,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1737025943437,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,10 +1,10 @@\n /* In your LoginSection.css file */\r\n \r\n .login-section {\r\n   display: flex;\r\n-  align-items: center;  /* Align items vertically in the center */\r\n-  justify-content: start;  /* Align items to the start (left) */\r\n+  align-items: center;\r\n+  justify-content: start;\r\n   width: 1400px;\r\n   height: 76px;\r\n   background-color: #fff;\r\n   padding: 0 20px;\r\n@@ -21,14 +21,14 @@\n   width: 76px;\r\n   height: 76px;\r\n   border-radius: 50%;\r\n   background-color: #ccc;\r\n-  margin-left: 10px;  /* Adds a small gap between text and image */\r\n+  margin-left: 10px;\r\n }\r\n \r\n .company-name {\r\n   font-size: 16px;\r\n   font-weight: 500;\r\n   color: #000;\r\n-  margin-left: 10px;  /* Adds space between image and company name */\r\n-  text-transform: capitalize;  /* Capitalizes the company name */\r\n+  margin-left: 10px;\r\n+  text-transform: capitalize;\r\n }\r\n"
+                },
+                {
+                    "date": 1737026468209,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,10 +1,8 @@\n-/* In your LoginSection.css file */\r\n-\r\n .login-section {\r\n   display: flex;\r\n-  align-items: center;\r\n-  justify-content: start;\r\n+  align-items: end;\r\n+  justify-content: none;\r\n   width: 1400px;\r\n   height: 76px;\r\n   background-color: #fff;\r\n   padding: 0 20px;\r\n@@ -21,14 +19,13 @@\n   width: 76px;\r\n   height: 76px;\r\n   border-radius: 50%;\r\n   background-color: #ccc;\r\n-  margin-left: 10px;\r\n }\r\n \r\n-.company-name {\r\n-  font-size: 16px;\r\n-  font-weight: 500;\r\n-  color: #000;\r\n-  margin-left: 10px;\r\n-  text-transform: capitalize;\r\n+.WelcomeText {\r\n+  font-size: 24px;\r\n+  font-weight: bold;\r\n+  color: #333;\r\n+  margin-bottom: 20px;\r\n+  text-align: center;\r\n }\r\n"
+                },
+                {
+                    "date": 1737035647141,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,9 +3,8 @@\n   align-items: end;\r\n   justify-content: none;\r\n   width: 1400px;\r\n   height: 76px;\r\n-  background-color: #fff;\r\n   padding: 0 20px;\r\n   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);\r\n }\r\n \r\n"
+                },
+                {
+                    "date": 1737035889719,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,30 +1,22 @@\n .login-section {\r\n-  display: flex;\r\n-  align-items: end;\r\n-  justify-content: none;\r\n-  width: 1400px;\r\n-  height: 76px;\r\n-  padding: 0 20px;\r\n-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);\r\n+  display: flex; /* Enables Flexbox */\r\n+  flex-direction: column; /* Arrange children vertically */\r\n+  align-items: center; /* Horizontally centers children */\r\n+  justify-content: center; /* Vertically centers children */\r\n+  height: 100vh; /* Set height to full viewport (or adjust as needed) */\r\n }\r\n \r\n .login-text {\r\n-  font-size: 24px;\r\n-  font-weight: bold;\r\n-  color: #000;\r\n+  font-size: 1.5rem; /* Adjust font size as needed */\r\n+  margin-bottom: 1rem; /* Optional: Add spacing below the span */\r\n }\r\n \r\n .login-icon {\r\n-  width: 76px;\r\n-  height: 76px;\r\n-  border-radius: 50%;\r\n-  background-color: #ccc;\r\n+  width: 50px; /* Adjust size as needed */\r\n+  height: 50px; /* Adjust size as needed */\r\n+  margin-bottom: 1rem; /* Optional: Add spacing below the image */\r\n }\r\n \r\n-.WelcomeText {\r\n-  font-size: 24px;\r\n-  font-weight: bold;\r\n-  color: #333;\r\n-  margin-bottom: 20px;\r\n-  text-align: center;\r\n+.company-name {\r\n+  font-size: 1rem; /* Adjust size as needed */\r\n }\r\n"
+                },
+                {
+                    "date": 1737038125150,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,22 +1,31 @@\n .login-section {\r\n-  display: flex; /* Enables Flexbox */\r\n-  flex-direction: column; /* Arrange children vertically */\r\n-  align-items: center; /* Horizontally centers children */\r\n-  justify-content: center; /* Vertically centers children */\r\n-  height: 100vh; /* Set height to full viewport (or adjust as needed) */\r\n+  display: flex;\r\n+  align-items: end;\r\n+  justify-content: none;\r\n+  width: 1400px;\r\n+  height: 76px;\r\n+  background-color: #fff;\r\n+  padding: 0 20px;\r\n+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);\r\n }\r\n \r\n .login-text {\r\n-  font-size: 1.5rem; /* Adjust font size as needed */\r\n-  margin-bottom: 1rem; /* Optional: Add spacing below the span */\r\n+  font-size: 24px;\r\n+  font-weight: bold;\r\n+  color: #000;\r\n }\r\n \r\n .login-icon {\r\n-  width: 50px; /* Adjust size as needed */\r\n-  height: 50px; /* Adjust size as needed */\r\n-  margin-bottom: 1rem; /* Optional: Add spacing below the image */\r\n+  width: 76px;\r\n+  height: 76px;\r\n+  border-radius: 50%;\r\n+  background-color: #ccc;\r\n }\r\n \r\n-.company-name {\r\n-  font-size: 1rem; /* Adjust size as needed */\r\n+.WelcomeText {\r\n+  font-size: 24px;\r\n+  font-weight: bold;\r\n+  color: #333;\r\n+  margin-bottom: 20px;\r\n+  text-align: center;\r\n }\r\n"
+                },
+                {
+                    "date": 1737038131171,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,9 +3,8 @@\n   align-items: end;\r\n   justify-content: none;\r\n   width: 1400px;\r\n   height: 76px;\r\n-  background-color: #fff;\r\n   padding: 0 20px;\r\n   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);\r\n }\r\n \r\n"
+                },
+                {
+                    "date": 1737038299001,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,30 +1,33 @@\n .login-section {\r\n-  display: flex;\r\n-  align-items: end;\r\n-  justify-content: none;\r\n-  width: 1400px;\r\n-  height: 76px;\r\n-  padding: 0 20px;\r\n-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);\r\n+  display: flex; /* Enable Flexbox */\r\n+  align-items: center; /* Vertically align items in the center */\r\n+  justify-content: space-between; /* Space between elements for proper layout */\r\n+  width: 1400px; /* Set a fixed width */\r\n+  height: 76px; /* Maintain the desired height */\r\n+  padding: 0 20px; /* Horizontal padding for spacing */\r\n+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */\r\n+  background-color: #fff; /* Optional: Add a background color for contrast */\r\n }\r\n \r\n .login-text {\r\n-  font-size: 24px;\r\n-  font-weight: bold;\r\n-  color: #000;\r\n+  font-size: 24px; /* Keep a readable font size */\r\n+  font-weight: bold; /* Bold font for emphasis */\r\n+  color: #000; /* Black color for text */\r\n+  margin-right: auto; /* Push this text to the left */\r\n }\r\n \r\n .login-icon {\r\n-  width: 76px;\r\n-  height: 76px;\r\n-  border-radius: 50%;\r\n-  background-color: #ccc;\r\n+  width: 76px; /* Maintain the icon size */\r\n+  height: 76px; /* Maintain the icon size */\r\n+  border-radius: 50%; /* Make the icon circular */\r\n+  background-color: #ccc; /* Placeholder background color */\r\n+  margin-left: 20px; /* Add spacing between the icon and adjacent elements */\r\n }\r\n \r\n .WelcomeText {\r\n-  font-size: 24px;\r\n-  font-weight: bold;\r\n-  color: #333;\r\n-  margin-bottom: 20px;\r\n-  text-align: center;\r\n+  font-size: 24px; /* Match the size of .login-text */\r\n+  font-weight: bold; /* Keep bold for consistency */\r\n+  color: #333; /* Use a slightly softer color for the welcome text */\r\n+  margin: 0 auto; /* Center the text in its container */\r\n+  text-align: center; /* Align the text centrally */\r\n }\r\n"
+                },
+                {
+                    "date": 1737038312315,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -5,9 +5,8 @@\n   width: 1400px; /* Set a fixed width */\r\n   height: 76px; /* Maintain the desired height */\r\n   padding: 0 20px; /* Horizontal padding for spacing */\r\n   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */\r\n-  background-color: #fff; /* Optional: Add a background color for contrast */\r\n }\r\n \r\n .login-text {\r\n   font-size: 24px; /* Keep a readable font size */\r\n@@ -19,9 +18,8 @@\n .login-icon {\r\n   width: 76px; /* Maintain the icon size */\r\n   height: 76px; /* Maintain the icon size */\r\n   border-radius: 50%; /* Make the icon circular */\r\n-  background-color: #ccc; /* Placeholder background color */\r\n   margin-left: 20px; /* Add spacing between the icon and adjacent elements */\r\n }\r\n \r\n .WelcomeText {\r\n"
+                },
+                {
+                    "date": 1737038329401,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,9 +4,8 @@\n   justify-content: space-between; /* Space between elements for proper layout */\r\n   width: 1400px; /* Set a fixed width */\r\n   height: 76px; /* Maintain the desired height */\r\n   padding: 0 20px; /* Horizontal padding for spacing */\r\n-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */\r\n }\r\n \r\n .login-text {\r\n   font-size: 24px; /* Keep a readable font size */\r\n"
+                },
+                {
+                    "date": 1737038340943,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,8 +23,8 @@\n \r\n .WelcomeText {\r\n   font-size: 24px; /* Match the size of .login-text */\r\n   font-weight: bold; /* Keep bold for consistency */\r\n-  color: #333; /* Use a slightly softer color for the welcome text */\r\n+  color: #fff; /* Use a slightly softer color for the welcome text */\r\n   margin: 0 auto; /* Center the text in its container */\r\n   text-align: center; /* Align the text centrally */\r\n }\r\n"
+                },
+                {
+                    "date": 1737038357498,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -9,9 +9,9 @@\n \r\n .login-text {\r\n   font-size: 24px; /* Keep a readable font size */\r\n   font-weight: bold; /* Bold font for emphasis */\r\n-  color: #000; /* Black color for text */\r\n+  color: #fff; /* Black color for text */\r\n   margin-right: auto; /* Push this text to the left */\r\n }\r\n \r\n .login-icon {\r\n"
+                }
+            ],
+            "date": 1737025806857,
+            "name": "Commit-0",
+            "content": "/* In your LoginSection.css file */\r\n\r\n.login-section {\r\n  display: flex;\r\n  align-items: center;  /* Align items vertically in the center */\r\n  justify-content: start;  /* Align items to the start (left) */\r\n  width: 1400px;\r\n  height: 76px;\r\n  background-color: #fff;\r\n  padding: 0 20px;\r\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);\r\n}\r\n\r\n.login-text {\r\n  font-size: 24px;\r\n  font-weight: bold;\r\n  color: #000;\r\n}\r\n\r\n.login-icon {\r\n  width: 76px;\r\n  height: 76px;\r\n  border-radius: 50%;\r\n  background-color: #ccc;\r\n  margin-left: 10px;  /* Adds a small gap between text and image */\r\n}\r\n\r\n.company-name {\r\n  font-size: 16px;\r\n  font-weight: 500;\r\n  color: #000;\r\n  margin-left: 10px;  /* Adds space between image and company name */\r\n  text-transform: capitalize;  /* Capitalizes the company name */\r\n}\r\n"
+        }
+    ]
+}
