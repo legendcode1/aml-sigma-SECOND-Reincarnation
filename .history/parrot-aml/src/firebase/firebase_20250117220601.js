@@ -39,9 +39,7 @@ getDocs(colref).then((snapshot) => {
     users.push({ ...doc.data(), id: doc.id });
   });
   console.log(users);
-})
-.catch((err) => {
-  console.log('Error getting documents', error);
 });
+
 
 export { app, auth, analytics, firestore };

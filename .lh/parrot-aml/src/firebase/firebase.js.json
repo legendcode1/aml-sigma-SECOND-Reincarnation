@@ -3,11 +3,63 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 13,
             "patches": [
                 {
                     "date": 1737041504567,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1737124756313,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,10 +1,14 @@\n // src/firebase/firebase.js\r\n import { initializeApp, getApp, getApps } from 'firebase/app';\r\n import { getAnalytics } from 'firebase/analytics';\r\n import { getAuth } from 'firebase/auth'; // Add authentication\r\n-import { getFirestore } from 'firebase/firestore'; // Add Firestore\r\n+import { \r\n+  getFirestore,\r\n+  collection,\r\n \r\n+} from 'firebase/firestore'; // Add Firestore\r\n+\r\n const firebaseConfig = {\r\n   apiKey: \"AIzaSyBfku8hikwXrII_Uv2u0pL6-f0a0a0mKr8\",\r\n   authDomain: \"datumcorp-aml.firebaseapp.com\",\r\n   projectId: \"datumcorp-aml\",\r\n@@ -23,7 +27,7 @@\n }\r\n \r\n const analytics = getAnalytics(app);\r\n const auth = getAuth(app); // Initialize Auth service\r\n-const firestore = getFirestore(app); // Initialize Firestore\r\n+const firestore = getFirestore(); // Initialize Firestore\r\n \r\n export { app, auth, analytics, firestore };\r\n"
+                },
+                {
+                    "date": 1737125167275,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,9 +4,9 @@\n import { getAuth } from 'firebase/auth'; // Add authentication\r\n import { \r\n   getFirestore,\r\n   collection,\r\n-\r\n+  addDoc,\r\n } from 'firebase/firestore'; // Add Firestore\r\n \r\n const firebaseConfig = {\r\n   apiKey: \"AIzaSyBfku8hikwXrII_Uv2u0pL6-f0a0a0mKr8\",\r\n@@ -27,7 +27,10 @@\n }\r\n \r\n const analytics = getAnalytics(app);\r\n const auth = getAuth(app); // Initialize Auth service\r\n-const firestore = getFirestore(); // Initialize Firestore\r\n+const firestore = getFirestore(app); // Initialize Firestore\r\n \r\n+const db = getFirestore(); \r\n+const colref = collection(db, 'users');\r\n+\r\n export { app, auth, analytics, firestore };\r\n"
+                },
+                {
+                    "date": 1737125479090,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,9 +4,9 @@\n import { getAuth } from 'firebase/auth'; // Add authentication\r\n import { \r\n   getFirestore,\r\n   collection,\r\n-  addDoc,\r\n+  getDocs\r\n } from 'firebase/firestore'; // Add Firestore\r\n \r\n const firebaseConfig = {\r\n   apiKey: \"AIzaSyBfku8hikwXrII_Uv2u0pL6-f0a0a0mKr8\",\r\n@@ -30,7 +30,11 @@\n const auth = getAuth(app); // Initialize Auth service\r\n const firestore = getFirestore(app); // Initialize Firestore\r\n \r\n const db = getFirestore(); \r\n-const colref = collection(db, 'users');\r\n+const colref = collection(db, 'users');\\\r\n+getDocs(colref).then((snapshot) => { \r\n+  console.log(snapshot.docs); \r\n+});\r\n \r\n+\r\n export { app, auth, analytics, firestore };\r\n"
+                },
+                {
+                    "date": 1737125485141,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -30,9 +30,9 @@\n const auth = getAuth(app); // Initialize Auth service\r\n const firestore = getFirestore(app); // Initialize Firestore\r\n \r\n const db = getFirestore(); \r\n-const colref = collection(db, 'users');\\\r\n+const colref = collection(db, 'users');\r\n getDocs(colref).then((snapshot) => { \r\n   console.log(snapshot.docs); \r\n });\r\n \r\n"
+                },
+                {
+                    "date": 1737125813754,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -30,11 +30,11 @@\n const auth = getAuth(app); // Initialize Auth service\r\n const firestore = getFirestore(app); // Initialize Firestore\r\n \r\n const db = getFirestore(); \r\n-const colref = collection(db, 'users');\r\n+const colref = collection(db, 'users');\\\r\n getDocs(colref).then((snapshot) => { \r\n-  console.log(snapshot.docs); \r\n+  console.log(snapshot.docs.map(doc => doc.data())); \r\n });\r\n \r\n \r\n export { app, auth, analytics, firestore };\r\n"
+                },
+                {
+                    "date": 1737125848591,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -30,9 +30,9 @@\n const auth = getAuth(app); // Initialize Auth service\r\n const firestore = getFirestore(app); // Initialize Firestore\r\n \r\n const db = getFirestore(); \r\n-const colref = collection(db, 'users');\\\r\n+const colref = collection(db, 'users');\r\n getDocs(colref).then((snapshot) => { \r\n   console.log(snapshot.docs.map(doc => doc.data())); \r\n });\r\n \r\n"
+                },
+                {
+                    "date": 1737126217224,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -32,9 +32,13 @@\n \r\n const db = getFirestore(); \r\n const colref = collection(db, 'users');\r\n getDocs(colref).then((snapshot) => { \r\n-  console.log(snapshot.docs.map(doc => doc.data())); \r\n+  console.log(snapshot.docs.map(doc => doc.data()));\r\n+  let users = []\r\n+  snapshot.docs.forEach(doc => {\r\n+    users.push(...doc.data());\r\n+  });\r\n });\r\n \r\n \r\n export { app, auth, analytics, firestore };\r\n"
+                },
+                {
+                    "date": 1737126278447,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -35,9 +35,9 @@\n getDocs(colref).then((snapshot) => { \r\n   console.log(snapshot.docs.map(doc => doc.data()));\r\n   let users = []\r\n   snapshot.docs.forEach(doc => {\r\n-    users.push(...doc.data());\r\n+    users.push({ ...doc.data(), id: doc.id });\r\n   });\r\n });\r\n \r\n \r\n"
+                },
+                {
+                    "date": 1737126361967,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -37,8 +37,9 @@\n   let users = []\r\n   snapshot.docs.forEach(doc => {\r\n     users.push({ ...doc.data(), id: doc.id });\r\n   });\r\n+  console.log(users);\r\n });\r\n \r\n \r\n export { app, auth, analytics, firestore };\r\n"
+                },
+                {
+                    "date": 1737126385807,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -40,6 +40,9 @@\n   });\r\n   console.log(users);\r\n });\r\n \r\n+.catch((error) => {\r\n+  console.log('Error getting documents', error);\r\n+});\r\n \r\n export { app, auth, analytics, firestore };\r\n"
+                },
+                {
+                    "date": 1737127258945,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -40,9 +40,9 @@\n   });\r\n   console.log(users);\r\n });\r\n \r\n-.catch((error) => {\r\n+.catch((err) => {\r\n   console.log('Error getting documents', error);\r\n });\r\n \r\n export { app, auth, analytics, firestore };\r\n"
+                },
+                {
+                    "date": 1737127358891,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -39,9 +39,8 @@\n     users.push({ ...doc.data(), id: doc.id });\r\n   });\r\n   console.log(users);\r\n });\r\n-\r\n .catch((err) => {\r\n   console.log('Error getting documents', error);\r\n });\r\n \r\n"
+                },
+                {
+                    "date": 1737127375939,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -38,9 +38,9 @@\n   snapshot.docs.forEach(doc => {\r\n     users.push({ ...doc.data(), id: doc.id });\r\n   });\r\n   console.log(users);\r\n-});\r\n+})\r\n .catch((err) => {\r\n   console.log('Error getting documents', error);\r\n });\r\n \r\n"
                 }
             ],
             "date": 1737041504567,

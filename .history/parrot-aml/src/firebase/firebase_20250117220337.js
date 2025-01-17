@@ -36,12 +36,9 @@ getDocs(colref).then((snapshot) => {
   console.log(snapshot.docs.map(doc => doc.data()));
   let users = []
   snapshot.docs.forEach(doc => {
-    users.push({ ...doc.data(), id: doc.id });
+    users.push(...doc.data());
   });
-  console.log(users);
-})
-.catch((err) => {
-  console.log('Error getting documents', error);
 });
+
 
 export { app, auth, analytics, firestore };

@@ -5,7 +5,7 @@ import { getAuth } from 'firebase/auth'; // Add authentication
 import { 
   getFirestore,
   collection,
-  getDocs
+
 } from 'firebase/firestore'; // Add Firestore
 
 const firebaseConfig = {
@@ -28,20 +28,6 @@ if (getApps().length === 0) {
 
 const analytics = getAnalytics(app);
 const auth = getAuth(app); // Initialize Auth service
-const firestore = getFirestore(app); // Initialize Firestore
-
-const db = getFirestore(); 
-const colref = collection(db, 'users');
-getDocs(colref).then((snapshot) => { 
-  console.log(snapshot.docs.map(doc => doc.data()));
-  let users = []
-  snapshot.docs.forEach(doc => {
-    users.push({ ...doc.data(), id: doc.id });
-  });
-  console.log(users);
-})
-.catch((err) => {
-  console.log('Error getting documents', error);
-});
+const firestore = getFirestore(); // Initialize Firestore
 
 export { app, auth, analytics, firestore };

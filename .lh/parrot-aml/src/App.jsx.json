@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 23,
+            "activePatchIndex": 24,
             "patches": [
                 {
                     "date": 1735329591986,
@@ -100,6 +100,10 @@
                 {
                     "date": 1737041315348,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,8 @@\n import React, { useState, useEffect } from 'react';\n import './App.css';\n import { Route, Routes, useNavigate } from 'react-router-dom';\n-import { app, firestore } from './firebase'; // Correct import for app and firestore\n+import { app, firestore } from './firebase/firebase'; // Correct import for app and firestore\n import LeftBar from './Component/LeftBar';\n import MainInterface from './Component/MainInterface';\n import LoginPage from './login system/LoginPage';\n import { getAuth, onAuthStateChanged } from 'firebase/auth';\n"
+                },
+                {
+                    "date": 1737123529592,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -8,10 +8,10 @@\n import { getAuth, onAuthStateChanged } from 'firebase/auth';\n \n // Domain-to-client_id mapping\n const domainClientMapping = {\n-  'transinergi.com': { client_id: 'client-id-transinergi', 'company-name': 'Trans Sinergi' },\n-  'datum.com': { client_id: 'client-id-datum', 'company-name': 'DatumCorp' }\n+  'transinergi.com': { client_id: 'company-id-transinergi', 'company-name': 'Trans Sinergi' },\n+  'datum.com': { client_id: 'company-id-datum', 'company-name': 'DatumCorp' }\n };\n \n const App = () => {\n   const [searchParams, setSearchParams] = useState({\n"
                 }
             ],
             "date": 1735329591986,

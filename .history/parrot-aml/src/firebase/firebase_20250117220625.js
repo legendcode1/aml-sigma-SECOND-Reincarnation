@@ -39,8 +39,9 @@ getDocs(colref).then((snapshot) => {
     users.push({ ...doc.data(), id: doc.id });
   });
   console.log(users);
-})
-.catch((err) => {
+});
+
+.catch((error) => {
   console.log('Error getting documents', error);
 });
 
