@@ -1,0 +1,101 @@
+.ImportantMessages {
+    width: 100%;
+    height: 100%;
+    padding: 64px 112.5px 0 112px; /* Reduced padding by half */
+    background: #243541;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .LoginPadding {
+    width: 100%;
+    padding: 271.5px 426.5px; /* Reduced padding by half */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px; /* Reduced gap by half */
+  }
+  
+  .LoginSection {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 5px; /* Reduced gap by half */
+  }
+  
+  .WelcomeText {
+    color: white;
+    font-size: 75px; /* Reduced font size by half */
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+  }
+  
+  .Frame34 {
+    padding: 31px 26.5px; /* Reduced padding by half */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 5px; /* Reduced gap by half */
+  }
+  
+  .EmailColumn,
+  .PasswordColumn {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 6px; /* Reduced gap by half */
+  }
+  
+  .EmailAddress,
+  .Password {
+    color: white;
+    font-size: 35px; /* Reduced font size by half */
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+  }
+  
+  .InputField {
+    width: 750px; /* Scaled width */
+    height: 84px; /* Scaled height */
+    background: #d9d9d9;
+    border: none;
+    padding: 8px; /* Padding for user comfort */
+    font-size: 28px; /* Larger font size for input text */
+    font-family: 'JetBrains Mono', monospace; /* Matching font style */
+    color: #000; /* Text color for better visibility */
+    outline: none; /* Removes default focus outline */
+    border-radius: 4px; /* Optional: Add rounded corners */
+  }
+  
+  .SubmitSection {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 43.5px 0; /* Reduced padding by half */
+  }
+  
+  .SubmitButton {
+    width: 504.5px; /* Reduced width by half */
+    height: 56px; /* Reduced height by half */
+    background: #314a57;
+    color: white;
+    font-size: 35px; /* Reduced font size by half */
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .ErrorMessage {
+    color: red;
+    font-size: 8px; /* Reduced font size by half */
+    margin-top: 10px; /* Reduced margin by half */
+  }
+  

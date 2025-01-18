@@ -1,0 +1,109 @@
+.ImportantMessages {
+    width: 100%;
+    height: 100vh; /* Ensures the page takes up the full viewport height */
+    padding: 32px 10%; /* Flexible padding */
+    background: #243541;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .LoginPadding {
+    width: 100%;
+    height: 80%; /* Occupies 80% of the available height */
+    padding: 5% 15%; /* Adjusted for proportional scaling */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2.5px; /* Reduced gap */
+  }
+  
+  .LoginSection {
+    width: 50%;
+    height: auto; /* Automatically adjusts based on content */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 2.5px; /* Reduced gap */
+  }
+  
+  .WelcomeText {
+    color: white;
+    font-size: 37.5px; /* Reduced font size */
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    text-align: center;
+  }
+  
+  .Frame34 {
+    padding: 15.5px 13.25px; /* Reduced padding */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 2.5px; /* Reduced gap */
+    width: 100%; /* Ensures the form stretches properly */
+  }
+  
+  .EmailColumn,
+  .PasswordColumn {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 3px; /* Reduced gap */
+    width: 100%; /* Full-width columns */
+  }
+  
+  .EmailAddress,
+  .Password {
+    color: white;
+    font-size: 17.5px; /* Reduced font size */
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+  }
+  
+  .InputField {
+    width: 100%; /* Input fields now adapt to parent width */
+    max-width: 375px; /* Caps the input width */
+    height: 42px; /* Scaled height */
+    background: #d9d9d9;
+    border: none;
+    padding: 4px; /* Padding for user comfort */
+    font-size: 14px; /* Smaller font size for input text */
+    font-family: 'JetBrains Mono', monospace;
+    color: #000; /* Text color for better visibility */
+    outline: none; /* Removes default focus outline */
+    border-radius: 4px; /* Optional: Add rounded corners */
+  }
+  
+  .SubmitSection {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 21.75px 0; /* Reduced padding */
+    width: 100%; /* Ensures the button aligns properly */
+  }
+  
+  .SubmitButton {
+    width: 100%; /* Button now stretches with parent */
+    max-width: 252.25px; /* Caps the width for better usability */
+    height: 28px; /* Reduced height */
+    background: #314a57;
+    color: white;
+    font-size: 17.5px; /* Reduced font size */
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .ErrorMessage {
+    color: red;
+    font-size: 4px; /* Reduced font size */
+    margin-top: 5px; /* Reduced margin */
+    text-align: center; /* Centers error messages */
+  }
+  

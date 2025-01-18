@@ -1,0 +1,128 @@
+.ImportantMessages {
+    width: 100%;
+    height: 100vh; /* Full viewport height */
+    padding: 32px; /* Adjusted padding for breathing room */
+    background: #243541;
+    display: flex;
+    justify-content: center; /* Centers horizontally */
+    align-items: center; /* Centers vertically */
+    flex-direction: column; /* Ensures stacked layout */
+  }
+
+.LogoSection {
+    position: absolute;
+    top: 20px; /* Distance from the top */
+    right: 20px; /* Distance from the right */
+    display: flex;
+    justify-content:flex-start; /* Ensures the logo is aligned to the right */
+    align-items: center;
+    margin-bottom: 30px;
+    width: auto;
+}
+
+.CompanyLogo {
+    max-width: 100px; /* Restrict max width for better look */
+    height: auto; /* Maintain aspect ratio */
+}
+
+.LoginPadding {
+    width: 100%;
+    max-width: 800px; /* Restrict width for better readability */
+    height: auto; /* Allow content height to adjust */
+    padding: 5% 10%; /* Balanced padding */
+    display: flex;
+    flex-direction: column; /* Stacks items vertically */
+    justify-content: center; /* Center inner content vertically */
+    align-items: center; /* Center inner content horizontally */
+    gap: 10px; /* Small gap between elements */
+}
+
+.LoginSection {
+    width: 100%;
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    justify-content: center; /* Centers inner elements vertically */
+    align-items: center; /* Centers inner elements horizontally */
+    gap: 10px;
+}
+
+.WelcomeText {
+    color: white;
+    font-size: 40px; /* Adjust font size */
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    text-align: center; /* Centers text */
+}
+
+.Frame34 {
+    width: 100%;
+    max-width: 400px; /* Restricts width for better layout */
+    padding: 16px; /* Adjusted padding */
+    display: flex;
+    flex-direction: column; /* Stacks elements */
+    justify-content: flex-start;
+    align-items: stretch; /* Aligns to fill parent width */
+    gap: 10px; /* Add space between input fields */
+}
+
+.EmailColumn,
+.PasswordColumn {
+    width: 100%; /* Ensure full width for consistency */
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Small gap between label and input */
+}
+
+.EmailAddress,
+.Password {
+    color: white;
+    font-size: 18px; /* Smaller font size for labels */
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+}
+
+.InputField {
+    width: 100%; /* Input fields fill parent width */
+    height: 45px; /* Slightly larger for usability */
+    background: #d9d9d9;
+    border: none;
+    padding: 8px; /* Comfortable padding */
+    font-size: 16px; /* Balanced font size */
+    font-family: 'JetBrains Mono', monospace;
+    color: #000;
+    outline: none;
+    border-radius: 4px; /* Smooth corners */
+}
+
+.SubmitSection {
+    width: 100%;
+    display: flex;
+    justify-content: center; /* Centers the button */
+    align-items: center;
+    margin-top: 20px; /* Space above button */
+}
+
+.SubmitButton {
+    width: 100%;
+    max-width: 200px; /* Restrict button width */
+    height: 50px; /* Comfortable button height */
+    background: #314a57;
+    color: white;
+    font-size: 18px; /* Readable font size */
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.SubmitButton:hover {
+    background: #2a3d47;
+}
+
+.ErrorMessage {
+    color: red;
+    font-size: 12px; /* Adjusted for visibility */
+    margin-top: 10px;
+    text-align: center; /* Center error message */
+}

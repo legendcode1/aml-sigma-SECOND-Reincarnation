@@ -1,0 +1,34 @@
+/* In your LoginSection.css file */
+
+.login-section {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  width: 1400px;
+  height: 76px;
+  background-color: #fff;
+  padding: 0 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.login-text {
+  font-size: 24px;
+  font-weight: bold;
+  color: #000;
+}
+
+.login-icon {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background-color: #ccc;
+  margin-left: 10px;
+}
+
+.company-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #000;
+  margin-left: 10px;
+  text-transform: capitalize;
+}

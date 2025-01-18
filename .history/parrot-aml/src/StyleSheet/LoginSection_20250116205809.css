@@ -1,0 +1,22 @@
+.login-section {
+  display: flex; /* Enables Flexbox */
+  flex-direction: column; /* Arrange children vertically */
+  align-items: center; /* Horizontally centers children */
+  justify-content: center; /* Vertically centers children */
+  height: 100vh; /* Set height to full viewport (or adjust as needed) */
+}
+
+.login-text {
+  font-size: 1.5rem; /* Adjust font size as needed */
+  margin-bottom: 1rem; /* Optional: Add spacing below the span */
+}
+
+.login-icon {
+  width: 50px; /* Adjust size as needed */
+  height: 50px; /* Adjust size as needed */
+  margin-bottom: 1rem; /* Optional: Add spacing below the image */
+}
+
+.company-name {
+  font-size: 1rem; /* Adjust size as needed */
+}

@@ -3,6 +3,8 @@
     "gh-pages": "^6.2.0"
   },
   "dependencies": {
-    "react-markdown": "^9.0.1"
+    "firebase": "^11.1.0",
+    "react-markdown": "^9.0.1",
+    "react-router-dom": "^7.1.1"
   }
 }
