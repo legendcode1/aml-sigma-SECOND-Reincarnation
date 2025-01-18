@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 13,
+            "activePatchIndex": 18,
             "patches": [
                 {
                     "date": 1737041504567,
@@ -60,6 +60,26 @@
                 {
                     "date": 1737127375939,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -38,9 +38,9 @@\n   snapshot.docs.forEach(doc => {\r\n     users.push({ ...doc.data(), id: doc.id });\r\n   });\r\n   console.log(users);\r\n-});\r\n+})\r\n .catch((err) => {\r\n   console.log('Error getting documents', error);\r\n });\r\n \r\n"
+                },
+                {
+                    "date": 1737128542537,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,56 @@\n+// src/firebase/firebase.js\r\n+import { initializeApp, getApp, getApps } from 'firebase/app';\r\n+import { getAnalytics } from 'firebase/analytics';\r\n+import { getAuth } from 'firebase/auth'; // Add authentication\r\n+import { \r\n+  getFirestore,\r\n+  collection,\r\n+  getDocs\r\n+} from 'firebase/firestore'; // Add Firestore\r\n+\r\n+const firebaseConfig = {\r\n+  apiKey: \"AIzaSyBfku8hikwXrII_Uv2u0pL6-f0a0a0mKr8\",\r\n+  authDomain: \"datumcorp-aml.firebaseapp.com\",\r\n+  projectId: \"datumcorp-aml\",\r\n+  storageBucket: \"datumcorp-aml.appspot.com\",\r\n+  messagingSenderId: \"710428028162\",\r\n+  appId: \"1:710428028162:web:486e3aad77de49d0d8261b\",\r\n+  measurementId: \"G-KSL9Y2V3HX\"\r\n+};\r\n+\r\n+// Initialize Firebase only if not already initialized\r\n+let app;\r\n+if (getApps().length === 0) {\r\n+  app = initializeApp(firebaseConfig);\r\n+} else {\r\n+  app = getApp();\r\n+}\r\n+\r\n+const analytics = getAnalytics(app);\r\n+const auth = getAuth(app); // Initialize Auth service\r\n+const firestore = getFirestore(app); // Initialize Firestore\r\n+\r\n+\r\n+// Firestore query\r\n+const db = getFirestore(); \r\n+const colref = collection(db, 'users');\r\n+getDocs(colref).then((snapshot) => { \r\n+  console.log(snapshot.docs.map(doc => doc.data()));\r\n+  let users = []\r\n+  snapshot.docs.forEach(doc => {\r\n+    users.push({ ...doc.data(), id: doc.id });\r\n+  });\r\n+  console.log(users);\r\n+})\r\n+.catch((err) => {\r\n+  console.log('Error getting documents', error);\r\n+});\r\n+\r\n+export { app, auth, analytics, firestore };\r\n+\r\n+// adding documents\r\n+const addBookForm = document.querySelector('.add-input');\r\n+addBookForm.addEventListener('submit', async (e) => {\r\n+  e.preventDefault();\r\n+});\r\n+\r\n"
+                },
+                {
+                    "date": 1737128943590,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,11 +2,10 @@\n import { initializeApp, getApp, getApps } from 'firebase/app';\r\n import { getAnalytics } from 'firebase/analytics';\r\n import { getAuth } from 'firebase/auth'; // Add authentication\r\n import { \r\n-  getFirestore,\r\n-  collection,\r\n-  getDocs\r\n+  getFirestore, collection, getDocs,\r\n+  addDoc\r\n } from 'firebase/firestore'; // Add Firestore\r\n \r\n const firebaseConfig = {\r\n   apiKey: \"AIzaSyBfku8hikwXrII_Uv2u0pL6-f0a0a0mKr8\",\r\n@@ -53,51 +52,4 @@\n addBookForm.addEventListener('submit', async (e) => {\r\n   e.preventDefault();\r\n });\r\n \r\n-// src/firebase/firebase.js\r\n-import { initializeApp, getApp, getApps } from 'firebase/app';\r\n-import { getAnalytics } from 'firebase/analytics';\r\n-import { getAuth } from 'firebase/auth'; // Add authentication\r\n-import { \r\n-  getFirestore,\r\n-  collection,\r\n-  getDocs\r\n-} from 'firebase/firestore'; // Add Firestore\r\n-\r\n-const firebaseConfig = {\r\n-  apiKey: \"AIzaSyBfku8hikwXrII_Uv2u0pL6-f0a0a0mKr8\",\r\n-  authDomain: \"datumcorp-aml.firebaseapp.com\",\r\n-  projectId: \"datumcorp-aml\",\r\n-  storageBucket: \"datumcorp-aml.appspot.com\",\r\n-  messagingSenderId: \"710428028162\",\r\n-  appId: \"1:710428028162:web:486e3aad77de49d0d8261b\",\r\n-  measurementId: \"G-KSL9Y2V3HX\"\r\n-};\r\n-\r\n-// Initialize Firebase only if not already initialized\r\n-let app;\r\n-if (getApps().length === 0) {\r\n-  app = initializeApp(firebaseConfig);\r\n-} else {\r\n-  app = getApp();\r\n-}\r\n-\r\n-const analytics = getAnalytics(app);\r\n-const auth = getAuth(app); // Initialize Auth service\r\n-const firestore = getFirestore(app); // Initialize Firestore\r\n-\r\n-const db = getFirestore(); \r\n-const colref = collection(db, 'users');\r\n-getDocs(colref).then((snapshot) => { \r\n-  console.log(snapshot.docs.map(doc => doc.data()));\r\n-  let users = []\r\n-  snapshot.docs.forEach(doc => {\r\n-    users.push({ ...doc.data(), id: doc.id });\r\n-  });\r\n-  console.log(users);\r\n-})\r\n-.catch((err) => {\r\n-  console.log('Error getting documents', error);\r\n-});\r\n-\r\n-export { app, auth, analytics, firestore };\r\n"
+                },
+                {
+                    "date": 1737129808174,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -46,10 +46,4 @@\n });\r\n \r\n export { app, auth, analytics, firestore };\r\n \r\n-// adding documents\r\n-const addBookForm = document.querySelector('.add-input');\r\n-addBookForm.addEventListener('submit', async (e) => {\r\n-  e.preventDefault();\r\n-});\r\n-\r\n"
+                },
+                {
+                    "date": 1737136341932,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,11 +1,10 @@\n // src/firebase/firebase.js\r\n import { initializeApp, getApp, getApps } from 'firebase/app';\r\n import { getAnalytics } from 'firebase/analytics';\r\n-import { getAuth } from 'firebase/auth'; // Add authentication\r\n+import { getAuth } from '../auth/auth'; // Add authentication\r\n import { \r\n   getFirestore, collection, getDocs,\r\n-  addDoc\r\n } from 'firebase/firestore'; // Add Firestore\r\n \r\n const firebaseConfig = {\r\n   apiKey: \"AIzaSyBfku8hikwXrII_Uv2u0pL6-f0a0a0mKr8\",\r\n"
+                },
+                {
+                    "date": 1737136548343,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,10 +1,11 @@\n // src/firebase/firebase.js\r\n import { initializeApp, getApp, getApps } from 'firebase/app';\r\n import { getAnalytics } from 'firebase/analytics';\r\n-import { getAuth } from '../auth/auth'; // Add authentication\r\n+import { getAuth } from 'firebase/auth'; // Add authentication\r\n import { \r\n   getFirestore, collection, getDocs,\r\n+  addDoc\r\n } from 'firebase/firestore'; // Add Firestore\r\n \r\n const firebaseConfig = {\r\n   apiKey: \"AIzaSyBfku8hikwXrII_Uv2u0pL6-f0a0a0mKr8\",\r\n@@ -45,4 +46,5 @@\n });\r\n \r\n export { app, auth, analytics, firestore };\r\n \r\n+\r\n"
                 }
             ],
             "date": 1737041504567,

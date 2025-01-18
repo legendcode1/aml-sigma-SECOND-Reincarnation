@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 14,
+            "activePatchIndex": 15,
             "patches": [
                 {
                     "date": 1737025658907,
@@ -64,6 +64,10 @@
                 {
                     "date": 1737047611892,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -9,20 +9,24 @@\n   useEffect(() => {\r\n     const storedUserName = localStorage.getItem('userName');\r\n     const storedCompanyName = localStorage.getItem('companyName');\r\n \r\n+    // Log values for debugging\r\n+    console.log(\"Stored userName:\", storedUserName);\r\n+    console.log(\"Stored companyName:\", storedCompanyName);\r\n+\r\n     if (storedUserName) {\r\n-      setUserName(storedUserName); // Update user name\r\n+      setUserName(storedUserName); // Update user name if available\r\n     }\r\n \r\n     if (storedCompanyName) {\r\n-      setCompanyName(storedCompanyName); // Update company name\r\n+      setCompanyName(storedCompanyName); // Update company name if available\r\n     }\r\n   }, []);\r\n \r\n   return (\r\n     <div className=\"login-section\" onClick={onClick}>\r\n-      <span className=\"login-text\">Welcome {userName} from {companyName}</span> {/* Display dynamic userName and companyName */}\r\n+      <span className=\"login-text\">{userName} from {companyName}</span> {/* Display dynamic userName and companyName */}\r\n       <img \r\n         src=\"/main-interface/login-icon.png\" \r\n         alt=\"Login Icon\" \r\n         className=\"login-icon\"\r\n"
+                },
+                {
+                    "date": 1737232668020,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,38 @@\n+import React, { useEffect, useState } from 'react';\r\n+import '../StyleSheet/LoginSection.css';\r\n+\r\n+const LoginSection = ({ loginText = \"Login\", onClick = () => console.log(\"Login clicked\") }) => {\r\n+  const [companyName, setCompanyName] = useState(\"Unknown Company\");\r\n+  const [userName, setUserName] = useState(\"SIGMA\");\r\n+\r\n+  // Fetch user data from localStorage when the component mounts\r\n+  useEffect(() => {\r\n+    const storedUserName = localStorage.getItem('user_name');\r\n+    const storedCompanyName = localStorage.getItem('company_name');\r\n+\r\n+    // Log values for debugging\r\n+    console.log(\"Stored userName:\", storedUserName);\r\n+    console.log(\"Stored companyName:\", storedCompanyName);\r\n+\r\n+    if (storedUserName) {\r\n+      setUserName(storedUserName); // Update user name if available\r\n+    }\r\n+\r\n+    if (storedCompanyName) {\r\n+      setCompanyName(storedCompanyName); // Update company name if available\r\n+    }\r\n+  }, []);\r\n+\r\n+  return (\r\n+    <div className=\"login-section\" onClick={onClick}>\r\n+      <span className=\"login-text\">{userName} from {companyName}</span> {/* Display dynamic userName and companyName */}\r\n+      <img \r\n+        src=\"/main-interface/login-icon.png\" \r\n+        alt=\"Login Icon\" \r\n+        className=\"login-icon\"\r\n+      />\r\n+    </div>\r\n+  );\r\n+};\r\n+\r\n+export default LoginSection;\r\n"
                 }
             ],
             "date": 1737025658907,

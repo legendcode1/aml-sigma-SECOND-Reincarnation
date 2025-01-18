@@ -27,15 +27,8 @@ export const fetchUserDataByUID = async (uid) => {
     if (!userDoc.exists()) {
       throw new Error(`No user found with UID: ${uid}`);
     }
-    
+    localStorage.setItem('user_id', userDoc.uid); // Store user ID
     const userData = userDoc.data(); // Extract data from the user document
-
-    // Fetch 'name' field from user document
-    const userName = userData.name || 'Unknown User'; // Default to 'Unknown User' if name doesn't exist
-
-    localStorage.setItem('user_id', userData.uid); // Store user ID in localStorage
-    localStorage.setItem('user_name', userName); // Store user name in localStorage
-
     console.log('Fetched user data:', userData);
     return userData;
   } catch (error) {
@@ -55,9 +48,9 @@ export const fetchCompanyDataByID = async (companyId) => {
       throw new Error(`No company found with ID: ${companyId}`);
     }
 
-    // Assuming 'company_name' is the field name in Firestore
-    const companyName = companyDoc.data().company_name || 'Unknown'; // If 'company_name' is missing, default to 'Unknown'
-    localStorage.setItem('company_name', companyName); // Store company name if available
+
+    localStorage.setItem('company_name', companyDoc['company name'] || 'Unknown'); // Store company name if available
+
 
     const companyData = companyDoc.data(); // Extract data from the company document
     console.log('Fetched company data:', companyData);
@@ -106,6 +99,8 @@ export const loginUser = async (email, password) => {
 };
 
 // store minimal data in localStorage
+
+
 
 // Export auth and db for use in other modules
 export { auth, db };

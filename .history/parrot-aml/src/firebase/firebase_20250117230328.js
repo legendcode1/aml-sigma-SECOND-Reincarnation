@@ -47,4 +47,3 @@ getDocs(colref).then((snapshot) => {
 
 export { app, auth, analytics, firestore };
 
-

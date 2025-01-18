@@ -3,8 +3,9 @@ import { initializeApp, getApp, getApps } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
 import { getAuth } from 'firebase/auth'; // Add authentication
 import { 
-  getFirestore, collection, getDocs,
-  addDoc
+  getFirestore,
+  collection,
+  getDocs
 } from 'firebase/firestore'; // Add Firestore
 
 const firebaseConfig = {
@@ -47,4 +48,9 @@ getDocs(colref).then((snapshot) => {
 
 export { app, auth, analytics, firestore };
 
+// adding documents
+const addBookForm = document.querySelector('.add-input');
+addBookForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+});
 

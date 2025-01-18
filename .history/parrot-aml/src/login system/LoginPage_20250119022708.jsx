@@ -22,7 +22,7 @@ const LoginPage = () => {
 
       // Store minimal data in localStorage
       localStorage.setItem('user_id', user.uid); // Store user ID
-      localStorage.setItem('company_name', companyData['company name'] || 'Unknown'); // Store company name if available
+      localStorage.setItem('company_name', companyData['name'] || 'Unknown'); // Store company name if available
 
       // Redirect to the main page after login
       navigate('/main');

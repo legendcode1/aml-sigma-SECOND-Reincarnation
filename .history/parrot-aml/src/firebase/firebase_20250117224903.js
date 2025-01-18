@@ -47,4 +47,9 @@ getDocs(colref).then((snapshot) => {
 
 export { app, auth, analytics, firestore };
 
+// adding documents
+const addBookForm = document.querySelector('.add-input');
+addBookForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+});
 

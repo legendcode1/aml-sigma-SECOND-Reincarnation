@@ -1,31 +1,22 @@
+// src/Component/LoginPage.jsx
 import React, { useState } from 'react';
-import { loginUser } from '../auth/auth'; // Import the login function
+import { loginUser } from '../firebase/authService'; // Import the login function
 import { useNavigate } from 'react-router-dom';
 import './LoginPage.css'; // Import the CSS file
 
-const LoginPage = () => {
+const LoginPage = ({ companyName }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [companyName, setCompanyName] = useState(''); // Store company name
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault(); // Prevent the form from reloading the page
 
     try {
-      const { user, userData, companyData } = await loginUser(email, password); // Log in the user
+      const user = await loginUser(email, password); // Log in the user
       console.log('User logged in:', user);
-      
-      // Set the company name after login
-      setCompanyName(companyData['name'] || 'Unknown');
-
-      // Store minimal data in localStorage
-      localStorage.setItem('user_id', user.uid); // Store user ID
-      localStorage.setItem('company_name', companyData['company name'] || 'Unknown'); // Store company name if available
-
-      // Redirect to the main page after login
-      navigate('/main');
+      navigate('/main'); // Redirect to the main page after login
     } catch (err) {
       setError(err.message); // Display error message if login fails
     }

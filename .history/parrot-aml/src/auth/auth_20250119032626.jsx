@@ -30,8 +30,8 @@ export const fetchUserDataByUID = async (uid) => {
     
     const userData = userDoc.data(); // Extract data from the user document
 
-    // Fetch 'name' field from user document
-    const userName = userData.name || 'Unknown User'; // Default to 'Unknown User' if name doesn't exist
+    // Assuming 'user_name' is the field name in Firestore
+    const userName = userData.user_name || 'Unknown User'; // If 'user_name' is missing, default to 'Unknown User'
 
     localStorage.setItem('user_id', userData.uid); // Store user ID in localStorage
     localStorage.setItem('user_name', userName); // Store user name in localStorage

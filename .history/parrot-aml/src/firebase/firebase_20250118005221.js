@@ -1,10 +1,9 @@
 // src/firebase/firebase.js
 import { initializeApp, getApp, getApps } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
-import { getAuth } from 'firebase/auth'; // Add authentication
+import { getAuth } from '../auth/auth'; // Add authentication
 import { 
   getFirestore, collection, getDocs,
-  addDoc
 } from 'firebase/firestore'; // Add Firestore
 
 const firebaseConfig = {
@@ -46,5 +45,4 @@ getDocs(colref).then((snapshot) => {
 });
 
 export { app, auth, analytics, firestore };
-
 

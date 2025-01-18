@@ -27,15 +27,8 @@ export const fetchUserDataByUID = async (uid) => {
     if (!userDoc.exists()) {
       throw new Error(`No user found with UID: ${uid}`);
     }
-    
+
     const userData = userDoc.data(); // Extract data from the user document
-
-    // Fetch 'name' field from user document
-    const userName = userData.name || 'Unknown User'; // Default to 'Unknown User' if name doesn't exist
-
-    localStorage.setItem('user_id', userData.uid); // Store user ID in localStorage
-    localStorage.setItem('user_name', userName); // Store user name in localStorage
-
     console.log('Fetched user data:', userData);
     return userData;
   } catch (error) {
@@ -44,29 +37,7 @@ export const fetchUserDataByUID = async (uid) => {
   }
 };
 
-// Function to fetch company data by company ID
-export const fetchCompanyDataByID = async (companyId) => {
-  try {
-    const companyDocRef = doc(db, 'client', companyId); // Reference to 'client' document
-    console.log(`Attempting to fetch client data for company ID: ${companyId}`);
-    const companyDoc = await getDoc(companyDocRef); // Fetch company document
 
-    if (!companyDoc.exists()) {
-      throw new Error(`No company found with ID: ${companyId}`);
-    }
-
-    // Assuming 'company_name' is the field name in Firestore
-    const companyName = companyDoc.data().company_name || 'Unknown'; // If 'company_name' is missing, default to 'Unknown'
-    localStorage.setItem('company_name', companyName); // Store company name if available
-
-    const companyData = companyDoc.data(); // Extract data from the company document
-    console.log('Fetched company data:', companyData);
-    return companyData;
-  } catch (error) {
-    console.error('Error fetching company data:', error.message);
-    throw error;
-  }
-};
 
 // Function to handle login and fetch related data
 export const loginUser = async (email, password) => {
@@ -86,8 +57,8 @@ export const loginUser = async (email, password) => {
     // Log the fetched user data to confirm the structure
     console.log('Fetched user data:', userData);
 
-    // Check if 'company' field exists in the user data
-    const companyId = userData['company id']; // Ensure this field exists in Firestore, not 'company id'
+    // Check if 'company id' exists in the user data
+    const companyId = userData['company id']; // Ensure this field exists in Firestore
     if (!companyId) {
       throw new Error('Company ID not found in user data.');
     }
@@ -105,7 +76,25 @@ export const loginUser = async (email, password) => {
   }
 };
 
-// store minimal data in localStorage
+// Function to fetch company data by company ID
+export const fetchCompanyDataByID = async (companyId) => {
+  try {
+    const companyDocRef = doc(db, 'client', companyId); // Reference to 'client' document
+    console.log(`Attempting to fetch client data for company ID: ${companyId}`);
+    const companyDoc = await getDoc(companyDocRef); // Fetch company document
+
+    if (!companyDoc.exists()) {
+      throw new Error(`No company found with ID: ${companyId}`);
+    }
+
+    const companyData = companyDoc.data(); // Extract data from the company document
+    console.log('Fetched company data:', companyData);
+    return companyData;
+  } catch (error) {
+    console.error('Error fetching company data:', error.message);
+    throw error;
+  }
+};
 
 // Export auth and db for use in other modules
 export { auth, db };
