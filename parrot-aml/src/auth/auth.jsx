@@ -1,6 +1,8 @@
+// filepath: /c:/Users/Ananta Anugrah/Desktop/aml sigma SECOND Reincarnation/parrot-aml/src/auth/auth.jsx
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, getDoc } from 'firebase/firestore'; // Import Firestore functions
+import { getFirestore, doc, getDoc, collection, getDocs } from 'firebase/firestore'; // Import Firestore functions
+import { loadChatMessagesFirestore } from '../indexedDB'; // Import the function from indexedDB.js
 
 // Firebase configuration
 const firebaseConfig = {
@@ -68,6 +70,29 @@ export const fetchCompanyDataByID = async (companyId) => {
   }
 };
 
+// Function to fetch chat history for a company
+export const fetchChatHistoryByCompanyID = async (companyId) => {
+  try {
+    const chatHistoryCollectionRef = collection(db, 'client', companyId, 'chat_history'); // Reference to 'chat_history' subcollection
+    const chatHistorySnapshot = await getDocs(chatHistoryCollectionRef);
+
+    if (chatHistorySnapshot.empty) {
+      throw new Error(`No chat history found for company ID: ${companyId}`);
+    }
+
+    const chatHistory = chatHistorySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Extract chat history data
+    console.log('Fetched chat history:', chatHistory);
+
+    // Load chat history into IndexedDB
+    await loadChatMessagesFirestore(chatHistory);
+
+    return chatHistory;
+  } catch (error) {
+    console.error('Error fetching chat history:', error.message);
+    throw error;
+  }
+};
+
 // Function to handle login and fetch related data
 export const loginUser = async (email, password) => {
   try {
@@ -96,16 +121,15 @@ export const loginUser = async (email, password) => {
 
     // Fetch company data using the 'company id'
     const companyData = await fetchCompanyDataByID(companyId);
+    const chatHistory = await fetchChatHistoryByCompanyID(companyId);
 
     // Return user and company data for further use
-    return { user, userData, companyData };
+    return { user, userData, companyData, chatHistory };
   } catch (error) {
     console.error('Login failed:', error.message);
     throw error;
   }
 };
-
-// store minimal data in localStorage
 
 // Export auth and db for use in other modules
 export { auth, db };

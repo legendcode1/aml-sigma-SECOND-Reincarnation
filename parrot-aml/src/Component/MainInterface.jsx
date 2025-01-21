@@ -1,13 +1,16 @@
+// filepath: /c:/Users/Ananta Anugrah/Desktop/aml sigma SECOND Reincarnation/parrot-aml/src/Component/MainInterface.jsx
 import React, { useEffect, useState } from 'react';
 import '../StyleSheet/MainInterface.css'; // Import the CSS file
 import ChatBot from './ChatBot'; // Import the ChatBot component
 import MainLayout from './MainLayout'; // Import the MainLayout component
 import LoginSection from './LoginSection'; // Import the reusable LoginSection component
-import { useNavigate } from 'react-router-dom'; // To handle redirection
+import ChatHistory from './ChatHistory'; // Import the ChatHistory component
+import { useNavigate, useParams } from 'react-router-dom'; // To handle redirection and params
 import { getAuth, onAuthStateChanged } from 'firebase/auth'; // Firebase authentication
 
 const MainInterface = ({ submitted, searchParams, handleInputChange, saveData }) => {
   const navigate = useNavigate();
+  const { chatId } = useParams(); // Get chatId from URL params
   const [user, setUser] = useState(null); // Store authenticated user information
 
   useEffect(() => {
@@ -36,12 +39,16 @@ const MainInterface = ({ submitted, searchParams, handleInputChange, saveData })
 
       {/* Main Content */}
       <MainLayout>
-        <ChatBot 
-          submitted={submitted}
-          searchParams={searchParams}
-          handleInputChange={handleInputChange}
-          saveData={saveData}
-        />
+        {chatId ? (
+          <ChatHistory />
+        ) : (
+          <ChatBot 
+            submitted={submitted}
+            searchParams={searchParams}
+            handleInputChange={handleInputChange}
+            saveData={saveData}
+          />
+        )}
       </MainLayout>
 
       {/* Add other features like dashboard, save to PDF, etc. here */}

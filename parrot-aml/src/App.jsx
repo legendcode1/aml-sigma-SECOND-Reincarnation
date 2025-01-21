@@ -1,3 +1,4 @@
+// filepath: /c:/Users/Ananta Anugrah/Desktop/aml sigma SECOND Reincarnation/parrot-aml/src/App.jsx
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import { Route, Routes, useNavigate } from 'react-router-dom';
@@ -23,6 +24,7 @@ const App = () => {
   const [savedItems, setSavedItems] = useState([]);
   const [submitted, setSubmitted] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [initialAuthCheck, setInitialAuthCheck] = useState(false); // Track initial authentication check
   const navigate = useNavigate();
 
   // Get company name based on the domain
@@ -51,15 +53,18 @@ const App = () => {
       console.log('Auth state changed', user);
       if (user) {
         setIsAuthenticated(true); // User is authenticated
-        navigate('/main'); // Redirect to the main layout
+        if (!initialAuthCheck) {
+          navigate('/main'); // Redirect to the main layout only once
+        }
       } else {
         setIsAuthenticated(false); // User is not authenticated
         navigate('/login'); // Redirect to the login page
       }
+      setInitialAuthCheck(true); // Mark the initial authentication check as completed
     });
 
     return () => unsubscribe();
-  }, [navigate]);
+  }, [navigate, initialAuthCheck]);
 
   const resetApp = () => {
     console.log('Resetting app...');
@@ -82,7 +87,7 @@ const App = () => {
 
         {/* Main layout route (protected route) */}
         <Route
-          path="/main"
+          path="/main/*"
           element={
             isAuthenticated ? (
               <div className="main-parent">
@@ -90,12 +95,30 @@ const App = () => {
                   <LeftBar savedItems={savedItems} />
                 </div>
                 <div className="main-interface">
-                  <MainInterface
-                    submitted={submitted}
-                    searchParams={searchParams}
-                    handleInputChange={handleInputChange}
-                    saveData={saveData}
-                  />
+                  <Routes>
+                    <Route
+                      path="/"
+                      element={
+                        <MainInterface
+                          submitted={submitted}
+                          searchParams={searchParams}
+                          handleInputChange={handleInputChange}
+                          saveData={saveData}
+                        />
+                      }
+                    />
+                    <Route
+                      path="chat/:chatId"
+                      element={
+                        <MainInterface
+                          submitted={submitted}
+                          searchParams={searchParams}
+                          handleInputChange={handleInputChange}
+                          saveData={saveData}
+                        />
+                      }
+                    />
+                  </Routes>
                 </div>
               </div>
             ) : (
