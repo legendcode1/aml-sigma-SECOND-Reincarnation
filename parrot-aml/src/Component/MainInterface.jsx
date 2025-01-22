@@ -8,7 +8,7 @@ import ChatHistory from './ChatHistory'; // Import the ChatHistory component
 import { useNavigate, useParams } from 'react-router-dom'; // To handle redirection and params
 import { getAuth, onAuthStateChanged } from 'firebase/auth'; // Firebase authentication
 
-const MainInterface = ({ submitted, searchParams, handleInputChange, saveData }) => {
+const MainInterface = ({ submitted, searchParams, handleInputChange, saveData, resetApp }) => {
   const navigate = useNavigate();
   const { chatId } = useParams(); // Get chatId from URL params
   const [user, setUser] = useState(null); // Store authenticated user information
@@ -28,31 +28,30 @@ const MainInterface = ({ submitted, searchParams, handleInputChange, saveData })
   }, [navigate]);
 
   return (
-    <div className="main-interface">
+    <MainLayout>
       {/* Login Section */}
       <div className="login-section">
         <LoginSection 
           loginText={user ? `Welcome, ${user.displayName || "User"}` : "Please Log In"}
           onClick={() => console.log("Login section clicked!")}
+          onReset={resetApp} // Pass the resetApp function
         />
       </div>
 
       {/* Main Content */}
-      <MainLayout>
-        {chatId ? (
-          <ChatHistory />
-        ) : (
-          <ChatBot 
-            submitted={submitted}
-            searchParams={searchParams}
-            handleInputChange={handleInputChange}
-            saveData={saveData}
-          />
-        )}
-      </MainLayout>
+      {chatId ? (
+        <ChatHistory />
+      ) : (
+        <ChatBot 
+          submitted={submitted}
+          searchParams={searchParams}
+          handleInputChange={handleInputChange}
+          saveData={saveData}
+        />
+      )}
 
       {/* Add other features like dashboard, save to PDF, etc. here */}
-    </div>
+    </MainLayout>
   );
 };
 

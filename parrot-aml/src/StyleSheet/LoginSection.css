@@ -1,17 +1,13 @@
 .login-section {
   display: flex; /* Enable Flexbox */
-  align-items: center; /* Vertically align items in the center */
-  justify-content: space-between; /* Space between elements for proper layout */
-  width: 1400px; /* Set a fixed width */
+  justify-content: end; /* Space between elements for proper layout */
   height: 76px; /* Maintain the desired height */
-  padding: 0 20px; /* Horizontal padding for spacing */
 }
 
 .login-text {
   font-size: 24px; /* Keep a readable font size */
   font-weight: bold; /* Bold font for emphasis */
-  color: #fff; /* Black color for text */
-  margin-right: auto; /* Push this text to the left */
+  color: #fff; /* Black color for text */ 
 }
 
 .login-icon {
@@ -27,4 +23,27 @@
   color: #fff; /* Use a slightly softer color for the welcome text */
   margin: 0 auto; /* Center the text in its container */
   text-align: center; /* Align the text centrally */
+}
+
+
+.reset-button {
+  position: absolute;
+  align-items: center;
+  top: 80px;
+  transform: translateY(-50%);
+  padding: 5px 10px;
+  background-color: #f44336; /* Red background */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  display: none; /* Initially hidden */
+}
+
+.reset-button:hover {
+  background-color: #d32f2f;
+}
+
+.login-text:hover + .reset-button {
+  display: block; /* Show the reset button on hover */
 }

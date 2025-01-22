@@ -104,6 +104,7 @@ const App = () => {
                           searchParams={searchParams}
                           handleInputChange={handleInputChange}
                           saveData={saveData}
+                          resetApp={resetApp} // Pass the resetApp function
                         />
                       }
                     />
@@ -115,6 +116,7 @@ const App = () => {
                           searchParams={searchParams}
                           handleInputChange={handleInputChange}
                           saveData={saveData}
+                          resetApp={resetApp} // Pass the resetApp function
                         />
                       }
                     />
