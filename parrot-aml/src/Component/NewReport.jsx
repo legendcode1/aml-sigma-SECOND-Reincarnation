@@ -15,7 +15,8 @@ const NewReport = ({ searchParams, handleInputChange, saveData }) => {
     let data = {
       name: searchParams.name,
       age: searchParams.age,
-      occupation: searchParams.occupation
+      occupation: searchParams.occupation,
+      gender: searchParams.gender
     };
 
     try {
@@ -67,6 +68,16 @@ const NewReport = ({ searchParams, handleInputChange, saveData }) => {
                   name="occupation"
                   placeholder="Occupation"
                   value={searchParams.occupation}
+                  onChange={handleInputChange}
+                  className="search-input"
+                />
+              </div>
+              <div className="gender-input-container">
+                <input
+                  type="text"
+                  name="gender"
+                  placeholder="Gender"
+                  value={searchParams.gender}
                   onChange={handleInputChange}
                   className="search-input"
                 />

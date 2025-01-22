@@ -1,4 +1,3 @@
-// filepath: /c:/Users/Ananta Anugrah/Desktop/aml sigma SECOND Reincarnation/parrot-aml/src/Component/LeftBar.jsx
 import React, { useState, useEffect } from 'react';
 import '../StyleSheet/LeftBar.css'; // Ensure the path is correct
 import sortIcon from '/leftbar/sort.png'; // Ensure the correct path
@@ -8,7 +7,7 @@ import highrisk from '/leftbar/high-risk.png';
 import fav from '/leftbar/star.png';
 import { getChatMessages } from '../indexedDB'; // Import the function from indexedDB.js
 import { FixedSizeList as List } from 'react-window'; // Import react-window for virtualized list
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
+import { Link } from 'react-router-dom'; // Import Link for navigation
 
 const HighRiskBadge = () => (
   <div className="risk-badge">
@@ -17,10 +16,10 @@ const HighRiskBadge = () => (
   </div>
 );
 
-const ChatItem = ({ index, style, data, navigate }) => {
+const ChatItem = ({ index, style, data }) => {
   const item = data[index];
   return (
-    <div style={style} className="chat-item" onClick={() => navigate(`/main/chat/${item.id}`)}>
+    <Link to={`/main/chat/${item.id}`} style={style} className="chat-item">
       {/* Chat Profile Section */}
       <div className="chat-profile">
         <span className="profile-name">{item.headline || "Unnamed Chat"}</span>
@@ -29,13 +28,12 @@ const ChatItem = ({ index, style, data, navigate }) => {
           <HighRiskBadge />
         )}
       </div>
-    </div>
+    </Link>
   );
 };
 
 const LeftBar = () => {
   const [chatHistory, setChatHistory] = useState([]);
-  const navigate = useNavigate(); // Initialize navigate
 
   // Fetch chat history from IndexedDB when the component mounts
   useEffect(() => {
@@ -58,14 +56,6 @@ const LeftBar = () => {
       <div className="logo-container">
         <img src={datum} alt="Datum Logo" className="logo" />
         <img src={plusIcon} alt="Add" className="plus-icon" />
-      </div>
-      <hr />
-
-      {/* Navigation Links */}
-      <div className="nav-links">
-        <button>Dashboard</button>
-        <button>Favorite</button>
-        <button>PDF Maker</button>
       </div>
       <hr />
 
@@ -98,7 +88,7 @@ const LeftBar = () => {
               itemKey={(index, data) => data[index].id} // Ensure unique keys
             >
               {({ index, style, data }) => (
-                <ChatItem index={index} style={style} data={data} navigate={navigate} />
+                <ChatItem index={index} style={style} data={data} />
               )}
             </List>
           )}
