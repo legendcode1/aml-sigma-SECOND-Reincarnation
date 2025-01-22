@@ -1,17 +1,25 @@
-// filepath: /c:/Users/Ananta Anugrah/Desktop/aml sigma SECOND Reincarnation/parrot-aml/src/Component/MainInterface.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../StyleSheet/MainInterface.css'; // Import the CSS file
 import ChatBot from './ChatBot'; // Import the ChatBot component
 import MainLayout from './MainLayout'; // Import the MainLayout component
 import LoginSection from './LoginSection'; // Import the reusable LoginSection component
 import ChatHistory from './ChatHistory'; // Import the ChatHistory component
+import SearchResult from './SearchResult'; // Import the SearchResult component
+import NewReport from './NewReport'; // Import the NewReport component
 import { useNavigate, useParams } from 'react-router-dom'; // To handle redirection and params
 import { getAuth, onAuthStateChanged } from 'firebase/auth'; // Firebase authentication
 
-const MainInterface = ({ submitted, searchParams, handleInputChange, saveData, resetApp }) => {
+const MainInterface = ({ submitted, saveData, resetApp }) => {
   const navigate = useNavigate();
   const { chatId } = useParams(); // Get chatId from URL params
   const [user, setUser] = useState(null); // Store authenticated user information
+  const [report, setReport] = useState(''); // Store the generated report
+  const [searchParams, setSearchParams] = useState({
+    name: '',
+    age: '',
+    occupation: '',
+    gender: ''
+  });
 
   useEffect(() => {
     const auth = getAuth(); // Initialize Firebase authentication
@@ -27,6 +35,18 @@ const MainInterface = ({ submitted, searchParams, handleInputChange, saveData, r
     return () => unsubscribe(); // Clean up the subscription
   }, [navigate]);
 
+  const handleReportGenerated = (generatedReport) => {
+    setReport(generatedReport); // Update the report state
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setSearchParams((prevParams) => ({
+      ...prevParams,
+      [name]: value
+    }));
+  };
+
   return (
     <MainLayout>
       {/* Login Section */}
@@ -39,18 +59,25 @@ const MainInterface = ({ submitted, searchParams, handleInputChange, saveData, r
       </div>
 
       {/* Main Content */}
-      {chatId ? (
-        <ChatHistory />
+      {report ? (
+        <SearchResult 
+          name={searchParams.name}
+          occupation={searchParams.occupation}
+          age={searchParams.age}
+          gender={searchParams.gender}
+          clientId="CompanyXYZ" // Replace with actual client ID
+          sessionId="1234abcd-efgh-5678-ijkl-9012mnop3456" // Replace with actual session ID
+          onReportGenerated={handleReportGenerated}
+          report={report}
+        />
       ) : (
-        <ChatBot 
-          submitted={submitted}
+        <NewReport 
           searchParams={searchParams}
           handleInputChange={handleInputChange}
           saveData={saveData}
+          setReport={setReport}
         />
       )}
-
-      {/* Add other features like dashboard, save to PDF, etc. here */}
     </MainLayout>
   );
 };

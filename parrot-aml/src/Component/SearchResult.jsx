@@ -1,16 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import '../StyleSheet/SearchResult.css';
-import markdownP from '../markdown/markdownP.md';
+import { generateReport } from '../apiService'; // Import the API service
 
-const SearchResult = ({ name }) => {
-  const [description, setDescription] = useState('');
+const SearchResult = ({ name, occupation, age, gender, clientId, sessionId, onReportGenerated, report }) => {
+  const [description, setDescription] = useState(report || '');
 
   useEffect(() => {
-    fetch(markdownP)
-      .then(response => response.text())
-      .then(text => setDescription(text));
-  }, []);
+    const fetchReport = async () => {
+      try {
+        const report = await generateReport(sessionId, clientId, name, occupation, age, gender);
+        setDescription(report);
+        onReportGenerated(report); // Pass the report to the parent component
+      } catch (error) {
+        console.error('Error fetching report:', error);
+      }
+    };
+
+    if (!report) {
+      fetchReport();
+    }
+  }, [name, occupation, age, gender, clientId, sessionId, onReportGenerated, report]);
 
   return (
     <div className="search-result">
@@ -20,13 +30,6 @@ const SearchResult = ({ name }) => {
         </div>
         <div className="description-container">
           <ReactMarkdown className="description-text">{description}</ReactMarkdown>
-        </div>
-      </div>
-      <div className="search-bars">
-        <div className="name-bar">
-          <div className="search-frame">
-            <span className="search-placeholder">Search Something about this human...</span>
-          </div>
         </div>
       </div>
     </div>

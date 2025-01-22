@@ -1,8 +1,13 @@
-// filepath: /c:/Users/Ananta Anugrah/Desktop/aml sigma SECOND Reincarnation/parrot-aml/src/auth/auth.jsx
+import { Buffer } from 'buffer';
+import { EventEmitter } from 'events';
+import process from 'process';
+import util from 'util';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, getDoc, collection, getDocs } from 'firebase/firestore'; // Import Firestore functions
 import { loadChatMessagesFirestore } from '../indexedDB'; // Import the function from indexedDB.js
+import axios from 'axios';
+import { GoogleAuth } from 'google-auth-library'; // Import GoogleAuth from google-auth-library
 
 // Firebase configuration
 const firebaseConfig = {
@@ -19,6 +24,48 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app); // Initialize Firestore
+
+// Path to your service account key file
+const SERVICE_ACCOUNT_FILE = 'parrot-aml/src/auth/datumcorp-main-7ab0fea0925b.json';
+
+// Target URL for authentication (your Cloud Run backend)
+const TARGET_URL = 'https://aegisllm-backend-633765957616.asia-southeast1.run.app';
+
+async function getAuthHeaders() {
+  try {
+    // Create a GoogleAuth instance
+    const auth = new GoogleAuth({
+      keyFile: SERVICE_ACCOUNT_FILE,
+      scopes: ['https://www.googleapis.com/auth/cloud-platform'], // Ensure proper scopes are set
+    });
+
+    // Obtain a client to generate an ID token
+    const client = await auth.getIdTokenClient(TARGET_URL);
+
+    // Get the ID token
+    const tokenResponse = await client.getRequestHeaders();
+    
+    return {
+      ...tokenResponse,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    };
+  } catch (error) {
+    console.error('Error generating auth headers:', error);
+    throw error;
+  }
+}
+
+async function makeAuthenticatedRequest(payload) {
+  try {
+    const headers = await getAuthHeaders();
+    const response = await axios.post(`${TARGET_URL}/report`, payload, { headers });
+    return response.data;
+  } catch (error) {
+    console.error('Error making authenticated request:', error);
+    throw error;
+  }
+}
 
 // Function to fetch user data by UID
 export const fetchUserDataByUID = async (uid) => {
@@ -132,4 +179,4 @@ export const loginUser = async (email, password) => {
 };
 
 // Export auth and db for use in other modules
-export { auth, db };
+export { auth, db, makeAuthenticatedRequest };

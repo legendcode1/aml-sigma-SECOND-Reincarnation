@@ -3,9 +3,9 @@ import '../StyleSheet/NewReport.css'; // Update the CSS file import
 import send from '../assets/newreport/send.png'; // Update the image path
 import { firestore } from '../firebase/firebase'; // Update the path
 import { addDoc, collection } from 'firebase/firestore';
+import { generateReport } from '../apiService'; // Import the API service
 
-const NewReport = ({ searchParams, handleInputChange, saveData }) => {
-
+const NewReport = ({ searchParams, handleInputChange, saveData, setReport }) => {
   const ref = collection(firestore, 'messages');
 
   const handleSave = async () => {
@@ -22,8 +22,27 @@ const NewReport = ({ searchParams, handleInputChange, saveData }) => {
     try {
       await addDoc(ref, data);
       console.log("Document successfully written!");
+
+      // Generate the report
+      const generatedReport = await generateReport(
+        "1234abcd-efgh-5678-ijkl-9012mnop3456", // Replace with actual session ID
+        "CompanyXYZ", // Replace with actual client ID
+        searchParams.name,
+        searchParams.occupation,
+        searchParams.age,
+        searchParams.gender
+      );
+
+      // Pass the generated report back to the parent component
+      setReport(generatedReport);
     } catch (e) {
       console.error("Error adding document: ", e);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSave();
     }
   };
 
@@ -39,8 +58,9 @@ const NewReport = ({ searchParams, handleInputChange, saveData }) => {
                   type="text"
                   name="name"
                   placeholder="Search a name..."
-                  value={searchParams.name}
+                  value={searchParams.name || ''}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                   className="search-input"
                 />
                 <button className="search-icon" onClick={handleSave}>
@@ -57,8 +77,9 @@ const NewReport = ({ searchParams, handleInputChange, saveData }) => {
                   type="text"
                   name="age"
                   placeholder="Age"
-                  value={searchParams.age}
+                  value={searchParams.age || ''}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                   className="search-input"
                 />
               </div>
@@ -67,8 +88,9 @@ const NewReport = ({ searchParams, handleInputChange, saveData }) => {
                   type="text"
                   name="occupation"
                   placeholder="Occupation"
-                  value={searchParams.occupation}
+                  value={searchParams.occupation || ''}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                   className="search-input"
                 />
               </div>
@@ -77,11 +99,19 @@ const NewReport = ({ searchParams, handleInputChange, saveData }) => {
                   type="text"
                   name="gender"
                   placeholder="Gender"
-                  value={searchParams.gender}
+                  value={searchParams.gender || ''}
                   onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
                   className="search-input"
                 />
               </div>
+            </div>
+          </div>
+          <div className="report-container">
+            <h2>Generated Report</h2>
+            <div className="report-content">
+              {/* Placeholder for the report content */}
+              {/* Remove the incorrect usage of the report prop */}
             </div>
           </div>
         </div>

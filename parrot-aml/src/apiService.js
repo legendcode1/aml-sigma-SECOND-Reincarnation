@@ -1,0 +1,19 @@
+import { makeAuthenticatedRequest } from './auth/auth.jsx';
+
+export const generateReport = async (session_id, client_id, pep_name, pep_occupation, pep_age, pep_gender) => {
+  try {
+    const payload = {
+      session_id,
+      client_id,
+      pep_name,
+      pep_occupation,
+      pep_age,
+      pep_gender
+    };
+    const response = await makeAuthenticatedRequest(payload);
+    return response.report;
+  } catch (error) {
+    console.error('Error generating report:', error);
+    throw error;
+  }
+};

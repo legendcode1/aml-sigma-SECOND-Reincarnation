@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "datumcorp-main",
+  "private_key_id": "7ab0fea0925b3d9b1d17b7224347390bbd723df8",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDEH5du7X+xUOBS\nwd8hMdKH4KSOGQJDrTYwsPZJFK4yJiktdWL4qemBv+41/ulzk3ALKfr9cYibSi34\n+mNc6b9j1wfHXwowkxONIHcV8wHNNfmRaNESjJgnMTl2uzWk3w9R1CwPzfv9AopX\n+6EAkE4cCGUx2UNF3aWfHcGa9hje2tvWQlAQWAsarpDTAW30vbZQ1iguL2x581Ck\nhFqKl46dTJOc2gnsp1o0xw1JXkvw3O62OfAwpe6yrHtG1xwicyApQdSZXTfkwncb\nInLnabQFOGcxL8zH7NEkpzHzXk80GisAZBS6tJCQtfkuxK4BERWX1C0NGvKo7C/h\nbnZhlmfhAgMBAAECggEAAt7YVVptcxEP2B+StlkfikH/P+itYVlH83kS67wn9gox\nXK3XiF6am93CfOtpljmsgG9UJ1DkdYBlu/DfPYPa0M672YmiXAEPvnyriDMrCIpq\nErxN4LzVI8Vgdc9KOwA8SJ/HktDPx72EJ0LtXEqgaArhP0mSprNr1NsSGLm8y13d\nCMjp8VsrFSMM9e+FSOZae/kp1ZeW6P7/Qte+49PfhPVcWQucbO5rov4+ZIYQbL3v\n5l2a2vcMzNK8Rr/i+szjXFCokT300OzdIxlqMJyzTSkdBYJMCr9g5SKT1WbK3Xqe\nW/a1APBiZL57+uGiLX2VCeE/AzT7yVukyPV0YgS1qQKBgQDgTO/CvVv2//G7pdzm\ncMYn44EFMSlvT4VdqGyk6lvKYKr6WUu1RqXwwMxRhIMIvLxUJzdQuSP4/JLGRg4Z\nrPI0nY5yODL6GNyvg/pFoDJhu9tBnRU75Uq35iRlmb5Rj2DXMDufGPX1gecl4He/\nPYyU9UN8UTiBs+gIv6MG4ZAqqQKBgQDf1zkGnm2qlJpEXyfUMFbG4vIbNrxZjWy8\nMYBjqTcUzcK7tMstcCs6b/PTLCoQPyPS+uAuFofcUv+DsyIcX/zeR9Qb+zrttNpR\n+yitjfhqMuxzIdA/I6ngy0SFm8Sjh7RPk5n+wvI8xJ+urZq5uzr3p4bVSaWdcni7\nq+7++FUOeQKBgD9LtsUfppoXM+IeNi4ZWPHcs4YBj43HxPzfEHmhYPHFQbqQBFtN\nanp8DaxbVpbam9KrlmKDPHGA5PJqxoPcWCUc6Ru2XDxTU8N73N5VDKKj3oWvjFRw\nqhsnKNI7BogBi/RtugV1h8MWO2Jm66Pd/JP0emzUhrujRzFg0uKYOJSxAoGBAI3h\n+TaV04Otf/9YpYFdRpP4pGfVkRvehg7f/bauOsjIB+g9GBBsKip3bgDr3JnBu+5u\nsQzloSZpwaZ0NGnx+fHXa750x4yG91/BqK4h8FU4hCISS9LJw1NG5N8ftkvFp+hM\n8e7HGQ6lv2XUit+xqxXxrYiijwS224px2CLru9ZZAoGAfDOH2ECXGiYlite86VXY\ndGvVij0eK1MKntLg95nj3SPF0nLM81drTH/Mk20uMIZW0VLoDWAjnJcqsnEZp1iv\nzswCMC/YkzzfjlZbVx3D4F71T12OOhB6buE2JsdMQxeFWJKyQwvFL/GziY6Varl1\nhcRr18kB1aMeiROprp7nSNg=\n-----END PRIVATE KEY-----\n",
+  "client_email": "aegis-llm-backend-service@datumcorp-main.iam.gserviceaccount.com",
+  "client_id": "113745657504672375978",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/aegis-llm-backend-service%40datumcorp-main.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

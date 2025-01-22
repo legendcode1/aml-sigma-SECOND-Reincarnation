@@ -1,4 +1,3 @@
-// filepath: /c:/Users/Ananta Anugrah/Desktop/aml sigma SECOND Reincarnation/parrot-aml/src/Component/ChatBot.jsx
 import React, { useState, useEffect } from 'react';
 import '../StyleSheet/ChatBot.css';
 import NewReport from './NewReport';
