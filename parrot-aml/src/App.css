@@ -54,7 +54,6 @@ html, body, #root {
 .main-interface {
   flex: 1;
   background-color: #314a57;
-  padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;

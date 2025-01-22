@@ -1,7 +1,8 @@
+// filepath: /c:/Users/Ananta Anugrah/Desktop/aml sigma SECOND Reincarnation/parrot-aml/src/Component/LoginSection.jsx
 import React, { useEffect, useState } from 'react';
 import '../StyleSheet/LoginSection.css';
 
-const LoginSection = ({ loginText = "Login", onClick = () => console.log("Login clicked") }) => {
+const LoginSection = ({ loginText = "Login", onClick = () => console.log("Login clicked"), onReset }) => {
   const [companyName, setCompanyName] = useState("Unknown Company");
   const [userName, setUserName] = useState("SIGMA");
 
@@ -26,11 +27,7 @@ const LoginSection = ({ loginText = "Login", onClick = () => console.log("Login 
   return (
     <div className="login-section" onClick={onClick}>
       <span className="login-text">{userName} from {companyName}</span> {/* Display dynamic userName and companyName */}
-      <img 
-        src="/main-interface/login-icon.png" 
-        alt="Login Icon" 
-        className="login-icon"
-      />
+      <button className="reset-button" onClick={onReset}>Reset</button>
     </div>
   );
 };

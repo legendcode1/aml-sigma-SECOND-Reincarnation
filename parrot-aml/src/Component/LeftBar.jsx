@@ -82,10 +82,10 @@ const LeftBar = () => {
             <List
               height={400} // Adjust height as needed
               itemCount={chatHistory.length}
-              itemSize={100} // Adjust item size as needed
+              itemSize={40} // Adjust item size as needed
               width={'100%'}
               itemData={chatHistory}
-              itemKey={(index, data) => data[index].id} // Ensure unique keys
+              itemKey={(index, data) => data[index].id} // Ensure unique keys\
             >
               {({ index, style, data }) => (
                 <ChatItem index={index} style={style} data={data} />
