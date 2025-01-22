@@ -1,7 +1,5 @@
 import { Buffer } from 'buffer';
-import { EventEmitter } from 'events';
 import process from 'process';
-import util from 'util';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, getDoc, collection, getDocs } from 'firebase/firestore'; // Import Firestore functions
