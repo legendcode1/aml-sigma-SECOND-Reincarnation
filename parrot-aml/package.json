@@ -13,15 +13,22 @@
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
     "axios": "^1.7.9",
+    "browserify-fs": "^1.0.0",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.1",
     "firebase": "^11.2.0",
     "google-auth-library": "^9.15.0",
     "idb": "^8.0.1",
+    "process": "^0.11.10",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-window": "^1.8.11"
+    "react-window": "^1.8.11",
+    "stream-browserify": "^3.0.0",
+    "util": "^0.12.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
+    "@rollup/plugin-inject": "^5.0.5",
     "@types/react": "^18.3.17",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",

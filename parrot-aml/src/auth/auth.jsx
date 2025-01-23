@@ -56,8 +56,7 @@ async function getAuthHeaders() {
 
 async function makeAuthenticatedRequest(payload) {
   try {
-    const headers = await getAuthHeaders();
-    const response = await axios.post(`${TARGET_URL}/report`, payload, { headers });
+    const response = await axios.post('http://localhost:3000/api/report', payload);
     return response.data;
   } catch (error) {
     console.error('Error making authenticated request:', error);

@@ -1,5 +1,6 @@
-import { makeAuthenticatedRequest } from './auth/auth.jsx';
+import axios from 'axios';
 
+// Frontend function to generate report
 export const generateReport = async (session_id, client_id, pep_name, pep_occupation, pep_age, pep_gender) => {
   try {
     const payload = {
@@ -10,8 +11,8 @@ export const generateReport = async (session_id, client_id, pep_name, pep_occupa
       pep_age,
       pep_gender
     };
-    const response = await makeAuthenticatedRequest(payload);
-    return response.report;
+    const response = await axios.post('http://localhost:3000/api/report', payload);
+    return response.data.report;
   } catch (error) {
     console.error('Error generating report:', error);
     throw error;

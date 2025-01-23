@@ -1,4 +1,3 @@
-// src/firebase/firebase.js
 import { initializeApp, getApp, getApps } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
 import { getAuth } from 'firebase/auth'; // Add authentication
@@ -29,7 +28,6 @@ const analytics = getAnalytics(app);
 const auth = getAuth(app); // Initialize Auth service
 const firestore = getFirestore(app); // Initialize Firestore
 
-
 // Firestore query
 const db = getFirestore(); 
 const colref = collection(db, 'users');
@@ -41,10 +39,8 @@ getDocs(colref).then((snapshot) => {
   });
   console.log(users);
 })
-.catch((err) => {
-  console.log('Error getting documents', error);
+.catch((error) => {
+  console.error('Error getting documents:', error);
 });
 
 export { app, auth, analytics, firestore };
-
-

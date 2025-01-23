@@ -1,14 +1,27 @@
 {
   "devDependencies": {
-    "gh-pages": "^6.2.0"
+    "@vitejs/plugin-react": "^4.3.4",
+    "gh-pages": "^6.2.0",
+    "rollup-plugin-node-polyfills": "^0.2.1"
   },
   "dependencies": {
+    "@rollup/plugin-inject": "^5.0.5",
+    "axios": "^1.7.9",
+    "browserify": "^17.0.1",
+    "browserify-fs": "^1.0.0",
     "buffer": "^6.0.3",
+    "cors": "^2.8.5",
+    "crypto-browserify": "^3.12.1",
     "events": "^3.3.0",
+    "express": "^4.21.2",
     "firebase": "^11.1.0",
+    "google-auth-library": "^9.15.0",
+    "inherits": "^2.0.4",
     "process": "^0.11.10",
     "react-markdown": "^9.0.1",
     "react-router-dom": "^7.1.1",
-    "util": "^0.12.5"
+    "stream-browserify": "^3.0.0",
+    "util": "^0.12.5",
+    "vite": "^6.0.11"
   }
 }
