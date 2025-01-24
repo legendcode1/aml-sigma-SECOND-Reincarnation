@@ -49,14 +49,11 @@ const MainInterface = ({ submitted, saveData, resetApp }) => {
 
   return (
     <MainLayout>
-      {/* Login Section */}
-      <div className="login-section">
-        <LoginSection 
-          loginText={user ? `Welcome, ${user.displayName || "User"}` : "Please Log In"}
-          onClick={() => console.log("Login section clicked!")}
-          onReset={resetApp} // Pass the resetApp function
-        />
-      </div>
+      <LoginSection 
+        loginText={user ? `Welcome, ${user.displayName || "User"}` : "Please Log In"}
+        onClick={() => console.log("Login section clicked!")}
+        onReset={resetApp} // Pass the resetApp function
+      />
 
       {/* Main Content */}
       {report ? (

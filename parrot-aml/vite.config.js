@@ -1,21 +1,14 @@
+// vite.config.js
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
-import { NodeModulesPolyfillPlugin } from '@esbuild-plugins/node-modules-polyfill';
 import inject from '@rollup/plugin-inject';
 import path from 'path';
 
 export default defineConfig({
   plugins: [
     react(),
-    NodeGlobalsPolyfillPlugin({
-      process: true,
-      buffer: true,
-    }),
-    NodeModulesPolyfillPlugin(),
     inject({
-      global: ['globalThis', 'global'],
-      process: 'process/browser',
+      global: 'globalThis',
       Buffer: ['buffer', 'Buffer'],
     }),
   ],
@@ -29,18 +22,8 @@ export default defineConfig({
       fs: path.resolve(__dirname, 'node_modules/browserify-fs'),
     },
   },
-  optimizeDeps: {
-    esbuildOptions: {
-      define: {
-        global: 'globalThis', // Polyfill `global`
-      },
-      plugins: [
-        NodeGlobalsPolyfillPlugin({
-          process: true,
-          buffer: true,
-        }),
-      ],
-    },
+  define: {
+    global: 'globalThis',
   },
   build: {
     sourcemap: true, // Enable source maps for debugging

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import '../StyleSheet/SearchResult.css';
-import { generateReport } from '../apiService'; // Import the API service
+import { generateReport } from '../apiService'; // Ensure this path is correct
 
 const SearchResult = ({ name, occupation, age, gender, clientId, sessionId, onReportGenerated, report }) => {
   const [description, setDescription] = useState(report || '');
