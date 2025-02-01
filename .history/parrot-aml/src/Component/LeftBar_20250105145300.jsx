@@ -26,7 +26,7 @@ const LeftBar = ({ savedItems }) => {
         <div className="chat-header">
           <span>Chat History</span>
           <div className="icon-group">
-            <img src="../assets/leftbar/sort.png" alt="Vector" className="icon" />
+            <img src="/leftbar/sort.png" alt="Vector" className="icon" />
             <img src="https://dashboard.codeparrot.ai/api/assets/Z2m_pY6CYQNjI8Vf" alt="Component" className="icon" />
             <img src="https://dashboard.codeparrot.ai/api/assets/Z2m_pY6CYQNjI8Vg" alt="Vector" className="icon" />
           </div>

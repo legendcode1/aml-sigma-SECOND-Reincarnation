@@ -1,10 +1,28 @@
 // aml-backend/routes/api.js
 
 const express = require('express');
-const axios = require('axios');
-const { getAuthHeaders } = require('../auth');
+// const axios = require('axios'); // Commented out since we are mocking
+// const { getAuthHeaders } = require('../auth'); // Commented out since we are mocking
 
 const router = express.Router();
+
+// Flag to toggle between mock and real API
+const USE_MOCK_API = true;
+
+// Mock data generator function
+const generateMockReport = (data) => {
+  return {
+    report: `EDD Report for ${data.pep_name}:
+    
+    - **Session ID:** ${data.session_id}
+    - **Client ID:** ${data.client_id}
+    - **Occupation:** ${data.pep_occupation}
+    - **Age:** ${data.pep_age}
+    - **Gender:** ${data.pep_gender}
+    
+    *This is a mock report generated for testing purposes.*`,
+  };
+};
 
 // POST /report
 router.post('/report', async (req, res) => {
@@ -34,24 +52,46 @@ router.post('/report', async (req, res) => {
     pep_gender,
   };
 
-  try {
-    const headers = await getAuthHeaders(process.env.AIGISLLM_BACKEND_URL);
-    console.log("Auth headers obtained:", headers);
+  if (USE_MOCK_API) {
+    // Return mock response
+    const mockResponse = generateMockReport(payload);
+    console.log("Mock API response:", mockResponse);
+    return res.status(200).json(mockResponse);
+  } else {
+    // Uncomment the following block to use the real API
+    /*
+    try {
+      console.log("Attempting to obtain auth headers...");
+      const headers = await getAuthHeaders(process.env.AIGISLLM_BACKEND_URL);
+      console.log("Auth headers obtained:", headers);
 
-    const response = await axios.post(
-      `${process.env.AIGISLLM_BACKEND_URL}/report`,
-      payload,
-      { headers }
-    );
+      console.log("Sending POST request to external API...");
+      const response = await axios.post(
+        `${process.env.AIGISLLM_BACKEND_URL}/report`,
+        payload,
+        { headers }
+      );
+      console.log("External API response:", response.data);
 
-    console.log("External API response:", response.data);
+      return res.status(200).json(response.data);
+    } catch (error) {
+      console.error("Full error object:", error);
+      if (error.response) {
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+        console.error("Error response headers:", error.response.headers);
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+      } else {
+        console.error("Error message:", error.message);
+      }
+      console.error("Error config:", error.config);
 
-    return res.status(200).json(response.data);
-  } catch (error) {
-    console.error('Error in /report:', error.response?.data || error.message);
-    return res.status(error.response?.status || 500).json({
-      error: error.response?.data || 'Internal Server Error',
-    });
+      return res.status(error.response?.status || 500).json({
+        error: error.response?.data || 'Internal Server Error',
+      });
+    }
+    */
   }
 });
 
@@ -86,27 +126,57 @@ router.post('/followup', async (req, res) => {
     user_message,
   };
 
-  try {
-    const headers = await getAuthHeaders(process.env.AIGISLLM_BACKEND_URL);
-    console.log("Auth headers obtained:", headers);
+  if (USE_MOCK_API) {
+    // Return mock response
+    const mockResponse = {
+      report: `Follow-up EDD Report for ${pep_name}:
+      
+      - **Session ID:** ${session_id}
+      - **Client ID:** ${client_id}
+      - **User Message:** "${user_message}"
+      
+      *This is a mock follow-up report generated for testing purposes.*`,
+    };
+    console.log("Mock API response for followup:", mockResponse);
+    return res.status(200).json(mockResponse);
+  } else {
+    // Uncomment the following block to use the real API
+    /*
+    try {
+      console.log("Attempting to obtain auth headers for followup...");
+      const headers = await getAuthHeaders(process.env.AIGISLLM_BACKEND_URL);
+      console.log("Auth headers obtained:", headers);
 
-    const response = await axios.post(
-      `${process.env.AIGISLLM_BACKEND_URL}/followup`,
-      payload,
-      {
-        headers,
-        params: { client_id },
+      console.log("Sending POST request to external API for followup...");
+      const response = await axios.post(
+        `${process.env.AIGISLLM_BACKEND_URL}/followup`,
+        payload,
+        {
+          headers,
+          params: { client_id },
+        }
+      );
+      console.log("External API response for followup:", response.data);
+
+      return res.status(200).json(response.data);
+    } catch (error) {
+      console.error("Full error object for /followup:", error);
+      if (error.response) {
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+        console.error("Error response headers:", error.response.headers);
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+      } else {
+        console.error("Error message:", error.message);
       }
-    );
+      console.error("Error config:", error.config);
 
-    console.log("External API response:", response.data);
-
-    return res.status(200).json(response.data);
-  } catch (error) {
-    console.error('Error in /followup:', error.response?.data || error.message);
-    return res.status(error.response?.status || 500).json({
-      error: error.response?.data || 'Internal Server Error',
-    });
+      return res.status(error.response?.status || 500).json({
+        error: error.response?.data || 'Internal Server Error',
+      });
+    }
+    */
   }
 });
 
