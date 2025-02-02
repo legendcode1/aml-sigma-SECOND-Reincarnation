@@ -1,74 +1,84 @@
-import React, { useState } from 'react';
-import { loginUser } from '../auth/auth'; // Import the login function
-import { useNavigate } from 'react-router-dom';
-import './LoginPage.css'; // Import the CSS file
+// src/login system/LoginPage.jsx
 
-const LoginPage = () => {
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { loginUser } from '../auth/auth'; // Import loginUser function
+import PropTypes from 'prop-types';
+import './LoginPage.css'; // Ensure correct path
+
+/**
+ * LoginPage Component
+ *
+ * Handles user authentication.
+ *
+ * Props:
+ * - companyName (string): The name of the company to display on the login page.
+ */
+const LoginPage = ({ companyName }) => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [companyName, setCompanyName] = useState(''); // Store company name
-  const navigate = useNavigate();
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
+  /**
+   * Handle user login
+   */
   const handleLogin = async (e) => {
-    e.preventDefault(); // Prevent the form from reloading the page
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
 
     try {
-      const { user, userData, companyData } = await loginUser(email, password); // Log in the user
+      const { user, userData, companyData, chatHistory } = await loginUser(email, password);
       console.log('User logged in:', user);
-      
-      // Set the company name after login
-      setCompanyName(companyData['name'] || 'Unknown');
-
-      // Store minimal data in localStorage
-      localStorage.setItem('user_id', user.uid); // Store user ID
-      localStorage.setItem('company_name', companyData['company name'] || 'Unknown'); // Store company name if available
-
-      // Redirect to the main page after login
-      navigate('/main');
+      // Since App.jsx listens to auth state changes, no need to navigate here
     } catch (err) {
-      setError(err.message); // Display error message if login fails
+      console.error('Login failed:', err);
+      setError(err.message || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="ImportantMessages">
-      <div className="LogoSection">
-        <img src="/datum/datum.png" alt="Company Logo" className="CompanyLogo" />
-      </div>
-      <div className="LoginPadding">
-        <form className="LoginSection" onSubmit={handleLogin}> {/* Use a form element */}
-          <div className="WelcomeText">{companyName} - Welcome</div> {/* Display company name */}
-          <div className="Frame34">
-            <div className="EmailColumn">
-              <label className="EmailAddress">Email Address</label>
-              <input
-                type="email"
-                className="InputField"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="PasswordColumn">
-              <label className="Password">Password</label>
-              <input
-                type="password"
-                className="InputField"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <div className="SubmitSection">
-              <button type="submit" className="SubmitButton"> {/* Button inside the form */}
-                Log in
-              </button>
-            </div>
-          </div>
-        </form>
-        {error && <p className="ErrorMessage">{error}</p>} {/* Display error message */}
-      </div>
+    <div className="login-page-container">
+      <h1>Welcome to {companyName}</h1>
+      <form onSubmit={handleLogin} className="login-form">
+        <label htmlFor="email">Email:</label>
+        <input
+          type="email"
+          id="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+
+        <label htmlFor="password">Password:</label>
+        <input
+          type="password"
+          id="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+
+        {error && <div className="error-message">{error}</div>}
+        {loading ? (
+          <div className="loading-message">Logging in...</div>
+        ) : (
+          <button type="submit" className="login-button">
+            Login
+          </button>
+        )}
+      </form>
     </div>
   );
+};
+
+// Prop type validation
+LoginPage.propTypes = {
+  companyName: PropTypes.string.isRequired,
 };
 
 export default LoginPage;

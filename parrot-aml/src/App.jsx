@@ -1,133 +1,149 @@
-// filepath: /c:/Users/Ananta Anugrah/Desktop/aml sigma SECOND Reincarnation/parrot-aml/src/App.jsx
+// src/App.jsx
+
 import React, { useState, useEffect } from 'react';
-import './App.css';
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import { app, firestore } from './firebase/firebase'; // Correct import for app and firestore
 import LeftBar from './Component/LeftBar';
 import MainInterface from './Component/MainInterface';
 import LoginPage from './login system/LoginPage';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { fetchUserDataByUID, fetchCompanyDataByID } from './auth/auth'; // Import necessary functions
+import axios from 'axios';
+import './App.css';
 
-// Domain-to-client_id mapping
-const domainClientMapping = {
-  'transinergi.com': { client_id: '-transinergi', 'company-name': 'Trans Sinergi' },
-  'datum.com': { client_id: '-datum', 'company-name': 'DatumCorp' }
-};
-
+/**
+ * App Component
+ *
+ * This is the root component of the application.
+ * It handles authentication state and routes accordingly.
+ */
 const App = () => {
-  const [searchParams, setSearchParams] = useState({
-    name: '',
-    age: '',
-    occupation: ''
-  });
-
-  const [savedItems, setSavedItems] = useState([]);
-  const [submitted, setSubmitted] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [initialAuthCheck, setInitialAuthCheck] = useState(false); // Track initial authentication check
+  const [clientId, setClientId] = useState(null);
+  const [companyName, setCompanyName] = useState(''); // State for companyName
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Get company name based on the domain
-  const domain = window.location.hostname;
-  const companyName = domainClientMapping[domain]?.['company-name'] || 'Unknown Company';
-
-  const saveData = () => {
-    if (searchParams.name.trim()) {
-      setSavedItems((prevItems) => [...prevItems, searchParams]);
-      setSubmitted(true);
-    }
+  // Define domain to company mapping
+  const domainClientMapping = {
+    'transinergi.com': { client_id: 'transinergi116', 'company-name': 'Sinergi Trans' },
+    'datum.com': { client_id: 'datumCorp', 'company-name': 'DatumCorp' },
+    'localhost': { client_id: 'transinergi116', 'company-name': 'Sinergi Trans' }, // For development
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setSearchParams((prev) => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  // Check authentication status
   useEffect(() => {
-    const auth = getAuth(app); // Ensure to use 'app' here for correct Firebase instance
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      console.log('Auth state changed', user);
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        setIsAuthenticated(true); // User is authenticated
-        if (!initialAuthCheck) {
-          navigate('/main'); // Redirect to the main layout only once
+        console.log('Auth state changed:', user);
+        setIsAuthenticated(true);
+
+        try {
+          // Fetch user data
+          const userData = await fetchUserDataByUID(user.uid);
+          console.log('Fetched user data:', userData);
+
+          // Extract company ID from user data
+          const companyId = userData['company id'];
+          if (!companyId) {
+            throw new Error('Company ID not found in user data.');
+          }
+          console.log('Company ID:', companyId);
+
+          // Fetch company data if needed
+          const companyData = await fetchCompanyDataByID(companyId);
+          console.log('Fetched company data:', companyData);
+
+          // Set clientId state
+          setClientId(companyId);
+          console.log('clientId set to:', companyId);
+
+          // Determine companyName based on the domain
+          const hostname = window.location.hostname;
+          const mapping = domainClientMapping[hostname] || domainClientMapping['localhost'];
+          const determinedCompanyName = mapping['company-name'] || 'Unknown Company';
+          setCompanyName(determinedCompanyName);
+
+          // Redirect to dashboard after successful login
+          navigate('/dashboard');
+        } catch (error) {
+          console.error('Error during authentication:', error);
+          // Handle errors (e.g., show a notification)
+          setIsAuthenticated(false);
+          setClientId(null);
+          navigate('/login');
         }
       } else {
-        setIsAuthenticated(false); // User is not authenticated
-        navigate('/login'); // Redirect to the login page
+        setIsAuthenticated(false);
+        setClientId(null);
+        setCompanyName('');
+        navigate('/login');
       }
-      setInitialAuthCheck(true); // Mark the initial authentication check as completed
+      setLoading(false);
     });
 
     return () => unsubscribe();
-  }, [navigate, initialAuthCheck]);
+  }, [navigate]);
 
-  const resetApp = () => {
-    console.log('Resetting app...');
-    // Reset Firebase Auth state and remove client_id from localStorage
-    const auth = getAuth(app);
-    auth.signOut(); // Log out the user
-    localStorage.removeItem('client_id'); // Remove stored client_id
-    setIsAuthenticated(false); // Update the authentication state
-    navigate('/login'); // Redirect to login page
+  /**
+   * Handle user logout
+   */
+  const handleReset = async () => {
+    const auth = getAuth();
+    try {
+      await auth.signOut();
+      console.log('User signed out successfully.');
+      setIsAuthenticated(false);
+      setClientId(null);
+      setCompanyName('');
+      navigate('/login');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
+
+  if (loading) {
+    return <div>Loading...</div>; // Show a loading state until authentication is checked
+  }
+
+  if (isAuthenticated && !clientId) {
+    // Authentication is complete but clientId was not fetched
+    return <div>Error: Client ID is missing.</div>;
+  }
 
   return (
     <div className="app-container">
       {/* Reset button placed outside the main layout */}
-      <button onClick={resetApp} className="reset-button">Reset App (Logout and Clear Data)</button>
+      {isAuthenticated && (
+        <button onClick={handleReset} className="reset-button">
+          Reset App (Logout and Clear Data)
+        </button>
+      )}
 
       <Routes>
         {/* Login route */}
         <Route path="/login" element={<LoginPage companyName={companyName} />} />
 
-        {/* Main layout route (protected route) */}
+        {/* Dashboard routes */}
         <Route
-          path="/main/*"
+          path="/dashboard/*"
           element={
-            isAuthenticated ? (
+            isAuthenticated && clientId ? (
               <div className="main-parent">
                 <div className="left-bar">
-                  <LeftBar savedItems={savedItems} />
+                  <LeftBar />
                 </div>
                 <div className="main-interface">
-                  <Routes>
-                    <Route
-                      path="/"
-                      element={
-                        <MainInterface
-                          submitted={submitted}
-                          searchParams={searchParams}
-                          handleInputChange={handleInputChange}
-                          saveData={saveData}
-                          resetApp={resetApp} // Pass the resetApp function
-                        />
-                      }
-                    />
-                    <Route
-                      path="chat/:chatId"
-                      element={
-                        <MainInterface
-                          submitted={submitted}
-                          searchParams={searchParams}
-                          handleInputChange={handleInputChange}
-                          saveData={saveData}
-                          resetApp={resetApp} // Pass the resetApp function
-                        />
-                      }
-                    />
-                  </Routes>
+                  <MainInterface clientId={clientId} />
                 </div>
               </div>
             ) : (
-              <p>You must log in to access the main layout.</p>
+              <div>Loading dashboard...</div>
             )
           }
         />
+
+        {/* Redirect any other routes to /login */}
+        <Route path="*" element={<LoginPage companyName={companyName} />} />
       </Routes>
     </div>
   );
