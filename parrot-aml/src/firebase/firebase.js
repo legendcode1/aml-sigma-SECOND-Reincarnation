@@ -1,50 +1,29 @@
 // src/firebase/firebase.js
-import { initializeApp, getApp, getApps } from 'firebase/app';
-import { getAnalytics } from 'firebase/analytics';
-import { getAuth } from 'firebase/auth'; // Add authentication
-import { 
-  getFirestore, collection, getDocs,
-  addDoc
-} from 'firebase/firestore'; // Add Firestore
 
+import { initializeApp, getApp, getApps } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+
+// Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBfku8hikwXrII_Uv2u0pL6-f0a0a0mKr8",
-  authDomain: "datumcorp-aml.firebaseapp.com",
-  projectId: "datumcorp-aml",
-  storageBucket: "datumcorp-aml.appspot.com",
-  messagingSenderId: "710428028162",
-  appId: "1:710428028162:web:486e3aad77de49d0d8261b",
-  measurementId: "G-KSL9Y2V3HX"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-// Initialize Firebase only if not already initialized
+// Initialize Firebase
 let app;
-if (getApps().length === 0) {
+if (!getApps().length) {
   app = initializeApp(firebaseConfig);
 } else {
   app = getApp();
 }
 
-const analytics = getAnalytics(app);
-const auth = getAuth(app); // Initialize Auth service
-const firestore = getFirestore(app); // Initialize Firestore
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-
-// Firestore query
-const db = getFirestore(); 
-const colref = collection(db, 'users');
-getDocs(colref).then((snapshot) => { 
-  console.log(snapshot.docs.map(doc => doc.data()));
-  let users = []
-  snapshot.docs.forEach(doc => {
-    users.push({ ...doc.data(), id: doc.id });
-  });
-  console.log(users);
-})
-.catch((err) => {
-  console.log('Error getting documents', error);
-});
-
-export { app, auth, analytics, firestore };
-
-
+export { app, auth, db };

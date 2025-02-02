@@ -1,13 +1,15 @@
+// src/Component/LeftBar.jsx
+
 import React, { useState, useEffect } from 'react';
 import '../StyleSheet/LeftBar.css'; // Ensure the path is correct
-import sortIcon from '/leftbar/sort.png'; // Ensure the correct path
-import plusIcon from '/leftbar/plus-sign.png';
-import datum from '/leftbar/datum.png';
-import highrisk from '/leftbar/high-risk.png';
-import fav from '/leftbar/star.png';
+import sortIcon from '/leftbar/sort.png'; // Updated path
+import plusIcon from '/leftbar/plus-sign.png'; // Updated path
+import datum from '/leftbar/datum.png'; // Updated path
+import highrisk from '/leftbar/high-risk.png'; // Updated path
+import fav from '/leftbar/star.png'; // Updated path
 import { getChatMessages } from '../indexedDB'; // Import the function from indexedDB.js
 import { FixedSizeList as List } from 'react-window'; // Import react-window for virtualized list
-import { Link } from 'react-router-dom'; // Import Link for navigation
+import { Link, useNavigate } from 'react-router-dom'; // Import Link and useNavigate for navigation
 
 const HighRiskBadge = () => (
   <div className="risk-badge">
@@ -19,12 +21,12 @@ const HighRiskBadge = () => (
 const ChatItem = ({ index, style, data }) => {
   const item = data[index];
   return (
-    <Link to={`/main/chat/${item.id}`} style={style} className="chat-item">
+    <Link to={`/dashboard/chat/${item.id}`} style={style} className="chat-item">
       {/* Chat Profile Section */}
       <div className="chat-profile">
-        <span className="profile-name">{item.headline || "Unnamed Chat"}</span>
+        <span className="profile-name">{item.headline || 'Unnamed Chat'}</span>
         {/* Show HighRiskBadge for specific names */}
-        {(item.headline === "Budi Arie Hartanto" || item.headline === "Ananta Wistara Anugrah") && (
+        {(item.headline === 'Budi Arie Hartanto' || item.headline === 'Ananta Wistara Anugrah') && (
           <HighRiskBadge />
         )}
       </div>
@@ -34,6 +36,7 @@ const ChatItem = ({ index, style, data }) => {
 
 const LeftBar = () => {
   const [chatHistory, setChatHistory] = useState([]);
+  const navigate = useNavigate();
 
   // Fetch chat history from IndexedDB when the component mounts
   useEffect(() => {
@@ -50,12 +53,24 @@ const LeftBar = () => {
     fetchChatHistory();
   }, []);
 
+  // Handle plus icon click
+  const handlePlusClick = () => {
+    console.log('Plus icon clicked. Navigating to /dashboard');
+    navigate('/dashboard'); // Navigate back to /dashboard
+  };
+
   return (
     <div className="left-bar-container">
       {/* Logo and Plus Icon */}
       <div className="logo-container">
         <img src={datum} alt="Datum Logo" className="logo" />
-        <img src={plusIcon} alt="Add" className="plus-icon" />
+        <img
+          src={plusIcon}
+          alt="Add"
+          className="plus-icon"
+          onClick={handlePlusClick}
+          style={{ cursor: 'pointer' }}
+        />
       </div>
       <hr />
 
@@ -82,10 +97,10 @@ const LeftBar = () => {
             <List
               height={400} // Adjust height as needed
               itemCount={chatHistory.length}
-              itemSize={40} // Adjust item size as needed
+              itemSize={60} // Adjust item size as needed
               width={'100%'}
               itemData={chatHistory}
-              itemKey={(index, data) => data[index].id} // Ensure unique keys\
+              itemKey={(index, data) => data[index].id} // Ensure unique keys
             >
               {({ index, style, data }) => (
                 <ChatItem index={index} style={style} data={data} />

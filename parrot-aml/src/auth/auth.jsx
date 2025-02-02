@@ -1,8 +1,10 @@
-// filepath: /c:/Users/Ananta Anugrah/Desktop/aml sigma SECOND Reincarnation/parrot-aml/src/auth/auth.jsx
+// src/auth/auth.jsx
+
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, getDoc, collection, getDocs } from 'firebase/firestore'; // Import Firestore functions
 import { loadChatMessagesFirestore } from '../indexedDB'; // Import the function from indexedDB.js
+import axios from 'axios'; // Make sure axios is installed
 
 // Firebase configuration
 const firebaseConfig = {
@@ -29,7 +31,7 @@ export const fetchUserDataByUID = async (uid) => {
     if (!userDoc.exists()) {
       throw new Error(`No user found with UID: ${uid}`);
     }
-    
+
     const userData = userDoc.data(); // Extract data from the user document
 
     // Fetch 'name' field from user document
@@ -111,7 +113,7 @@ export const loginUser = async (email, password) => {
     // Log the fetched user data to confirm the structure
     console.log('Fetched user data:', userData);
 
-    // Check if 'company' field exists in the user data
+    // Check if 'company id' field exists in the user data
     const companyId = userData['company id']; // Ensure this field exists in Firestore, not 'company id'
     if (!companyId) {
       throw new Error('Company ID not found in user data.');
@@ -122,6 +124,8 @@ export const loginUser = async (email, password) => {
     // Fetch company data using the 'company id'
     const companyData = await fetchCompanyDataByID(companyId);
     const chatHistory = await fetchChatHistoryByCompanyID(companyId);
+
+    // Optionally, perform any other operations (e.g., store chat history in IndexedDB)
 
     // Return user and company data for further use
     return { user, userData, companyData, chatHistory };

@@ -1,58 +1,45 @@
-// filepath: /c:/Users/Ananta Anugrah/Desktop/aml sigma SECOND Reincarnation/parrot-aml/src/Component/MainInterface.jsx
-import React, { useEffect, useState } from 'react';
-import '../StyleSheet/MainInterface.css'; // Import the CSS file
-import ChatBot from './ChatBot'; // Import the ChatBot component
-import MainLayout from './MainLayout'; // Import the MainLayout component
-import LoginSection from './LoginSection'; // Import the reusable LoginSection component
-import ChatHistory from './ChatHistory'; // Import the ChatHistory component
-import { useNavigate, useParams } from 'react-router-dom'; // To handle redirection and params
-import { getAuth, onAuthStateChanged } from 'firebase/auth'; // Firebase authentication
+// src/Component/MainInterface.jsx
 
-const MainInterface = ({ submitted, searchParams, handleInputChange, saveData, resetApp }) => {
-  const navigate = useNavigate();
-  const { chatId } = useParams(); // Get chatId from URL params
-  const [user, setUser] = useState(null); // Store authenticated user information
+import React from 'react';
+import '../StyleSheet/MainInterface.css';
+import NewReport from './NewReport';
+import ChatHistory from './ChatHistory';
+import { Routes, Route } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
-  useEffect(() => {
-    const auth = getAuth(); // Initialize Firebase authentication
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (!currentUser) {
-        // If the user is not logged in, redirect to the login page
-        navigate('/login');
-      } else {
-        setUser(currentUser); // Set user data
-      }
-    });
-
-    return () => unsubscribe(); // Clean up the subscription
-  }, [navigate]);
-
+/**
+ * MainInterface Component
+ *
+ * Handles routing within the dashboard section.
+ * Renders NewReport at /dashboard/
+ * Renders ChatHistory at /dashboard/chat/:chatId
+ *
+ * Props:
+ * - clientId (string): The unique identifier for the client/company.
+ */
+const MainInterface = ({ clientId }) => {
   return (
-    <MainLayout>
-      {/* Login Section */}
-      <div className="login-section">
-        <LoginSection 
-          loginText={user ? `Welcome, ${user.displayName || "User"}` : "Please Log In"}
-          onClick={() => console.log("Login section clicked!")}
-          onReset={resetApp} // Pass the resetApp function
+    <div className="main-interface-container">
+      <Routes>
+        {/* Route for /dashboard */}
+        <Route
+          path="/"
+          element={<NewReport clientId={clientId} />}
         />
-      </div>
 
-      {/* Main Content */}
-      {chatId ? (
-        <ChatHistory />
-      ) : (
-        <ChatBot 
-          submitted={submitted}
-          searchParams={searchParams}
-          handleInputChange={handleInputChange}
-          saveData={saveData}
+        {/* Route for /dashboard/chat/:chatId */}
+        <Route
+          path="chat/:chatId"
+          element={<ChatHistory clientId={clientId} />}
         />
-      )}
-
-      {/* Add other features like dashboard, save to PDF, etc. here */}
-    </MainLayout>
+      </Routes>
+    </div>
   );
+};
+
+// Prop type validation
+MainInterface.propTypes = {
+  clientId: PropTypes.string.isRequired,
 };
 
 export default MainInterface;
