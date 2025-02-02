@@ -24,7 +24,7 @@ const LoginPage = () => {
   return (
     <div className="ImportantMessages">
       <div className="LogoSection">
-        <img src="../assets/datum/datum.png" alt="Company Logo" className="CompanyLogo" />
+        <img src="/datum/datum.png" alt="Company Logo" className="CompanyLogo" />
       </div>
       <div className="LoginPadding">
         <div className="LoginSection">

@@ -1,6 +1,6 @@
 import React from 'react';
 import '../StyleSheet/NewReport.css'; // Update the CSS file import
-import send from '../assets/newreport/send.png'; // Update the image path
+import send from '/newreport/send.png'; // Update the image path
 import { firestore } from '../firebase/firebase'; // Update the path
 import { addDoc, collection } from 'firebase/firestore';
 
