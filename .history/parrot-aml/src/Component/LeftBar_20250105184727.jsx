@@ -1,6 +1,6 @@
 import React from 'react';
 import '../StyleSheet/LeftBar.css'; // Ensure the path is correct
-import sortIcon from '/leftbar/sort.png'; // Ensure the correct path
+import sortIcon from '../assets/leftbar/sort.png'; // Ensure the correct path
 
 const HighRiskBadge = () => (
   <div className="risk-badge">

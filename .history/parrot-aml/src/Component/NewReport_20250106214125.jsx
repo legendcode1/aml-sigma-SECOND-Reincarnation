@@ -1,6 +1,6 @@
 import React from 'react';
 import '../StyleSheet/NewReport.css'; // Update the CSS file import
-import send from '/newreport/send.png'; // Update the image path
+import send from '../assets/newreport/send.png'; // Update the image path
 
 const NewReport = ({ searchParams, handleInputChange, saveData }) => {
   const handleSave = () => {
