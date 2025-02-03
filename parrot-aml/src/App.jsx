@@ -1,7 +1,7 @@
 // src/App.jsx
 
 import React, { useState, useEffect } from 'react';
-import { Route, Routes, useNavigate } from 'react-router-dom';
+import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import LeftBar from './Component/LeftBar';
 import MainInterface from './Component/MainInterface';
 import LoginPage from './login system/LoginPage';
@@ -22,6 +22,7 @@ const App = () => {
   const [companyName, setCompanyName] = useState(''); // State for companyName
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation(); // Get the current route location
 
   // Define domain to company mapping
   const domainClientMapping = {
@@ -63,8 +64,11 @@ const App = () => {
           const determinedCompanyName = mapping['company-name'] || 'Unknown Company';
           setCompanyName(determinedCompanyName);
 
-          // Redirect to dashboard after successful login
-          navigate('/dashboard');
+          // Only navigate to '/dashboard' if the user is at the root or login page.
+          // This prevents redirecting away from routes like a specific chat view.
+          if (location.pathname === '/login' || location.pathname === '/') {
+            navigate('/dashboard');
+          }
         } catch (error) {
           console.error('Error during authentication:', error);
           // Handle errors (e.g., show a notification)
@@ -82,7 +86,7 @@ const App = () => {
     });
 
     return () => unsubscribe();
-  }, [navigate]);
+  }, [navigate, location]); // Include location in the dependency array
 
   /**
    * Handle user logout
