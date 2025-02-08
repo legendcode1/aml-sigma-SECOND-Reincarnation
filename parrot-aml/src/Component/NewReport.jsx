@@ -1,27 +1,17 @@
 // src/Component/NewReport.jsx
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase/firebase';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { setDoc, doc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import axios from 'axios';
-import PropTypes from 'prop-types';
 import { v4 as uuidv4 } from 'uuid';
-import '../StyleSheet/NewReport.css'; // Ensure correct path
-import send from '../assets/newreport/send.png'; // Ensure correct path
+import PropTypes from 'prop-types';
+import '../StyleSheet/NewReport.css';
+import send from '../assets/newreport/send.png';
 
-/**
- * NewReport Component
- *
- * Allows users to generate a new report by filling out a form.
- * Upon submission, it saves data to Firestore and sends a POST request to the backend.
- *
- * Props:
- * - clientId (string): The unique identifier for the client/company.
- */
 const NewReport = ({ clientId }) => {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useState({
+  const [formData, setFormData] = useState({
     name: '',
     age: '',
     occupation: '',
@@ -30,38 +20,29 @@ const NewReport = ({ clientId }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  /**
-   * Handle input changes in the form
-   */
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setSearchParams((prev) => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
-  /**
-   * Handle form submission
-   */
   const handleSave = async () => {
-    const { name, age, occupation, gender } = searchParams;
-
-    // Validate form fields
+    const { name, age, occupation, gender } = formData;
     if (!name || !age || !occupation || !gender) {
       setError('All fields are required.');
       return;
     }
-
     setLoading(true);
     setError(null);
 
-    // Generate unique identifiers
+    // Generate unique IDs for the session and chat document
     const sessionId = uuidv4();
     const chatId = uuidv4();
 
-    // Prepare data to send to the backend
-    const data = {
+    // Prepare the backend payload
+    const payload = {
       session_id: sessionId,
       client_id: clientId,
       pep_name: name,
@@ -71,30 +52,47 @@ const NewReport = ({ clientId }) => {
     };
 
     try {
-      // Save the initial report message to Firestore
-      const messagesCollectionRef = collection(db, 'client', clientId, 'chat_history', chatId, 'messages');
-      await addDoc(messagesCollectionRef, {
-        content: `Report generated for ${name}`,
+      // Create a new chat document with a fixed ID and fields:
+      // headline, sender, and dateMade
+      const chatDocRef = doc(db, 'client', clientId, 'chat_history', chatId);
+      await setDoc(chatDocRef, {
+        headline: `Report for ${name}`,
         sender: 'user',
+        dateMade: serverTimestamp(),
+      });
+      console.log('Chat document created with ID:', chatId);
+
+      // Create the initial message in the "messages" subcollection (prompt)
+      const messagesRef = collection(db, 'client', clientId, 'chat_history', chatId, 'messages');
+      await addDoc(messagesRef, {
+        prompt: `Initial report request for ${name}`,
+        output: '', // No output yet
         timestamp: serverTimestamp(),
       });
-      console.log('Initial report saved to Firestore!');
+      console.log('Initial user message saved.');
 
-      // Send data to backend
-      console.log('Sending data to backend:', data);
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/report`, data);
+      // Send payload to the backend to generate the report
+      console.log('Sending data to backend:', payload);
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/report`, payload);
       console.log('Received response from backend:', response.data);
 
       if (!response.data || !response.data.report) {
         throw new Error('Invalid response from backend.');
       }
 
-      // Navigate to chat history
-      console.log(`Navigating to /dashboard/chat/${chatId}`);
+      // Save the backend response as a new message (output)
+      await addDoc(messagesRef, {
+        prompt: '', // No prompt here
+        output: response.data.report,
+        timestamp: serverTimestamp(),
+      });
+      console.log('Backend report saved.');
+
+      // Navigate to the chat history view for this chat
       navigate(`/dashboard/chat/${chatId}`);
-      console.log(`Navigation to /dashboard/chat/${chatId} successful`);
+      console.log(`Navigated to /dashboard/chat/${chatId}`);
     } catch (e) {
-      console.error('Error communicating with backend:', e);
+      console.error('Error saving report:', e);
       setError('Failed to generate report. Please try again.');
     } finally {
       setLoading(false);
@@ -113,7 +111,7 @@ const NewReport = ({ clientId }) => {
                   type="text"
                   name="name"
                   placeholder="Search a name..."
-                  value={searchParams.name}
+                  value={formData.name}
                   onChange={handleInputChange}
                   className="search-input"
                   required
@@ -134,7 +132,7 @@ const NewReport = ({ clientId }) => {
                   type="text"
                   name="age"
                   placeholder="Age"
-                  value={searchParams.age}
+                  value={formData.age}
                   onChange={handleInputChange}
                   className="search-input"
                   required
@@ -145,7 +143,7 @@ const NewReport = ({ clientId }) => {
                   type="text"
                   name="occupation"
                   placeholder="Occupation"
-                  value={searchParams.occupation}
+                  value={formData.occupation}
                   onChange={handleInputChange}
                   className="search-input"
                   required
@@ -156,7 +154,7 @@ const NewReport = ({ clientId }) => {
                   type="text"
                   name="gender"
                   placeholder="Gender"
-                  value={searchParams.gender}
+                  value={formData.gender}
                   onChange={handleInputChange}
                   className="search-input"
                   required
@@ -164,9 +162,7 @@ const NewReport = ({ clientId }) => {
               </div>
             </div>
           </div>
-          {/* Display error message if any */}
           {error && <div className="error-message">{error}</div>}
-          {/* Display loading message if processing */}
           {loading && <div className="loading-message">Generating report...</div>}
         </div>
       </div>
@@ -174,7 +170,6 @@ const NewReport = ({ clientId }) => {
   );
 };
 
-// Prop type validation
 NewReport.propTypes = {
   clientId: PropTypes.string.isRequired,
 };

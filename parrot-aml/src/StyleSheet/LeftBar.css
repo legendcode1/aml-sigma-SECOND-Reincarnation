@@ -1,16 +1,54 @@
 /* src/StyleSheet/LeftBar.css */
+
+/* Ensure the left bar uses flex layout */
 .left-bar {
-  width: 328px;
+  width: 370px;
   background-color: #243541;
   padding: 20px;
   flex-shrink: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
+
+/* For the chat-history container, let it fill available vertical space and scroll if needed */
+.chat-history {
+  flex: 1; /* Allow the chat-history to grow and take remaining space */
+  overflow-y: auto; /* Enable vertical scrolling if content overflows */
+  padding-bottom: 20px; /* Optional padding to avoid content hitting the edge */
+}
+
+/* Ensure the chat-items container uses full height if needed */
+.chat-items {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  /* Remove any conflicting height settings that might cause overflow issues */
+}
+
+/* Optionally, adjust the header and other components so the overall layout is consistent */
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.chat-header span {
+  color: #fff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* Other styles remain the same... */
+
 
 .logo-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-right: 18px;
+  padding-right: 18px;  
   height: 27px;
   margin-bottom: 26px;
 }
@@ -23,6 +61,7 @@
 .plus-icon {
   width: 27px;
   height: 27px;
+  cursor: pointer;
 }
 
 .nav-links {
@@ -44,23 +83,15 @@
   padding: 0;
 }
 
+/* The chat-history container takes the remaining vertical space */
 .chat-history {
   flex: 1;
-}
-
-.chat-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+  flex-direction: column;
+  overflow-y: auto;
 }
 
-.chat-header span {
-  color: #fff;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 20px;
-  font-weight: 700;
-}
+
 
 .icon-group {
   display: flex;
@@ -73,16 +104,37 @@
   height: 20px;
 }
 
+/* The chat-items container fills the remaining space inside chat-history */
 .chat-items {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  overflow-y: auto;
 }
 
-.chat-item {
+/* Each chat-item wrapper wraps the entire content of one chat item */
+.chat-item-wrapper {
+  display: flex;
+  gap: 20px;
   padding: 10px 0;
+  cursor: pointer;
 }
 
+/* Link style for chat items */
+.chat-item-link {
+  text-decoration: none;
+  color: inherit;
+  width: 100%;
+}
+
+/* Container for the chat item content */
+.chat-item-content {
+  width: 100%;
+  display: flex;
+}
+
+/* Chat profile styling */
 .chat-profile {
   display: flex;
   flex-direction: column;
@@ -96,6 +148,7 @@
   font-weight: 400;
 }
 
+/* Risk badge styling */
 .risk-badge {
   position: relative;
   width: 89px;
@@ -119,33 +172,15 @@
   height: 100%;
 }
 
-.chat-details {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.timeline {
-  width: 43px;
-  display: flex;
-  justify-content: center;
-}
-
-.detail-items {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.detail-item {
-  padding: 10px;
-  color: #fff;
+/* Chat date styling */
+.chat-date {
+  color: #ccc;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 17px;
-  font-weight: 400;
+  font-size: 14px;
 }
 
+/* Horizontal rule styling */
 hr {
-  color: #ffffff;
+  border: 1px solid #ffffff;
+  margin: 10px 0;
 }

@@ -1,76 +1,59 @@
 // src/Component/ChatHistory.jsx
-
 import React, { useState, useEffect, useRef } from 'react';
 import '../StyleSheet/ChatHistory.css';
 import { db } from '../firebase/firebase';
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, orderBy, query } from 'firebase/firestore';
 import ReactMarkdown from 'react-markdown';
 import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 
-/**
- * ChatHistory Component
- *
- * Displays the chat history for a specific chat session.
- *
- * Props:
- * - clientId (string): The unique identifier for the client/company.
- */
 const ChatHistory = ({ clientId }) => {
-  const { chatId } = useParams(); // Retrieve chatId from URL
+  const { chatId } = useParams();
+  const [chatDoc, setChatDoc] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(true); // Loading state
-  const [error, setError] = useState(null); // Error state
-  const messagesEndRef = useRef(null); // Reference to the end of messages
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const messagesEndRef = useRef(null);
 
-  /**
-   * Fetch chat messages from Firestore
-   */
   useEffect(() => {
-    const fetchMessages = async () => {
+    const fetchChatData = async () => {
       try {
         if (!chatId) {
           throw new Error('Chat ID is missing.');
         }
+        // Fetch the chat document
+        const chatDocRef = doc(db, 'client', clientId, 'chat_history', chatId);
+        const chatSnapshot = await getDoc(chatDocRef);
+        if (!chatSnapshot.exists()) {
+          throw new Error('Chat document not found.');
+        }
+        setChatDoc(chatSnapshot.data());
 
-        // Reference to the 'messages' subcollection
-        const messagesCollectionRef = collection(
-          db,
-          'client',
-          clientId,
-          'chat_history',
-          chatId,
-          'messages'
-        );
-
-        // Query to order messages by timestamp ascending
+        // Fetch messages from the messages subcollection
+        const messagesCollectionRef = collection(db, 'client', clientId, 'chat_history', chatId, 'messages');
         const q = query(messagesCollectionRef, orderBy('timestamp', 'asc'));
         const querySnapshot = await getDocs(q);
-        const msgs = querySnapshot.docs.map((doc) => ({
+        const fetchedMessages = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
         }));
-
-        setMessages(msgs);
+        setMessages(fetchedMessages);
         setLoading(false);
-      } catch (e) {
-        console.error('Error fetching messages:', e);
-        setError(e.message || 'Failed to load chat history.');
+      } catch (err) {
+        console.error('Error fetching chat data:', err);
+        setError(err.message || 'Failed to load chat history.');
         setLoading(false);
       }
     };
 
     if (clientId && chatId) {
-      fetchMessages();
+      fetchChatData();
     } else {
-      setError('Chat ID or Client ID is missing.');
+      setError('Client ID or Chat ID is missing.');
       setLoading(false);
     }
   }, [chatId, clientId]);
 
-  /**
-   * Scroll to the bottom when messages change
-   */
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -89,23 +72,42 @@ const ChatHistory = ({ clientId }) => {
     <div className="chat-history-container">
       <div className="chat-section-padding">
         <div className="chat-section">
-          <h1 className="chat-title">Chat History</h1>
+          <h1 className="chat-title">{chatDoc ? chatDoc.headline : 'Chat History'}</h1>
+          {chatDoc && (
+            <div className="chat-meta">
+              <span>
+                Date Made:{' '}
+                {chatDoc.date_made
+                  ? new Date(chatDoc.date_made.seconds * 1000).toLocaleString()
+                  : 'N/A'}
+              </span>
+              <span> Created by: {chatDoc.sender || 'Unknown'}</span>
+            </div>
+          )}
         </div>
         {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`${msg.sender === 'api' ? 'api-message' : 'user-message'}`}
-          >
-            <ReactMarkdown className="description-text">{msg.content}</ReactMarkdown>
+          <div key={msg.id} className="message-api">
+            <div className="user-message">
+              <div className="message-prompt">
+                <strong>Prompt:</strong> <ReactMarkdown>{msg.prompt || ''}</ReactMarkdown>
+              </div>
+            </div>
+            {msg.output && (
+              <div className='api-message'>
+                <div className="message-output">
+                  <strong>Output:</strong> <ReactMarkdown>{msg.output || ''}</ReactMarkdown>
+                </div>
+              </div>
+              
+            )}
           </div>
         ))}
-        <div ref={messagesEndRef} /> {/* Dummy div to scroll into view */}
+        <div ref={messagesEndRef} /> {/* Scroll to bottom */}
       </div>
     </div>
   );
 };
 
-// Prop type validation
 ChatHistory.propTypes = {
   clientId: PropTypes.string.isRequired,
 };
