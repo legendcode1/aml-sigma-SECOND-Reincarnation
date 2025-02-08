@@ -1,10 +1,15 @@
 // src/auth/auth.jsx
-
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, getDoc, collection, getDocs } from 'firebase/firestore'; // Import Firestore functions
-import { loadChatMessagesFirestore } from '../indexedDB'; // Import the function from indexedDB.js
-import axios from 'axios'; // Make sure axios is installed
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  getDocs
+} from 'firebase/firestore';
+import { loadChatMessagesFirestore } from '../indexedDB';
+import axios from 'axios';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -20,50 +25,40 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app); // Initialize Firestore
+const db = getFirestore(app);
 
-// Function to fetch user data by UID
+/**
+ * Fetch the user document from Firestore.
+ * Returns the raw user data so that the caller can pick out the company ID.
+ */
 export const fetchUserDataByUID = async (uid) => {
   try {
-    const userDocRef = doc(db, 'users', uid); // Reference to 'users' document
-    const userDoc = await getDoc(userDocRef); // Fetch user document
-
+    const userDocRef = doc(db, 'users', uid);
+    const userDoc = await getDoc(userDocRef);
     if (!userDoc.exists()) {
       throw new Error(`No user found with UID: ${uid}`);
     }
-
-    const userData = userDoc.data(); // Extract data from the user document
-
-    // Fetch 'name' field from user document
-    const userName = userData.name || 'Unknown User'; // Default to 'Unknown User' if name doesn't exist
-
-    localStorage.setItem('user_id', userData.uid); // Store user ID in localStorage
-    localStorage.setItem('user_name', userName); // Store user name in localStorage
-
-    console.log('Fetched user data:', userData);
-    return userData;
+    const data = userDoc.data();
+    console.log('Fetched user data:', data);
+    return data;
   } catch (error) {
     console.error('Error fetching user data:', error.message);
     throw error;
   }
 };
 
-// Function to fetch company data by company ID
+/**
+ * Fetch the company data from Firestore.
+ */
 export const fetchCompanyDataByID = async (companyId) => {
   try {
-    const companyDocRef = doc(db, 'client', companyId); // Reference to 'client' document
+    const companyDocRef = doc(db, 'client', companyId);
     console.log(`Attempting to fetch client data for company ID: ${companyId}`);
-    const companyDoc = await getDoc(companyDocRef); // Fetch company document
-
+    const companyDoc = await getDoc(companyDocRef);
     if (!companyDoc.exists()) {
       throw new Error(`No company found with ID: ${companyId}`);
     }
-
-    // Assuming 'company_name' is the field name in Firestore
-    const companyName = companyDoc.data().company_name || 'Unknown'; // If 'company_name' is missing, default to 'Unknown'
-    localStorage.setItem('company_name', companyName); // Store company name if available
-
-    const companyData = companyDoc.data(); // Extract data from the company document
+    const companyData = companyDoc.data();
     console.log('Fetched company data:', companyData);
     return companyData;
   } catch (error) {
@@ -72,22 +67,23 @@ export const fetchCompanyDataByID = async (companyId) => {
   }
 };
 
-// Function to fetch chat history for a company
+/**
+ * Fetch chat history for a given company from Firestore.
+ */
 export const fetchChatHistoryByCompanyID = async (companyId) => {
   try {
-    const chatHistoryCollectionRef = collection(db, 'client', companyId, 'chat_history'); // Reference to 'chat_history' subcollection
+    const chatHistoryCollectionRef = collection(db, 'client', companyId, 'chat_history');
     const chatHistorySnapshot = await getDocs(chatHistoryCollectionRef);
-
     if (chatHistorySnapshot.empty) {
       throw new Error(`No chat history found for company ID: ${companyId}`);
     }
-
-    const chatHistory = chatHistorySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Extract chat history data
+    const chatHistory = chatHistorySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
     console.log('Fetched chat history:', chatHistory);
-
-    // Load chat history into IndexedDB
+    // Cache chat history in IndexedDB
     await loadChatMessagesFirestore(chatHistory);
-
     return chatHistory;
   } catch (error) {
     console.error('Error fetching chat history:', error.message);
@@ -95,39 +91,28 @@ export const fetchChatHistoryByCompanyID = async (companyId) => {
   }
 };
 
-// Function to handle login and fetch related data
+/**
+ * Handle login and fetch all related data.
+ */
 export const loginUser = async (email, password) => {
   try {
-    // Authenticate the user
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
-
     if (!user) {
       throw new Error('Authentication failed.');
     }
     console.log('User successfully authenticated:', user.uid);
-
-    // Fetch user data from Firestore using UID
+    // Get raw user data from Firestore
     const userData = await fetchUserDataByUID(user.uid);
-
-    // Log the fetched user data to confirm the structure
     console.log('Fetched user data:', userData);
-
-    // Check if 'company id' field exists in the user data
-    const companyId = userData['company id']; // Ensure this field exists in Firestore, not 'company id'
+    // Look for the company ID using either key
+    const companyId = userData.companyId || userData['company id'];
     if (!companyId) {
       throw new Error('Company ID not found in user data.');
     }
-
     console.log('Company ID found:', companyId);
-
-    // Fetch company data using the 'company id'
     const companyData = await fetchCompanyDataByID(companyId);
     const chatHistory = await fetchChatHistoryByCompanyID(companyId);
-
-    // Optionally, perform any other operations (e.g., store chat history in IndexedDB)
-
-    // Return user and company data for further use
     return { user, userData, companyData, chatHistory };
   } catch (error) {
     console.error('Login failed:', error.message);
@@ -135,5 +120,4 @@ export const loginUser = async (email, password) => {
   }
 };
 
-// Export auth and db for use in other modules
 export { auth, db };

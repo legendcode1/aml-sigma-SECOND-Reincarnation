@@ -1,35 +1,20 @@
 // src/App.jsx
-
 import React, { useState, useEffect } from 'react';
 import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import LeftBar from './Component/LeftBar';
 import MainInterface from './Component/MainInterface';
 import LoginPage from './login system/LoginPage';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { fetchUserDataByUID, fetchCompanyDataByID } from './auth/auth'; // Import necessary functions
-import axios from 'axios';
+import { fetchUserDataByUID, fetchCompanyDataByID } from './auth/auth';
 import './App.css';
 
-/**
- * App Component
- *
- * This is the root component of the application.
- * It handles authentication state and routes accordingly.
- */
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [clientId, setClientId] = useState(null);
-  const [companyName, setCompanyName] = useState(''); // State for companyName
+  const [companyName, setCompanyName] = useState('');
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const location = useLocation(); // Get the current route location
-
-  // Define domain to company mapping
-  const domainClientMapping = {
-    'transinergi.com': { client_id: 'transinergi116', 'company-name': 'Sinergi Trans' },
-    'datum.com': { client_id: 'datumCorp', 'company-name': 'DatumCorp' },
-    'localhost': { client_id: 'transinergi116', 'company-name': 'Sinergi Trans' }, // For development
-  };
+  const location = useLocation();
 
   useEffect(() => {
     const auth = getAuth();
@@ -37,43 +22,29 @@ const App = () => {
       if (user) {
         console.log('Auth state changed:', user);
         setIsAuthenticated(true);
-
         try {
-          // Fetch user data
           const userData = await fetchUserDataByUID(user.uid);
           console.log('Fetched user data:', userData);
-
-          // Extract company ID from user data
-          const companyId = userData['company id'];
+          // Look for the company ID using either "companyId" or "company id"
+          const companyId = userData.companyId || userData['company id'];
           if (!companyId) {
             throw new Error('Company ID not found in user data.');
           }
           console.log('Company ID:', companyId);
-
-          // Fetch company data if needed
           const companyData = await fetchCompanyDataByID(companyId);
           console.log('Fetched company data:', companyData);
-
-          // Set clientId state
           setClientId(companyId);
-          console.log('clientId set to:', companyId);
-
-          // Determine companyName based on the domain
-          const hostname = window.location.hostname;
-          const mapping = domainClientMapping[hostname] || domainClientMapping['localhost'];
-          const determinedCompanyName = mapping['company-name'] || 'Unknown Company';
-          setCompanyName(determinedCompanyName);
-
-          // Only navigate to '/dashboard' if the user is at the root or login page.
-          // This prevents redirecting away from routes like a specific chat view.
-          if (location.pathname === '/login' || location.pathname === '/') {
+          setCompanyName(companyData.company_name || 'Unknown Company');
+          // Navigate to "/dashboard" if not already there
+          if (!location.pathname.startsWith('/dashboard')) {
             navigate('/dashboard');
+            console.log('Navigated to /dashboard');
           }
         } catch (error) {
           console.error('Error during authentication:', error);
-          // Handle errors (e.g., show a notification)
           setIsAuthenticated(false);
           setClientId(null);
+          setCompanyName('');
           navigate('/login');
         }
       } else {
@@ -84,13 +55,9 @@ const App = () => {
       }
       setLoading(false);
     });
-
     return () => unsubscribe();
-  }, [navigate, location]); // Include location in the dependency array
+  }, [navigate, location]);
 
-  /**
-   * Handle user logout
-   */
   const handleReset = async () => {
     const auth = getAuth();
     try {
@@ -106,35 +73,28 @@ const App = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>; // Show a loading state until authentication is checked
+    return <div>Loading...</div>;
   }
-
   if (isAuthenticated && !clientId) {
-    // Authentication is complete but clientId was not fetched
     return <div>Error: Client ID is missing.</div>;
   }
 
   return (
     <div className="app-container">
-      {/* Reset button placed outside the main layout */}
       {isAuthenticated && (
         <button onClick={handleReset} className="reset-button">
           Reset App (Logout and Clear Data)
         </button>
       )}
-
       <Routes>
-        {/* Login route */}
         <Route path="/login" element={<LoginPage companyName={companyName} />} />
-
-        {/* Dashboard routes */}
         <Route
           path="/dashboard/*"
           element={
             isAuthenticated && clientId ? (
               <div className="main-parent">
                 <div className="left-bar">
-                  <LeftBar />
+                  <LeftBar clientId={clientId} />
                 </div>
                 <div className="main-interface">
                   <MainInterface clientId={clientId} />
@@ -145,8 +105,6 @@ const App = () => {
             )
           }
         />
-
-        {/* Redirect any other routes to /login */}
         <Route path="*" element={<LoginPage companyName={companyName} />} />
       </Routes>
     </div>
