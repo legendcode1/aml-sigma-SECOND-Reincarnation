@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import '../StyleSheet/LeftBar.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { FixedSizeList as List } from 'react-window';
+import AutoSizer from 'react-virtualized-auto-sizer';
 import { getChatMessages, loadChatMessagesFirestore } from '../indexedDB';
 import { fetchChatHistoryByCompanyID } from '../auth/auth';
 import PropTypes from 'prop-types';
@@ -24,7 +25,7 @@ const HighRiskBadge = () => (
 const ChatItem = ({ index, style, data }) => {
   const item = data[index];
   const isHighRisk = ['Budi Arie Hartanto', 'Ananta Wistara Anugrah'].includes(item.headline);
-  
+
   return (
     <div style={style} className="chat-item-wrapper">
       <Link to={`/dashboard/chat/${item.id}`} className="chat-item-link">
@@ -48,10 +49,9 @@ const ChatItem = ({ index, style, data }) => {
 
 ChatItem.propTypes = {
   index: PropTypes.number.isRequired,
-  style: PropTypes.object, // Provided by react-window
+  style: PropTypes.object.isRequired,
   data: PropTypes.array.isRequired,
 };
-
 
 const LeftBar = ({ clientId }) => {
   const [chatHistory, setChatHistory] = useState([]);
@@ -86,14 +86,14 @@ const LeftBar = ({ clientId }) => {
 
   const handlePlusClick = () => {
     console.log('Plus icon clicked. Navigating to /dashboard');
-    navigate('/dashboard'); // Navigate back to dashboard (NewReport view)
+    navigate('/dashboard'); // Navigate back to the dashboard (NewReport view)
   };
 
   if (loading) return <div className="loading">Loading chats...</div>;
   if (error) return <div className="error-message">Error: {error}</div>;
 
   return (
-    <>
+    <div className="left-bar-container">
       {/* Logo and Plus Icon */}
       <div className="logo-container">
         <img src={datum} alt="Datum Logo" className="logo" />
@@ -106,7 +106,6 @@ const LeftBar = ({ clientId }) => {
         />
       </div>
       <hr />
-      {/* Chat History Section */}
       <div className="chat-history">
         <div className="chat-header">
           <span>Chat History</span>
@@ -116,26 +115,27 @@ const LeftBar = ({ clientId }) => {
             <img src={fav} alt="Favorites" className="icon" />
           </div>
         </div>
+        {/* Wrap the list in a container that uses AutoSizer to automatically compute height */}
         <div className="chat-items">
-          {chatHistory.length === 0 ? (
-            <p className="no-chats">No chat history available.</p>
-          ) : (
-            <List
-              height={400} // Specify a fixed height (in pixels)
-              itemCount={chatHistory.length}
-              itemSize={80} // Adjust the item height as needed
-              width="100%"
-              itemData={chatHistory}
-              itemKey={(index, data) => data[index].id}
-            >
-              {({ index, style, data }) => (
-                <ChatItem index={index} style={style} data={data} />
-              )}
-            </List>
-          )}
+          <AutoSizer>
+            {({ height, width }) => (
+              <List
+                height={height}
+                itemCount={chatHistory.length}
+                itemSize={80}
+                width={width}
+                itemData={chatHistory}
+                itemKey={(index, data) => data[index].id}
+              >
+                {({ index, style, data }) => (
+                  <ChatItem index={index} style={style} data={data} />
+                )}
+              </List>
+            )}
+          </AutoSizer>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
