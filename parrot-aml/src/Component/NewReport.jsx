@@ -1,4 +1,3 @@
-// src/Component/NewReport.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase/firebase';
@@ -9,7 +8,7 @@ import PropTypes from 'prop-types';
 import '../StyleSheet/NewReport.css';
 import send from '../assets/newreport/send.png';
 
-const NewReport = ({ clientId }) => {
+const NewReport = ({ clientId, userName }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
@@ -52,17 +51,23 @@ const NewReport = ({ clientId }) => {
     };
 
     try {
-      // Create a new chat document with a fixed ID and fields:
-      // headline, sender, and dateMade
+      // Create a new chat document with fields: headline, sender, and dateMade.
+      // Now use the passed-in userName as the sender.
       const chatDocRef = doc(db, 'client', clientId, 'chat_history', chatId);
       await setDoc(chatDocRef, {
         headline: `Report for ${name}`,
-        sender: 'user',
+        sender: userName, // Use dynamic user name
         dateMade: serverTimestamp(),
+        pep_name: name,
+        pep_occupation: occupation,
+        pep_age: age,
+        pep_gender: gender
       });
+      
       console.log('Chat document created with ID:', chatId);
 
       // Create the initial message in the "messages" subcollection (prompt)
+      // (Note: Adjust the collection path as needed; here we use a subcollection under chatDocRef)
       const messagesRef = collection(db, 'client', clientId, 'chat_history', chatId, 'messages');
       await addDoc(messagesRef, {
         prompt: `Initial report request for ${name}`,
@@ -172,6 +177,7 @@ const NewReport = ({ clientId }) => {
 
 NewReport.propTypes = {
   clientId: PropTypes.string.isRequired,
+  userName: PropTypes.string.isRequired,
 };
 
 export default NewReport;

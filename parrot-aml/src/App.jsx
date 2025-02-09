@@ -1,4 +1,3 @@
-// src/App.jsx
 import React, { useState, useEffect } from 'react';
 import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import LeftBar from './Component/LeftBar';
@@ -12,6 +11,7 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [clientId, setClientId] = useState(null);
   const [companyName, setCompanyName] = useState('');
+  const [userName, setUserName] = useState(''); // New state for the user’s name
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
@@ -25,7 +25,7 @@ const App = () => {
         try {
           const userData = await fetchUserDataByUID(user.uid);
           console.log('Fetched user data:', userData);
-          // Look for the company ID using either "companyId" or "company id"
+          // Extract the company ID using either key:
           const companyId = userData.companyId || userData['company id'];
           if (!companyId) {
             throw new Error('Company ID not found in user data.');
@@ -35,7 +35,10 @@ const App = () => {
           console.log('Fetched company data:', companyData);
           setClientId(companyId);
           setCompanyName(companyData.company_name || 'Unknown Company');
-          // Navigate to "/dashboard" if not already there
+          // Also save the user's name for later use
+          setUserName(userData.name || 'Unknown User');
+          
+          // Navigate to "/dashboard" if not already there.
           if (!location.pathname.startsWith('/dashboard')) {
             navigate('/dashboard');
             console.log('Navigated to /dashboard');
@@ -45,12 +48,14 @@ const App = () => {
           setIsAuthenticated(false);
           setClientId(null);
           setCompanyName('');
+          setUserName('');
           navigate('/login');
         }
       } else {
         setIsAuthenticated(false);
         setClientId(null);
         setCompanyName('');
+        setUserName('');
         navigate('/login');
       }
       setLoading(false);
@@ -66,6 +71,7 @@ const App = () => {
       setIsAuthenticated(false);
       setClientId(null);
       setCompanyName('');
+      setUserName('');
       navigate('/login');
     } catch (error) {
       console.error('Error signing out:', error);
@@ -97,7 +103,8 @@ const App = () => {
                   <LeftBar clientId={clientId} />
                 </div>
                 <div className="main-interface">
-                  <MainInterface clientId={clientId} />
+                  {/* Pass clientId and userName down */}
+                  <MainInterface clientId={clientId} userName={userName} />
                 </div>
               </div>
             ) : (
