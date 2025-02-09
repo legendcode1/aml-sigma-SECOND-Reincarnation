@@ -1,8 +1,8 @@
 // aml-backend/routes/api.js
-
 const express = require('express');
-// const axios = require('axios'); // Commented out since we are mocking
-// const { getAuthHeaders } = require('../auth'); // Commented out since we are mocking
+// Uncomment axios and getAuthHeaders when you want to call the real API
+// const axios = require('axios');
+// const { getAuthHeaders } = require('../auth');
 
 const router = express.Router();
 
@@ -14,13 +14,13 @@ const generateMockReport = (data) => {
   return {
     report: `EDD Report for ${data.pep_name}:
     
-    - **Session ID:** ${data.session_id}
-    - **Client ID:** ${data.client_id}
-    - **Occupation:** ${data.pep_occupation}
-    - **Age:** ${data.pep_age}
-    - **Gender:** ${data.pep_gender}
-    
-    *This is a mock report generated for testing purposes.*`,
+- **Session ID:** ${data.session_id}
+- **Client ID:** ${data.client_id}
+- **Occupation:** ${data.pep_occupation}
+- **Age:** ${data.pep_age}
+- **Gender:** ${data.pep_gender}
+
+*This is a mock report generated for testing purposes.*`
   };
 };
 
@@ -32,7 +32,7 @@ router.post('/report', async (req, res) => {
     pep_name,
     pep_occupation,
     pep_age,
-    pep_gender,
+    pep_gender
   } = req.body;
 
   console.log("Received /report request:", req.body);
@@ -58,7 +58,7 @@ router.post('/report', async (req, res) => {
     console.log("Mock API response:", mockResponse);
     return res.status(200).json(mockResponse);
   } else {
-    // Uncomment the following block to use the real API
+    // Uncomment below to use the real API
     /*
     try {
       console.log("Attempting to obtain auth headers...");
@@ -131,16 +131,16 @@ router.post('/followup', async (req, res) => {
     const mockResponse = {
       report: `Follow-up EDD Report for ${pep_name}:
       
-      - **Session ID:** ${session_id}
-      - **Client ID:** ${client_id}
-      - **User Message:** "${user_message}"
-      
-      *This is a mock follow-up report generated for testing purposes.*`,
+- **Session ID:** ${session_id}
+- **Client ID:** ${client_id}
+- **User Message:** "${user_message}"
+
+*This is a mock follow-up report generated for testing purposes.*`
     };
     console.log("Mock API response for followup:", mockResponse);
     return res.status(200).json(mockResponse);
   } else {
-    // Uncomment the following block to use the real API
+    // Uncomment below to use the real API
     /*
     try {
       console.log("Attempting to obtain auth headers for followup...");

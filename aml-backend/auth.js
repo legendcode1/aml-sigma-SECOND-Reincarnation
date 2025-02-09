@@ -1,5 +1,4 @@
 // aml-backend/auth.js
-
 const { GoogleAuth } = require('google-auth-library');
 const dotenv = require('dotenv');
 const path = require('path');
@@ -18,7 +17,6 @@ const getAuthHeaders = async (targetUrl) => {
     const auth = new GoogleAuth({
       keyFile: path.resolve(__dirname, process.env.SERVICE_ACCOUNT_FILE),
       // Do NOT specify scopes when obtaining an ID token
-      // scopes: ['https://www.googleapis.com/auth/cloud-platform'], // Remove this line
     });
 
     // Get the ID Token client for the specified target URL (audience)
@@ -28,9 +26,9 @@ const getAuthHeaders = async (targetUrl) => {
     const headers = await client.getRequestHeaders();
 
     return {
-      ...headers, // Includes the Authorization: Bearer <id_token>
+      ...headers, // This includes the "Authorization: Bearer <id_token>"
       'Content-Type': 'application/json',
-      Accept: 'application/json',
+      Accept: 'application/json'
     };
   } catch (error) {
     console.error("Error obtaining auth headers:", error);

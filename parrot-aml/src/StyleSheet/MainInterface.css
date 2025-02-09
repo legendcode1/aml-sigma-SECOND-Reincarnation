@@ -1,3 +1,4 @@
+/* Main Interface Layout */
 .main-interface {
   flex: 1;
   background-color: #314a57;
@@ -5,10 +6,52 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 0 0;
+  margin: 0;
   vertical-align: middle;
 }
 
 .main-interface-container {
-  margin: auto 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
 } 
+
+/* Report and Chat Container Layout */
+.report-chat-container {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Report Section */
+.report-chat-container > :first-child {
+  flex: 0 0 auto;
+  max-width: 800px;
+  overflow-y: auto;
+}
+
+/* Chat History Section */
+.report-chat-container > :last-child {
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
+
+/* Resizer */
+.resizer {
+  width: 5px;
+  cursor: ew-resize;
+  background-color: #aaa;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  transition: background-color 0.2s ease;
+}
+
+.resizer:hover {
+  background-color: #888;
+}
