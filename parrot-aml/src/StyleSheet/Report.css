@@ -3,12 +3,11 @@
     flex-direction: column;
     height: 100%;
     width: 100%;
-    margin: 0px 20px;
   }
   
   
   
-  .search-result {
+  .report-result {
     padding: 20px 35px 55px;
     min-height: 100vh;
     display: flex;
@@ -17,19 +16,11 @@
     width: 100%;
   }
   
-  .search-section-padding {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    width: 300PX;
-    max-width: 1301px;
-  }
   
-  .search-section {
-    display: flex;
+  .report-section {
     justify-content: center;
     width: 100%;
+    margin-left: 20px;
   }
   
   .name-title {
@@ -44,22 +35,21 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    max-width: 80%; /* Limit the width of the message container */
+    width: 100%;
     padding: 10px 20px; /* Add padding inside the message container */
-    margin: 10px 0; /* Add some margin between messages */
-    border-radius: 10px; /* Add border radius for rounded corners */
     word-wrap: break-word; /* Ensure long words break to the next line */
-    color: #314a57;
+    color: #293742;
+    outline: #314a57 solid 1px;
   }
   
   
   .api-message {
-    background-color: #2c3e50; /* Background color for API messages */
+    background-color: #293742; /* Background color for API messages */
     align-self: flex-start; /* Align API messages to the left */
-  }
+  }s
   
   .user-message {
-    background-color: #2c3e50; /* Background color for user messages */
+    background-color: #293742; /* Background color for user messages */
     align-self: flex-start; /* Align user messages to the right */
   }
   

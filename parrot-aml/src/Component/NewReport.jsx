@@ -51,12 +51,11 @@ const NewReport = ({ clientId, userName }) => {
     };
 
     try {
-      // Create a new chat document with fields: headline, sender, and dateMade.
-      // Now use the passed-in userName as the sender.
+      // Create chat document (unchanged)
       const chatDocRef = doc(db, 'client', clientId, 'chat_history', chatId);
       await setDoc(chatDocRef, {
         headline: `Report for ${name}`,
-        sender: userName, // Use dynamic user name
+        sender: userName,
         dateMade: serverTimestamp(),
         pep_name: name,
         pep_occupation: occupation,
@@ -65,37 +64,35 @@ const NewReport = ({ clientId, userName }) => {
       });
       
       console.log('Chat document created with ID:', chatId);
-
-      // Create the initial message in the "messages" subcollection (prompt)
-      // (Note: Adjust the collection path as needed; here we use a subcollection under chatDocRef)
-      const messagesRef = collection(db, 'client', clientId, 'chat_history', chatId, 'messages');
-      await addDoc(messagesRef, {
+  
+      // Create initial message with specific ID 'initial-report'
+      const initialReportRef = doc(db, 'client', clientId, 'chat_history', chatId, 'messages', 'initial-report');
+      await setDoc(initialReportRef, {
         prompt: `Initial report request for ${name}`,
-        output: '', // No output yet
+        output: '', // Will be updated after backend response
         timestamp: serverTimestamp(),
       });
-      console.log('Initial user message saved.');
-
-      // Send payload to the backend to generate the report
-      console.log('Sending data to backend:', payload);
+      
+      console.log('Initial report message created with ID: initial-report');
+  
+      // Send payload to backend (unchanged)
       const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/report`, payload);
-      console.log('Received response from backend:', response.data);
-
+      
       if (!response.data || !response.data.report) {
         throw new Error('Invalid response from backend.');
       }
-
-      // Save the backend response as a new message (output)
-      await addDoc(messagesRef, {
-        prompt: '', // No prompt here
+  
+      // Update the initial-report document with the response
+      await setDoc(initialReportRef, {
+        prompt: `Initial report request for ${name}`,
         output: response.data.report,
         timestamp: serverTimestamp(),
-      });
-      console.log('Backend report saved.');
-
-      // Navigate to the chat history view for this chat
+      }, { merge: true });
+      
+      console.log('Initial report updated with backend response');
+  
+      // Navigate to chat view
       navigate(`/dashboard/chat/${chatId}`);
-      console.log(`Navigated to /dashboard/chat/${chatId}`);
     } catch (e) {
       console.error('Error saving report:', e);
       setError('Failed to generate report. Please try again.');

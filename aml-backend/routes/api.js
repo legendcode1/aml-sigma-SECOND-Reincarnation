@@ -1,15 +1,15 @@
 // aml-backend/routes/api.js
+
 const express = require('express');
-// Uncomment axios and getAuthHeaders when you want to call the real API
-// const axios = require('axios');
-// const { getAuthHeaders } = require('../auth');
+const axios = require('axios'); // Still imported in case you need to switch later
+const { getAuthHeaders } = require('../auth'); // Imported for real API mode
 
 const router = express.Router();
 
-// Flag to toggle between mock and real API
-const USE_MOCK_API = true;
+// Toggle to true for mock mode (to prevent using real tokens/calling external API)
+const USE_MOCK_API = false;
 
-// Mock data generator function
+// Mock data generator function (for fallback or testing)
 const generateMockReport = (data) => {
   return {
     report: `EDD Report for ${data.pep_name}:
@@ -32,7 +32,7 @@ router.post('/report', async (req, res) => {
     pep_name,
     pep_occupation,
     pep_age,
-    pep_gender
+    pep_gender,
   } = req.body;
 
   console.log("Received /report request:", req.body);
@@ -58,8 +58,6 @@ router.post('/report', async (req, res) => {
     console.log("Mock API response:", mockResponse);
     return res.status(200).json(mockResponse);
   } else {
-    // Uncomment below to use the real API
-    /*
     try {
       console.log("Attempting to obtain auth headers...");
       const headers = await getAuthHeaders(process.env.AIGISLLM_BACKEND_URL);
@@ -91,7 +89,6 @@ router.post('/report', async (req, res) => {
         error: error.response?.data || 'Internal Server Error',
       });
     }
-    */
   }
 });
 
@@ -140,8 +137,6 @@ router.post('/followup', async (req, res) => {
     console.log("Mock API response for followup:", mockResponse);
     return res.status(200).json(mockResponse);
   } else {
-    // Uncomment below to use the real API
-    /*
     try {
       console.log("Attempting to obtain auth headers for followup...");
       const headers = await getAuthHeaders(process.env.AIGISLLM_BACKEND_URL);
@@ -176,7 +171,6 @@ router.post('/followup', async (req, res) => {
         error: error.response?.data || 'Internal Server Error',
       });
     }
-    */
   }
 });
 

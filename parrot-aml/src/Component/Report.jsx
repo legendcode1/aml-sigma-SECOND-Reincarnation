@@ -1,103 +1,86 @@
-// src/Component/Report.jsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../StyleSheet/Report.css';
 import { db } from '../firebase/firebase';
-import { doc, getDoc, collection, getDocs, orderBy, query } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import ReactMarkdown from 'react-markdown';
 import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 
 const Report = ({ clientId }) => {
   const { chatId } = useParams();
-  const [chatDoc, setChatDoc] = useState(null);
-  const [messages, setMessages] = useState([]);
+  const [initialReport, setInitialReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    const fetchChatData = async () => {
+    const fetchInitialReport = async () => {
       try {
+        setLoading(true); // Reset loading state
+        setInitialReport(null); // Clear previous report
+        setError(null); // Clear any previous errors
+
         if (!chatId) {
           throw new Error('Chat ID is missing.');
         }
-        // Fetch the chat document
-        const chatDocRef = doc(db, 'client', clientId, 'chat_history', chatId);
-        const chatSnapshot = await getDoc(chatDocRef);
-        if (!chatSnapshot.exists()) {
-          throw new Error('Chat document not found.');
-        }
-        setChatDoc(chatSnapshot.data());
 
-        // Fetch messages from the messages subcollection
-        const messagesCollectionRef = collection(db, 'client', clientId, 'chat_history');
-        const q = query(messagesCollectionRef, orderBy('timestamp', 'asc'));
-        const querySnapshot = await getDocs(q);
-        const fetchedMessages = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setMessages(fetchedMessages);
-        setLoading(false);
+        const messageRef = doc(
+          db, 
+          'client', 
+          clientId, 
+          'chat_history', 
+          chatId,
+          'messages',
+          'initial-report'
+        );
+        
+        const messageDoc = await getDoc(messageRef);
+        
+        if (!messageDoc.exists()) {
+          throw new Error('Initial report message not found.');
+        }
+
+        setInitialReport(messageDoc.data());
+
       } catch (err) {
-        console.error('Error fetching chat data:', err);
-        setError(err.message || 'Failed to load chat history.');
+        console.error('Error fetching initial report message:', err);
+        setError(err.message || 'Failed to load initial report.');
+      } finally {
         setLoading(false);
       }
     };
 
-    if (clientId && chatId) {
-      fetchChatData();
-    } else {
-      setError('Client ID or Chat ID is missing.');
-      setLoading(false);
-    }
-  }, [chatId, clientId]);
+    fetchInitialReport();
+  }, [chatId, clientId]); // Added chatId to dependency array
 
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages]);
-
-  if (loading) {
-    return <div className="loading-messages">Loading chat messages...</div>;
-  }
-
-  if (error) {
-    return <div className="error-messages">{error}</div>;
-  }
+  if (loading) return <div className="loading-messages">Loading initial report...</div>;
+  if (error) return <div className="error-messages">{error}</div>;
 
   return (
     <div className="report-container">
       <div className="report-section-padding">
         <div className="report-section">
-          <h1 className="chat-title">{chatDoc ? chatDoc.headline : 'Chat History'}</h1>
-          {chatDoc && (
+          <h1 className="chat-title">Initial Report</h1>
+          {initialReport && (
             <div className="chat-meta">
               <span>
                 Date Made:{' '}
-                {chatDoc.date_made
-                  ? new Date(chatDoc.date_made.seconds * 1000).toLocaleString()
+                {initialReport.timestamp
+                  ? new Date(initialReport.timestamp.seconds * 1000).toLocaleString()
                   : 'N/A'}
               </span>
-              <span> Created by: {chatDoc.sender || 'Unknown'}</span>
             </div>
           )}
         </div>
-        {messages.map((msg) => (
-          <div key={msg.id} className="message-api">
-            {msg.output && (
-              <div className='api-message'>
-                <div className="message-output">
-                  <strong>Initial report</strong> <ReactMarkdown>{msg.output || ''}</ReactMarkdown>
-                </div>
+        <hr className="no-padding-hr" />
+        {initialReport && (
+          <div className="message-api">
+            <div className='api-message'>
+              <div className="message-output">
+                <ReactMarkdown>{initialReport.output || ''}</ReactMarkdown>
               </div>
-              
-            )}
+            </div>
           </div>
-        ))}
-        <div ref={messagesEndRef} /> {/* Scroll to bottom */}
+        )}
       </div>
     </div>
   );

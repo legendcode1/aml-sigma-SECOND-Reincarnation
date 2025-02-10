@@ -1,3 +1,4 @@
+// src/Component/ChatHistory.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import '../StyleSheet/ChatHistory.css';
 import { db } from '../firebase/firebase';
@@ -18,51 +19,47 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 
-const ChatMessage = ({ prompt, output, userName }) => {
-  return (
-    <div className="chat-message">
-      {prompt && (
-        <div className="user-message">
-          {userName && (
-            <div className="user-heading-message">
-              <strong>{userName}</strong>
-            </div>
-          )}
-          <div className="message-content">
-            <ReactMarkdown>{prompt}</ReactMarkdown>
-          </div>
-        </div>
-      )}
-      {output && (
-        <div className="bot-message">
-          <div className="bot-heading-message">
-            <strong>AegisAML</strong>
-          </div>
-          <div className="message-content">
-            <ReactMarkdown>{output}</ReactMarkdown>
-          </div>
-        </div>
-      )}
+// Component to render a user (prompt) message
+const UserMessage = ({ userName, prompt }) => (
+  <div className="user-message">
+    <div className="message-heading">
+      {userName && <strong>{userName}</strong>}
     </div>
-  );
+    <div className="message-content">
+      <ReactMarkdown>{prompt}</ReactMarkdown>
+    </div>
+  </div>
+);
+
+UserMessage.propTypes = {
+  userName: PropTypes.string,
+  prompt: PropTypes.string.isRequired,
 };
 
-ChatMessage.propTypes = {
-  prompt: PropTypes.string,
-  output: PropTypes.string,
-  userName: PropTypes.string
+// Component to render a bot (output) message
+const BotMessage = ({ output }) => (
+  <div className="bot-message">
+    <div className="message-heading">
+      <strong>AegisAML</strong>
+    </div>
+    <div className="message-content">
+      <ReactMarkdown>{output}</ReactMarkdown>
+    </div>
+  </div>
+);
+
+BotMessage.propTypes = {
+  output: PropTypes.string.isRequired,
 };
 
 const ChatHistory = ({ clientId, userName }) => {
   const { chatId } = useParams();
-  const [chatDoc, setChatDoc] = useState(null); // Document that should include the extra PEP fields
+  const [chatDoc, setChatDoc] = useState(null); // Expected to include extra PEP fields
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef(null);
-
-  console.log('userName:', userName);
 
   // Resizable and toggle state
   const [width, setWidth] = useState(400); // Default width (px)
@@ -75,11 +72,13 @@ const ChatHistory = ({ clientId, userName }) => {
       try {
         if (!chatId) throw new Error('Chat ID is missing.');
 
-        // Get the chat document (which should include pep fields)
+        // Get the chat document (which should include extra PEP fields)
         const chatDocRef = doc(db, 'client', clientId, 'chat_history', chatId);
         const chatSnapshot = await getDoc(chatDocRef);
         if (!chatSnapshot.exists()) throw new Error('Chat document not found.');
-        setChatDoc(chatSnapshot.data());
+        const chatData = chatSnapshot.data();
+        console.log("Fetched chat document:", chatData);
+        setChatDoc(chatData);
 
         // Get the messages subcollection
         const messagesCollectionRef = collection(
@@ -96,6 +95,7 @@ const ChatHistory = ({ clientId, userName }) => {
           id: doc.id,
           ...doc.data()
         }));
+        console.log("Fetched messages:", fetchedMessages);
         setMessages(fetchedMessages);
         setLoading(false);
       } catch (err) {
@@ -153,17 +153,17 @@ const ChatHistory = ({ clientId, userName }) => {
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
-  
+
     try {
-      // Create a new message object with userName
+      // Create a new message object for an optimistic update (include userName)
       const newMsg = {
         prompt: newMessage,
-        output: '',
+        output: '', // initially empty; to be updated after backend response
         timestamp: serverTimestamp(),
-        userName: userName // Add userName here
+        userName: userName,
       };
 
-      // Append the new message locally using a temporary ID
+      // Append the new message locally (using a temporary id)
       const tempId = uuidv4();
       setMessages(prev => [...prev, { id: tempId, ...newMsg }]);
 
@@ -177,27 +177,35 @@ const ChatHistory = ({ clientId, userName }) => {
         'messages'
       );
       const docRef = await addDoc(messagesCollectionRef, newMsg);
+      console.log("New message added to Firestore with id:", docRef.id);
 
       // Build the payload for the /followup API call.
-      // Use the extra PEP fields stored in the chat document.
       const payload = {
-        session_id: uuidv4(), // Or use your existing session identifier
+        session_id: uuidv4(), // Or reuse an existing session identifier if available
         client_id: clientId,
         pep_name: chatDoc?.pep_name || '',
         pep_occupation: chatDoc?.pep_occupation || '',
         pep_age: chatDoc?.pep_age || '',
         pep_gender: chatDoc?.pep_gender || '',
-        // Optionally include previous conversation context
+        // Optionally include previous conversation context (prompts only)
         chat_history: messages.map(m => m.prompt).join('\n'),
         user_message: newMessage
       };
+      console.log("Payload for followup:", payload);
 
       // Send the followup request to your backend
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/followup?client_id=${clientId}`,
         payload
       );
-      const outputReport = response.data.report;
+      console.log("Followup API response:", response.data);
+
+      // Try to extract the output report
+      let outputReport = response.data.report;
+      if (!outputReport && typeof response.data === 'string') {
+        outputReport = response.data;
+      }
+      console.log("Extracted output report:", outputReport);
 
       // Update the last message in local state with the backend output
       setMessages(prev => {
@@ -207,8 +215,12 @@ const ChatHistory = ({ clientId, userName }) => {
       });
 
       // Update the Firestore document for that message with the output field
-      await updateDoc(docRef, { output: outputReport });
-
+      if (outputReport !== undefined && outputReport !== null) {
+        await updateDoc(docRef, { output: outputReport });
+        console.log("Firestore document updated with output.");
+      } else {
+        console.error("Output report is undefined; not updating Firestore.");
+      }
       setNewMessage('');
     } catch (err) {
       console.error('Error sending follow-up message:', err);
@@ -219,9 +231,9 @@ const ChatHistory = ({ clientId, userName }) => {
   if (loading) return <div className="loading-messages">Loading messages...</div>;
   if (error) return <div className="error-messages">{error}</div>;
 
-
   return (
     <>
+      {/* Toggle Button (square) that stays outside the chat panel */}
       <button
         className="toggle-button"
         onClick={togglePanel}
@@ -234,6 +246,7 @@ const ChatHistory = ({ clientId, userName }) => {
         {isOpen ? '⫸' : '⫷'}
       </button>
 
+      {/* Chat History Panel */}
       <div
         className="chat-history-container"
         style={{
@@ -244,30 +257,36 @@ const ChatHistory = ({ clientId, userName }) => {
       >
         {isOpen && (
           <>
+            {/* Resize Handle */}
             <div className="resizer" onMouseDown={handleResizeMouseDown}></div>
 
+            {/* Chat Content – display messages using the ChatMessage components */}
             <div className="chat-section-padding">
-              {messages.map((msg) => (
-                <ChatMessage
-                  key={msg.id}
-                  prompt={msg.prompt}
-                  output={msg.output}
-                  userName={msg.userName || userName}
-                />
-              ))}
+              {messages
+                .filter((msg) => msg.id !== "initial-report")
+                .map((msg) => (
+                  <div key={msg.id} className="message-bubble">
+                    {msg.prompt && (
+                      <UserMessage userName={msg.userName || userName} prompt={msg.prompt} />
+                    )}
+                    {msg.output && <BotMessage output={msg.output} />}
+                  </div>
+                ))
+              }
               <div ref={messagesEndRef} />
-            </div>
 
-            <form onSubmit={handleSendMessage} className="chat-input-form">
-              <input
-                type="text"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Type your follow-up message..."
-                className="chat-input"
-              />
-              <button type="submit" className="send-button">Send</button>
-            </form>
+              {/* New Message Input Form */}
+              <form onSubmit={handleSendMessage} className="chat-input-form">
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder="Type your follow-up message..."
+                  className="chat-input"
+                />
+                <button type="submit" className="send-button">Send</button>
+              </form>
+            </div>
           </>
         )}
       </div>
