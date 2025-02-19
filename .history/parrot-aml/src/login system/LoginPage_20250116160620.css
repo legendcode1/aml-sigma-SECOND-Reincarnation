@@ -29,7 +29,7 @@
   }
   
   .WelcomeText {
-    color: white;
+    color: var(--text-color);
     font-size: 75px; /* Reduced font size by half */
     font-family: 'JetBrains Mono', monospace;
     font-weight: 700;
@@ -55,7 +55,7 @@
   
   .EmailAddress,
   .Password {
-    color: white;
+    color: var(--text-color);
     font-size: 35px; /* Reduced font size by half */
     font-family: 'JetBrains Mono', monospace;
     font-weight: 700;
@@ -85,7 +85,7 @@
     width: 504.5px; /* Reduced width by half */
     height: 56px; /* Reduced height by half */
     background: #314a57;
-    color: white;
+    color: var(--text-color);
     font-size: 35px; /* Reduced font size by half */
     font-family: 'JetBrains Mono', monospace;
     font-weight: 700;

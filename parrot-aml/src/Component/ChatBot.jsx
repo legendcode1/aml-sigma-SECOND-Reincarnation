@@ -1,63 +1,88 @@
-// src/Component/ChatBot.jsx
-
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import PropTypes from 'prop-types';
 import '../StyleSheet/ChatBot.css';
-import NewReport from './NewReport';
-import SearchResult from './SearchResult';
-import { addChatMessage, getChatMessages } from '../indexedDB'; // Import IndexedDB utility
-import PropTypes from 'prop-types'; // For prop type validation
 
-const ChatBot = ({ submitted, searchParams, handleInputChange, saveData, clientId, chatId }) => {
-  const [chatHistory, setChatHistory] = useState([]);
+const UserMessage = ({ userName, prompt }) => (
+  <div className="user-message">
+    <div className="message-heading">
+      {userName && <strong>{userName}</strong>}
+    </div>
+    <div className="message-content">
+      <ReactMarkdown>{prompt}</ReactMarkdown>
+    </div>
+  </div>
+);
 
+UserMessage.propTypes = {
+  userName: PropTypes.string,
+  prompt: PropTypes.string.isRequired,
+};
+
+const BotMessage = ({ output }) => (
+  <div className="bot-message">
+    <div className="message-heading">
+      <strong>AegisAML</strong>
+    </div>
+    <div className="message-content">
+      <ReactMarkdown>{output}</ReactMarkdown>
+    </div>
+  </div>
+);
+
+BotMessage.propTypes = {
+  output: PropTypes.string.isRequired,
+};
+
+const ChatBotContainer = ({
+  messages,
+  newMessage,
+  setNewMessage,
+  handleSendMessage,
+  messagesEndRef,
+  userName,
+}) => {
+  // Auto-scroll on messages update
   useEffect(() => {
-    // Fetch existing chat messages from IndexedDB on load
-    const fetchChatHistory = async () => {
-      const messages = await getChatMessages();
-      setChatHistory(messages);
-    };
-    fetchChatHistory();
-  }, []);
-
-  const saveMessage = async (message) => {
-    await addChatMessage(message); // Save to IndexedDB
-    setChatHistory((prev) => [...prev, message]); // Update local state
-  };
-
-  // Updated saveData function to pass data and chatId
-  const handleSaveData = async (data) => {
-    try {
-      await saveData(data, chatId);
-      await saveMessage(data); // Save to IndexedDB on submit
-    } catch (error) {
-      console.error('Error saving data:', error);
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  };
+  }, [messages, messagesEndRef]);
 
   return (
-    <div className="chatbot-container">
-      {!submitted ? (
-        <NewReport 
-          searchParams={searchParams} 
-          handleInputChange={handleInputChange} 
-          saveData={handleSaveData} 
-          clientId={clientId}
-          chatId={chatId}
+    <div className="chat-section-padding">
+      {messages
+        .filter((msg) => msg.id !== "initial-report")
+        .map((msg) => (
+          <div key={msg.id} className="message-bubble">
+            {msg.prompt && (
+              <UserMessage userName={msg.userName || userName} prompt={msg.prompt} />
+            )}
+            {msg.output && <BotMessage output={msg.output} />}
+          </div>
+        ))}
+      <div ref={messagesEndRef} />
+      <form onSubmit={handleSendMessage} className="chat-input-form">
+        <input
+          type="text"
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          placeholder="Type your follow-up message..."
+          className="chat-input"
         />
-      ) : (
-        <SearchResult name={searchParams.name} />
-      )}
+        <button type="submit" className="send-button">Send</button>
+      </form>
     </div>
   );
 };
 
-ChatBot.propTypes = {
-  submitted: PropTypes.bool.isRequired,
-  searchParams: PropTypes.object.isRequired,
-  handleInputChange: PropTypes.func.isRequired,
-  saveData: PropTypes.func.isRequired,
-  clientId: PropTypes.string.isRequired,
-  chatId: PropTypes.string.isRequired,
+ChatBotContainer.propTypes = {
+  messages: PropTypes.array.isRequired,
+  newMessage: PropTypes.string.isRequired,
+  setNewMessage: PropTypes.func.isRequired,
+  handleSendMessage: PropTypes.func.isRequired,
+  messagesEndRef: PropTypes.object.isRequired,
+  userName: PropTypes.string.isRequired,
 };
 
-export default ChatBot;
+export default ChatBotContainer;

@@ -5,6 +5,8 @@ import MainInterface from './Component/MainInterface';
 import LoginPage from './login system/LoginPage';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { fetchUserDataByUID, fetchCompanyDataByID } from './auth/auth';
+import './StyleSheet/global.css';
+
 import './App.css';
 
 const App = () => {

@@ -7,7 +7,7 @@
 .login-text {
   font-size: 24px; /* Keep a readable font size */
   font-weight: bold; /* Bold font for emphasis */
-  color: #fff; /* Black color for text */ 
+  color: var(--text-color); /* Black color for text */ 
 }
 
 .login-icon {
@@ -20,7 +20,7 @@
 .WelcomeText {
   font-size: 24px; /* Match the size of .login-text */
   font-weight: bold; /* Keep bold for consistency */
-  color: #fff; /* Use a slightly softer color for the welcome text */
+  color: var(--text-color); /* Use a slightly softer color for the welcome text */
   margin: 0 auto; /* Center the text in its container */
   text-align: center; /* Align the text centrally */
 }
@@ -33,7 +33,7 @@
   transform: translateY(-50%);
   padding: 5px 10px;
   background-color: #f44336; /* Red background */
-  color: white;
+  color: var(--text-color);
   border: none;
   border-radius: 5px;
   cursor: pointer;

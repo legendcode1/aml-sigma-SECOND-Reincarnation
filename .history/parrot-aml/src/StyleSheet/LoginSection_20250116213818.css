@@ -6,7 +6,7 @@
   height: 76px; /* Maintain the desired height */
   padding: 0 20px; /* Horizontal padding for spacing */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
-  background-color: #fff; /* Optional: Add a background color for contrast */
+  background-color: var(--text-color); /* Optional: Add a background color for contrast */
 }
 
 .login-text {
@@ -20,7 +20,7 @@
   width: 76px; /* Maintain the icon size */
   height: 76px; /* Maintain the icon size */
   border-radius: 50%; /* Make the icon circular */
-  background-color: #ccc; /* Placeholder background color */
+  background-color: var(--secondary-text-color); /* Placeholder background color */
   margin-left: 20px; /* Add spacing between the icon and adjacent elements */
 }
 

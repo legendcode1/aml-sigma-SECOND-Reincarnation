@@ -1,7 +1,7 @@
 import React from 'react';
 import '../StyleSheet/LeftBar.css'; // Ensure the path is correct
 import sortIcon from '/leftbar/sort.png'; // Ensure the correct path
-import plusIcon from '/leftbar/plus-sign.png';
+import plusIcon from '/leftbar/plus.svg';
 import datum from '/leftbar/datum.png';
 import highrisk from '/leftbar/high-risk.png';
 
