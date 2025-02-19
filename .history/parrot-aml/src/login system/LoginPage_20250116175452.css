@@ -47,7 +47,7 @@
 }
 
 .WelcomeText {
-    color: white;
+    color: var(--text-color);
     font-size: 40px; /* Adjust font size */
     font-family: 'JetBrains Mono', monospace;
     font-weight: 700;
@@ -75,7 +75,7 @@
 
 .EmailAddress,
 .Password {
-    color: white;
+    color: var(--text-color);
     font-size: 18px; /* Smaller font size for labels */
     font-family: 'JetBrains Mono', monospace;
     font-weight: 700;
@@ -107,7 +107,7 @@
     max-width: 200px; /* Restrict button width */
     height: 50px; /* Comfortable button height */
     background: #314a57;
-    color: white;
+    color: var(--text-color);
     font-size: 18px; /* Readable font size */
     font-family: 'JetBrains Mono', monospace;
     font-weight: 700;

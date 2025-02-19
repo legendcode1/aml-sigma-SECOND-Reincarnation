@@ -11,6 +11,9 @@ html, body, #root {
 }
 
 .app-container {
+  --primary-color: #293742;
+  --secondary-color: #22323E;
+  --stroke-color: #34414C;
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -20,7 +23,7 @@ html, body, #root {
 .reset-button {
   padding: 10px 20px;
   background-color: #f44336; /* Red background */
-  color: white;
+  color: var(--text-color);
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -44,7 +47,7 @@ html, body, #root {
 
 .left-bar {
   width: fit-content;
-  background-color: #293742;
+  background-color: var(--primary-color);
   height: 100vh;
   position: relative;
   outline: #434F59 solid 1px;
@@ -52,7 +55,7 @@ html, body, #root {
 
 .main-interface {
   flex: 1;
-  background-color: #293742;
+  background-color: var(--primary-color);
   display: flex;
   flex-direction: column;
   align-items: center;

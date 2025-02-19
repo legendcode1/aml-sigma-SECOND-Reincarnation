@@ -7,7 +7,7 @@
   height: 100vh; /* full viewport height */
   display: flex;
   flex-direction: column;
-  stroke: #fff;
+  stroke: var(--text-color);
 }
 
 .logo-container {
@@ -43,7 +43,7 @@
 }
 
 .chat-header span {
-  color: #fff;
+  color: var(--text-color);
   font-family: 'JetBrains Mono', monospace;
   font-size: 20px;
   font-weight: 700;
@@ -87,7 +87,7 @@
 }
 
 .profile-name {
-  color: #fff;
+  color: var(--text-color);
   font-family: 'JetBrains Mono', monospace;
   font-size: 17px;
   font-weight: 400;
@@ -104,7 +104,7 @@
 
 .risk-badge span {
   position: absolute;
-  color: #fff;
+  color: var(--text-color);
   font-family: 'JetBrains Mono', monospace;
   font-size: 15px;
   font-weight: 700;

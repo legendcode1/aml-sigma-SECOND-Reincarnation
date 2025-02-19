@@ -2,7 +2,7 @@ import React from 'react';
 import '../StyleSheet/MainInterface.css';
 import NewReport from './NewReport';
 import Report from './Report';
-import ChatHistory from './ChatHistory';
+import ChatPanel from './Panel';
 import { Routes, Route } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
@@ -11,15 +11,18 @@ const MainInterface = ({ clientId, userName }) => {
     <div className="main-interface-container">
       <Routes>
         {/* Default dashboard route shows the NewReport form */}
-        <Route path="/" element={<NewReport clientId={clientId} userName={userName} />} />
+        <Route 
+          path="/" 
+          element={<NewReport clientId={clientId} userName={userName} />} 
+        />
 
-        {/* When the URL is /dashboard/chat/:chatId, display both Report and ChatHistory */}
+        {/* When the URL is /dashboard/chat/:chatId, display Report and ChatPanel */}
         <Route
           path="chat/:chatId"
           element={
             <div className="report-chat-container">
-              <ChatHistory clientId={clientId} userName={userName}/>
               <Report clientId={clientId} />
+              <ChatPanel clientId={clientId} userName={userName} />
             </div>
           }
         />

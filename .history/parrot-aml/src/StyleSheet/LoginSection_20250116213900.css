@@ -24,7 +24,7 @@
 .WelcomeText {
   font-size: 24px; /* Match the size of .login-text */
   font-weight: bold; /* Keep bold for consistency */
-  color: #fff; /* Use a slightly softer color for the welcome text */
+  color: var(--text-color); /* Use a slightly softer color for the welcome text */
   margin: 0 auto; /* Center the text in its container */
   text-align: center; /* Align the text centrally */
 }

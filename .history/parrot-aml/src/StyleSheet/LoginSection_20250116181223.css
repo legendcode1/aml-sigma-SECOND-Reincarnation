@@ -6,7 +6,7 @@
   justify-content: start;
   width: 1400px;
   height: 76px;
-  background-color: #fff;
+  background-color: var(--text-color);
   padding: 0 20px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
@@ -21,7 +21,7 @@
   width: 76px;
   height: 76px;
   border-radius: 50%;
-  background-color: #ccc;
+  background-color: var(--secondary-text-color);
   margin-left: 10px;
 }
 

@@ -29,7 +29,7 @@
   }
   
   .WelcomeText {
-    color: white;
+    color: var(--text-color);
     font-size: 150px;
     font-family: 'JetBrains Mono', monospace;
     font-weight: 700;
@@ -55,7 +55,7 @@
   
   .EmailAddress,
   .Password {
-    color: white;
+    color: var(--text-color);
     font-size: 70px;
     font-family: 'JetBrains Mono', monospace;
     font-weight: 700;
@@ -81,7 +81,7 @@
     width: 1009px;
     height: 112px;
     background: #314a57;
-    color: white;
+    color: var(--text-color);
     font-size: 70px;
     font-family: 'JetBrains Mono', monospace;
     font-weight: 700;

@@ -20,7 +20,7 @@ html, body, #root {
 .reset-button {
   padding: 10px 20px;
   background-color: #f44336; /* Red background */
-  color: white;
+  color: var(--text-color);
   border: none;
   border-radius: 5px;
   cursor: pointer;

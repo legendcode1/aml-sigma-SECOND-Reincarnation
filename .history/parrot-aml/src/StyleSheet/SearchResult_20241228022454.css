@@ -39,7 +39,7 @@
     font-family: 'JetBrains Mono', monospace;
     font-weight: 700;
     font-size: 40px;
-    color: #ffffff;
+    color: var(--text-color);
     margin: 0;
   }
   
@@ -55,10 +55,10 @@
     font-weight: 700;
     font-size: 20px;
     letter-spacing: 2.8px;
-    color: #ffffff;
+    color: var(--text-color);
     margin: 0;
     line-height: 1.5;
-    white-space: pre-wrap;
+    var(--text-color)-space: pre-wrap;
   }
   
   .search-bars {
@@ -86,7 +86,7 @@
     font-family: 'JetBrains Mono', monospace;
     font-weight: 300;
     font-size: 20px;
-    color: #ffffff;
+    color: var(--text-color);
   }
   
   

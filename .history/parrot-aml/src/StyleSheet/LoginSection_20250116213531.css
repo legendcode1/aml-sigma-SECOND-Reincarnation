@@ -18,7 +18,7 @@
   width: 76px;
   height: 76px;
   border-radius: 50%;
-  background-color: #ccc;
+  background-color: var(--secondary-text-color);
 }
 
 .WelcomeText {

@@ -27,7 +27,7 @@
     font-family: 'JetBrains Mono', monospace;
     font-weight: 700;
     font-size: 40px;
-    color: #ffffff;
+    color: var(--text-color);
     margin: 0;
   }
   
@@ -38,18 +38,18 @@
     width: 100%;
     padding: 10px 20px; /* Add padding inside the message container */
     word-wrap: break-word; /* Ensure long words break to the next line */
-    color: #293742;
+    color: var(--primary-color);
     outline: #314a57 solid 1px;
   }
   
   
   .api-message {
-    background-color: #293742; /* Background color for API messages */
+    background-color: var(--primary-color); /* Background color for API messages */
     align-self: flex-start; /* Align API messages to the left */
   }s
   
   .user-message {
-    background-color: #293742; /* Background color for user messages */
+    background-color: var(--primary-color); /* Background color for user messages */
     align-self: flex-start; /* Align user messages to the right */
   }
   
@@ -61,10 +61,10 @@
     font-weight: 700;
     font-size: 20px;
     letter-spacing: 2.8px;
-    color: #ffffff;
+    color: var(--text-color);
     margin: 0;
     line-height: 1.5;
-    white-space: pre-wrap;
+    var(--text-color)-space: pre-wrap;
     width: 100%;
   }
   
@@ -90,7 +90,7 @@
   
   /* Modal content container */
   .modal-content {
-    background: #fff;
+    background: var(--text-color);
     padding: 20px;
     border-radius: 8px;
     width: 80%;
