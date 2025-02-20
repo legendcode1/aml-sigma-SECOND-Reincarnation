@@ -1,7 +1,7 @@
 /* src/StyleSheet/LeftBar.css */
 .left-bar-container {
   width: 370px;
-  background-color: 293742;
+  background-color: var(--secondary-color);
   padding: 20px;
   flex-shrink: 0;
   height: 100vh; /* full viewport height */
