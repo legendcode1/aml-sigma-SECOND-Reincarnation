@@ -42,7 +42,6 @@ const ChatBotContainer = ({
   messagesEndRef,
   userName,
 }) => {
-  // Auto-scroll on messages update
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -52,7 +51,7 @@ const ChatBotContainer = ({
   return (
     <div className="chat-section-padding">
       {messages
-        .filter((msg) => msg.id !== "initial-report")
+        .filter((msg) => msg.id !== 'initial-report')
         .map((msg) => (
           <div key={msg.id} className="message-bubble">
             {msg.prompt && (

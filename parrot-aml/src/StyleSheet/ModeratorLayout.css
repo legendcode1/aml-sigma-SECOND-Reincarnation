@@ -1,0 +1,16 @@
+.moderator-layout {
+    display: flex;
+    height: 100vh;
+  }
+  
+  .moderator-left-bar {
+    width: 370px; /* same as LeftBar width */
+    flex-shrink: 0;
+  }
+  
+  .moderator-main-interface {
+    flex: 1;
+    background: #293742;
+    overflow: auto;
+  }
+  
