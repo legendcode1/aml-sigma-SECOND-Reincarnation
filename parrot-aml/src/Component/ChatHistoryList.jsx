@@ -1,7 +1,7 @@
 import React from 'react';
 import { FixedSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import sortIcon from '/leftbar/sort.png';
 import fav from '/leftbar/star.png';
@@ -13,9 +13,10 @@ const HighRiskBadge = () => (
   </div>
 );
 
-const ChatItem = ({ inde, style, data }) => {
+const ChatItem = ({ index, style, data }) => {
   const item = data[index];
   const isHighRisk = ['Budi Arie Hartanto', 'Ananta Wistara Anugrah'].includes(item.headline);
+
   return (
     <div style={style} className="chat-item-wrapper">
       <Link to={`/dashboard/chat/${item.id}`} className="chat-item-link">
@@ -24,7 +25,11 @@ const ChatItem = ({ inde, style, data }) => {
             <span className="profile-name">{item.headline || 'Unnamed Chat'}</span>
             {isHighRisk && <HighRiskBadge />}
             <span className="chat-date">
-              {item.Datemade ? String(item.Datemade) : 'No date'}
+              {item.timestamp
+                ? (typeof item.timestamp.toDate === 'function'
+                    ? new Date(item.timestamp.toDate()).toLocaleDateString()
+                    : new Date(item.timestamp).toLocaleDateString())
+                : 'No date'}
             </span>
           </div>
         </div>
@@ -39,25 +44,12 @@ ChatItem.propTypes = {
   data: PropTypes.array.isRequired,
 };
 
-const ChatHistoryList = ({ chatHistory, onShowProfileSettings, clientId }) => {
-  const navigate = useNavigate();
-
-  const handleModeratorClick = () => {
-    navigate(`/${clientId}/moderator`);
-  };
-
+const ChatHistoryList = ({ chatHistory }) => {
   return (
     <div className="chat-items">
-      <hr />
-      <div className="nav-links">
-        <button onClick={handleModeratorClick}>Moderator</button>
-        <button onClick={onShowProfileSettings}>Profile Settings</button>
-      </div>
-      <hr />
-      <h2 className="chat-history-headline">Chat History</h2>
       <AutoSizer>
         {({ height, width }) => (
-          <List
+          <List   
             height={height}
             itemCount={chatHistory.length}
             itemSize={80}
@@ -77,8 +69,6 @@ const ChatHistoryList = ({ chatHistory, onShowProfileSettings, clientId }) => {
 
 ChatHistoryList.propTypes = {
   chatHistory: PropTypes.array.isRequired,
-  onShowProfileSettings: PropTypes.func,
-  clientId: PropTypes.string.isRequired,
 };
 
 export default ChatHistoryList;
