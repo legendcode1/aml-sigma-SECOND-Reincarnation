@@ -2,24 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import LeftBar from './Component/LeftBar';
 import MainInterface from './Component/MainInterface';
-import ModeratorLayout from './Component/ModeratorLayout';
 import LoginPage from './login system/LoginPage';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { fetchUserDataByUID, fetchCompanyDataByID } from './auth/auth';
 import './StyleSheet/global.css';
+
 import './App.css';
-
-// Cloudinary imports (optional)
-import { Cloudinary } from '@cloudinary/url-gen';
-import { AdvancedImage } from '@cloudinary/react';
-
-const cld = new Cloudinary({ cloud: { cloudName: 'dolqhixzw' } });
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [clientId, setClientId] = useState(null);
   const [companyName, setCompanyName] = useState('');
-  const [userName, setUserName] = useState('');
+  const [userName, setUserName] = useState(''); // New state for the user’s name
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
@@ -33,6 +27,7 @@ const App = () => {
         try {
           const userData = await fetchUserDataByUID(user.uid);
           console.log('Fetched user data:', userData);
+          // Extract the company ID using either key:
           const companyId = userData.companyId || userData['company id'];
           if (!companyId) {
             throw new Error('Company ID not found in user data.');
@@ -42,8 +37,11 @@ const App = () => {
           console.log('Fetched company data:', companyData);
           setClientId(companyId);
           setCompanyName(companyData.company_name || 'Unknown Company');
+          // Also save the user's name for later use
           setUserName(userData.name || 'Unknown User');
-          if (location.pathname === '/' || location.pathname === '/login') {
+          
+          // Navigate to "/dashboard" if not already there.
+          if (!location.pathname.startsWith('/dashboard')) {
             navigate('/dashboard');
             console.log('Navigated to /dashboard');
           }
@@ -82,8 +80,12 @@ const App = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (isAuthenticated && !clientId) return <div>Error: Client ID is missing.</div>;
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  if (isAuthenticated && !clientId) {
+    return <div>Error: Client ID is missing.</div>;
+  }
 
   return (
     <div className="app-container">
@@ -103,21 +105,12 @@ const App = () => {
                   <LeftBar clientId={clientId} />
                 </div>
                 <div className="main-interface">
+                  {/* Pass clientId and userName down */}
                   <MainInterface clientId={clientId} userName={userName} />
                 </div>
               </div>
             ) : (
               <div>Loading dashboard...</div>
-            )
-          }
-        />
-        <Route
-          path="/:clientId/moderator/*"
-          element={
-            isAuthenticated && clientId ? (
-              <ModeratorLayout clientId={clientId} />
-            ) : (
-              <div>Loading moderator panel...</div>
             )
           }
         />
