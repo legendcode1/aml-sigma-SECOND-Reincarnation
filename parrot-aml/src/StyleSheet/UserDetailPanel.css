@@ -1,0 +1,131 @@
+.UserDetailPanel {
+    width: 100%;
+    background: #293742;
+    border: 1px solid #3F4C56;
+    padding: 50px 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 50px;
+    box-sizing: border-box;
+  }
+  
+  .BioSection {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .Avatar img {
+    width: 85px;
+    height: 85px;
+    border-radius: 50%;
+  }
+  
+  .NameTag {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: flex-start;
+  }
+  
+  .NameTag .UserName {
+    color: white;
+    font-size: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+  }
+  
+  .NameTag .UserRole {
+    color: white;
+    font-size: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 200;
+  }
+  
+  .ContactInfo {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .InfoRow {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .InfoLabel {
+    color: white;
+    font-size: 15px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800;
+  }
+  
+  .InfoValue {
+    color: white;
+    font-size: 15px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 400;
+  }
+  
+  /* Chat History Table Styles */
+  .ChatHistorySection {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .SectionHeader {
+    color: white;
+    font-size: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    text-align: center;
+  }
+  
+  .ChatHistoryTable {
+    width: 100%;
+    background: #22323E;
+    border: 1px solid #354451;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .TableHeader, .TableRow {
+    display: flex;
+    align-items: center;
+    height: 56px;
+    padding: 0 16px;
+    border-bottom: 1px solid #354451;
+  }
+  
+  .TableHeader {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800;
+    font-size: 15px;
+    color: white;
+  }
+  
+  .HeaderCell, .RowCell {
+    flex: 1;
+    text-align: left;
+    word-wrap: break-word;
+  }
+  
+  .RowCell {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 400;
+    font-size: 15px;
+    color: white;
+  }
+  
+  .more-button {
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  

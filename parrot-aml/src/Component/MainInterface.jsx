@@ -6,14 +6,14 @@ import ChatPanel from './Panel';
 import { Routes, Route } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
-const MainInterface = ({ clientId, userName }) => {
+const MainInterface = ({ clientId, userName, uid, user }) => {
   return (
     <div className="main-interface-container">
       <Routes>
         {/* Default dashboard route shows the NewReport form */}
         <Route 
           path="/" 
-          element={<NewReport clientId={clientId} userName={userName} />} 
+          element={<NewReport clientId={clientId} userName={userName} uid={uid} />} 
         />
 
         {/* When the URL is /dashboard/chat/:chatId, display Report and ChatPanel */}
@@ -22,7 +22,7 @@ const MainInterface = ({ clientId, userName }) => {
           element={
             <div className="report-chat-container">
               <Report clientId={clientId} />
-              <ChatPanel clientId={clientId} userName={userName} />
+              <ChatPanel clientId={clientId} userName={userName} uid={uid} />
             </div>
           }
         />
@@ -34,6 +34,7 @@ const MainInterface = ({ clientId, userName }) => {
 MainInterface.propTypes = {
   clientId: PropTypes.string.isRequired,
   userName: PropTypes.string.isRequired,
+  uid: PropTypes.string.isRequired,
 };
 
 export default MainInterface;

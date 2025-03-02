@@ -1,0 +1,28 @@
+.editable-user-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-bottom: 1px solid #34414C;
+  }
+  
+  .cell {
+    flex: 1;
+    color: white;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+  }
+  
+  .edit-input {
+    flex: 1;
+    padding: 4px 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+  }
+  
+  .edit-button, .save-button {
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  

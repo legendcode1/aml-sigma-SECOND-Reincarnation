@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import {
   doc,
   getDoc,
@@ -14,27 +14,29 @@ import {
 } from 'firebase/firestore';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
-import ChatBot from './ChatBot';
+import ChatBotContainer from './ChatBot';
 import { db } from '../firebase/firebase';
 import '../StyleSheet/Panel.css';
 
-const ChatPanel = ({ clientId, userName }) => {
+const Panel = ({ clientId, userName, children, showToggle = true }) => {
   const { chatId } = useParams();
+  const location = useLocation();
+  const isChatMode = location.pathname.includes('/chat');
+
+  // Chat mode state – only used in chat mode
   const [chatDoc, setChatDoc] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [newMessage, setNewMessage] = useState('');
-
   const messagesEndRef = useRef(null);
 
-  // Panel state for toggling/resizing
-  const [width, setWidth] = useState(400);
-  const [isOpen, setIsOpen] = useState(true);
-  const isResizing = useRef(false);
-
-  // Fetch chat document and messages on mount
+  // Fetch chat data only if in chat mode
   useEffect(() => {
+    if (!isChatMode) {
+      setLoading(false);
+      return;
+    }
     const fetchChatData = async () => {
       try {
         if (!chatId) throw new Error('Chat ID is missing.');
@@ -71,9 +73,12 @@ const ChatPanel = ({ clientId, userName }) => {
       setError('Client ID or Chat ID is missing.');
       setLoading(false);
     }
-  }, [chatId, clientId]);
+  }, [chatId, clientId, isChatMode]);
 
-  // Handle resizing the panel
+  const [width, setWidth] = useState(400);
+  const [isOpen, setIsOpen] = useState(true);
+  const isResizing = useRef(false);
+
   const handleResizeMouseDown = (e) => {
     e.preventDefault();
     isResizing.current = true;
@@ -101,7 +106,6 @@ const ChatPanel = ({ clientId, userName }) => {
     setIsOpen(!isOpen);
   };
 
-  // Handle sending a message
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
@@ -113,11 +117,9 @@ const ChatPanel = ({ clientId, userName }) => {
         userName: userName,
       };
 
-      // Optimistically update local state
       const tempId = uuidv4();
       setMessages((prev) => [...prev, { id: tempId, ...newMsg }]);
 
-      // Save new message to Firestore
       const messagesCollectionRef = collection(
         db,
         'client',
@@ -128,7 +130,6 @@ const ChatPanel = ({ clientId, userName }) => {
       );
       const docRef = await addDoc(messagesCollectionRef, newMsg);
 
-      // Build payload for the backend call
       const payload = {
         session_id: uuidv4(),
         client_id: clientId,
@@ -150,7 +151,6 @@ const ChatPanel = ({ clientId, userName }) => {
         outputReport = response.data;
       }
 
-      // Update local state with the output
       setMessages((prev) => {
         const updated = [...prev];
         updated[updated.length - 1] = { ...updated[updated.length - 1], output: outputReport };
@@ -166,44 +166,48 @@ const ChatPanel = ({ clientId, userName }) => {
     }
   };
 
-  if (loading) return <div className="loading-messages">Loading messages...</div>;
-  if (error) return <div className="error-messages">{error}</div>;
+  if (isChatMode && loading) return <div className="loading-messages">Loading messages...</div>;
+  if (isChatMode && error) return <div className="error-messages">{error}</div>;
 
   return (
     <>
-      {/* Toggle Button */}
-      <button
-        className="toggle-button"
-        onClick={togglePanel}
-        style={{
-          width: '50px',
-          height: '50px',
-          right: isOpen ? `${width}px` : '0px'
-        }}
-      >
-        {isOpen ? '⫸' : '⫷'}
-      </button>
-
-      {/* Chat Panel Container */}
+      {isChatMode && showToggle && (
+        <button
+          className="toggle-button"
+          onClick={togglePanel}
+          style={{
+            width: '50px',
+            height: '50px',
+            right: isOpen ? `${width}px` : '0px',
+          }}
+        >
+          {isOpen ? '⫸' : '⫷'}
+        </button>
+      )}
       <div
         className="panel-container"
         style={{
           width: isOpen ? `${width}px` : '0px',
           right: isOpen ? '0' : '-5px',
-          overflow: isOpen ? 'visible' : 'hidden'
+          overflow: isOpen ? 'visible' : 'hidden',
         }}
       >
         {isOpen && (
           <>
             <div className="resizer" onMouseDown={handleResizeMouseDown}></div>
-            <ChatBot
-              messages={messages}
-              newMessage={newMessage}
-              setNewMessage={setNewMessage}
-              handleSendMessage={handleSendMessage}
-              messagesEndRef={messagesEndRef}
-              userName={userName}
-            />
+            {isChatMode ? (
+              <ChatBotContainer
+                messages={messages}
+                newMessage={newMessage}
+                setNewMessage={setNewMessage}
+                handleSendMessage={handleSendMessage}
+                messagesEndRef={messagesEndRef}
+                userName={userName}
+              />
+            ) : (
+              // In moderator mode, simply render the children passed from the parent.
+              children
+            )}
           </>
         )}
       </div>
@@ -211,9 +215,11 @@ const ChatPanel = ({ clientId, userName }) => {
   );
 };
 
-ChatPanel.propTypes = {
+Panel.propTypes = {
   clientId: PropTypes.string.isRequired,
   userName: PropTypes.string.isRequired,
+  children: PropTypes.node,
+  showToggle: PropTypes.bool,
 };
 
-export default ChatPanel;
+export default Panel;
