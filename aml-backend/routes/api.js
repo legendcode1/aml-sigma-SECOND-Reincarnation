@@ -1,8 +1,7 @@
-// aml-backend/routes/api.js
-
+// aml-backend/api.js
 const express = require('express');
-const axios = require('axios'); // Still imported in case you need to switch later
-const { getAuthHeaders } = require('../auth'); // Imported for real API mode
+const axios = require('axios');
+const { getAuthHeaders } = require('../auth');
 
 const router = express.Router();
 
@@ -19,6 +18,7 @@ const generateMockReport = (data) => {
 - **Occupation:** ${data.pep_occupation}
 - **Age:** ${data.pep_age}
 - **Gender:** ${data.pep_gender}
+- **UID:** ${data.UID || 'Not provided'}
 
 *This is a mock report generated for testing purposes.*`
   };
@@ -33,6 +33,7 @@ router.post('/report', async (req, res) => {
     pep_occupation,
     pep_age,
     pep_gender,
+    UID,
   } = req.body;
 
   console.log("Received /report request:", req.body);
@@ -50,6 +51,7 @@ router.post('/report', async (req, res) => {
     pep_occupation,
     pep_age,
     pep_gender,
+    UID, // Use the destructured UID directly
   };
 
   if (USE_MOCK_API) {
@@ -63,30 +65,26 @@ router.post('/report', async (req, res) => {
       const headers = await getAuthHeaders(process.env.AIGISLLM_BACKEND_URL);
       console.log("Auth headers obtained:", headers);
 
-      console.log("Sending POST request to external API...");
+      console.log("Sending POST request to Cloud Run:", `${process.env.AIGISLLM_BACKEND_URL}/report`);
       const response = await axios.post(
         `${process.env.AIGISLLM_BACKEND_URL}/report`,
         payload,
         { headers }
       );
-      console.log("External API response:", response.data);
+      console.log("Cloud Run response:", response.data);
 
       return res.status(200).json(response.data);
     } catch (error) {
-      console.error("Full error object:", error);
-      if (error.response) {
-        console.error("Error response data:", error.response.data);
-        console.error("Error response status:", error.response.status);
-        console.error("Error response headers:", error.response.headers);
-      } else if (error.request) {
-        console.error("No response received:", error.request);
-      } else {
-        console.error("Error message:", error.message);
-      }
-      console.error("Error config:", error.config);
-
+      console.error("Error forwarding /report request:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        request: error.request ? 'No response received' : undefined,
+        config: error.config,
+      });
       return res.status(error.response?.status || 500).json({
-        error: error.response?.data || 'Internal Server Error',
+        error: error.response?.data?.error || error.message || 'Internal Server Error',
+        details: error.response?.data?.details || undefined,
       });
     }
   }
@@ -142,7 +140,7 @@ router.post('/followup', async (req, res) => {
       const headers = await getAuthHeaders(process.env.AIGISLLM_BACKEND_URL);
       console.log("Auth headers obtained:", headers);
 
-      console.log("Sending POST request to external API for followup...");
+      console.log("Sending POST request to Cloud Run for followup:", `${process.env.AIGISLLM_BACKEND_URL}/followup`);
       const response = await axios.post(
         `${process.env.AIGISLLM_BACKEND_URL}/followup`,
         payload,
@@ -151,24 +149,20 @@ router.post('/followup', async (req, res) => {
           params: { client_id },
         }
       );
-      console.log("External API response for followup:", response.data);
+      console.log("Cloud Run response for followup:", response.data);
 
       return res.status(200).json(response.data);
     } catch (error) {
-      console.error("Full error object for /followup:", error);
-      if (error.response) {
-        console.error("Error response data:", error.response.data);
-        console.error("Error response status:", error.response.status);
-        console.error("Error response headers:", error.response.headers);
-      } else if (error.request) {
-        console.error("No response received:", error.request);
-      } else {
-        console.error("Error message:", error.message);
-      }
-      console.error("Error config:", error.config);
-
+      console.error("Error forwarding /followup request:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        request: error.request ? 'No response received' : undefined,
+        config: error.config,
+      });
       return res.status(error.response?.status || 500).json({
-        error: error.response?.data || 'Internal Server Error',
+        error: error.response?.data?.error || error.message || 'Internal Server Error',
+        details: error.response?.data?.details || undefined,
       });
     }
   }

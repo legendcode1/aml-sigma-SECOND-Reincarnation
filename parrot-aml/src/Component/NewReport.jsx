@@ -1,14 +1,15 @@
+// parrot-aml/src/NewReport.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase/firebase';
-import { setDoc, doc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import PropTypes from 'prop-types';
 import '../StyleSheet/NewReport.css';
 import send from '../assets/newreport/send.png';
 
-const NewReport = ({ clientId, userName }) => {
+const NewReport = ({ clientId, userName, uid, connectWebSocket }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
@@ -36,22 +37,20 @@ const NewReport = ({ clientId, userName }) => {
     setLoading(true);
     setError(null);
 
-    // Generate unique IDs for the session and chat document
-    const sessionId = uuidv4();
     const chatId = uuidv4();
-
-    // Prepare the backend payload
+    console.log('Generated chatId:', chatId);
     const payload = {
-      session_id: sessionId,
+      session_id: chatId,
       client_id: clientId,
       pep_name: name,
       pep_occupation: occupation,
       pep_age: age,
       pep_gender: gender,
+      UID: uid,
     };
+    console.log('Payload for /report:', payload);
 
     try {
-      // Create chat document (unchanged)
       const chatDocRef = doc(db, 'client', clientId, 'chat_history', chatId);
       await setDoc(chatDocRef, {
         headline: `Report for ${name}`,
@@ -60,45 +59,56 @@ const NewReport = ({ clientId, userName }) => {
         pep_name: name,
         pep_occupation: occupation,
         pep_age: age,
-        pep_gender: gender
+        pep_gender: gender,
       });
-      
       console.log('Chat document created with ID:', chatId);
-  
-      // Create initial message with specific ID 'initial-report'
-      const initialReportRef = doc(db, 'client', clientId, 'chat_history', chatId, 'messages', 'initial-report');
-      await setDoc(initialReportRef, {
-        prompt: `Initial report request for ${name}`,
-        output: '', // Will be updated after backend response
-        timestamp: serverTimestamp(),
+
+      console.log('Connecting to WebSocket before report request');
+      connectWebSocket(chatId);
+      localStorage.setItem('activeChatId', chatId);
+
+      setNotificationData({
+        headline: 'Generating Initial Report...',
+        message: 'Loading report...',
+        targetName: name,
+        isLoading: true,
       });
-      
-      console.log('Initial report message created with ID: initial-report');
-  
-      // Send payload to backend (unchanged)
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/report`, payload);
-      
+
+      console.log('Sending POST request to /report:', `${import.meta.env.VITE_BACKEND_URL}/report`);
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/report`, payload); // Removed timeout option
+      console.log('Backend response received:', response.data);
       if (!response.data || !response.data.report) {
-        throw new Error('Invalid response from backend.');
+        throw new Error('Invalid response from backend: ' + JSON.stringify(response.data));
       }
-  
-      // Update the initial-report document with the response
-      await setDoc(initialReportRef, {
-        prompt: `Initial report request for ${name}`,
-        output: response.data.report,
-        timestamp: serverTimestamp(),
-      }, { merge: true });
-      
-      console.log('Initial report updated with backend response');
-  
-      // Navigate to chat view
-      navigate(`/dashboard/chat/${chatId}`);
+
+      setTimeout(() => {
+        console.log('Navigating to chat view:', `/dashboard/chat/${chatId}`);
+        navigate(`/dashboard/chat/${chatId}`);
+      }, 500);
     } catch (e) {
-      console.error('Error saving report:', e);
-      setError('Failed to generate report. Please try again.');
+      console.error('Error during report submission:', e.message, e.response?.data, e.response?.status);
+      setError(`Failed to generate report: ${e.message}`);
+      setNotificationData({
+        headline: 'Report Generation Error',
+        message: `Failed: ${e.response?.data?.error || e.message}${e.response?.data?.details ? ' - ' + e.response.data.details : ''}`,
+        targetName: name,
+        isLoading: false,
+      });
     } finally {
+      console.log('Resetting loading state');
+      setNotificationData({
+        headline: 'Generating Initial Report...',
+        message: 'Waiting for report generation...',
+        targetName: 'No target yet',
+        isLoading: false,
+      });
       setLoading(false);
     }
+  };
+
+  const setNotificationData = (data) => {
+    console.log('Dispatching updateNotification event with:', data);
+    window.dispatchEvent(new CustomEvent('updateNotification', { detail: data }));
   };
 
   return (
@@ -175,6 +185,8 @@ const NewReport = ({ clientId, userName }) => {
 NewReport.propTypes = {
   clientId: PropTypes.string.isRequired,
   userName: PropTypes.string.isRequired,
+  uid: PropTypes.string.isRequired,
+  connectWebSocket: PropTypes.func.isRequired,
 };
 
 export default NewReport;
