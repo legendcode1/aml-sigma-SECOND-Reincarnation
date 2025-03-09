@@ -1,0 +1,36 @@
+.notification-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #243541;
+  z-index: 2000;
+  transition: opacity 0.3s ease;
+  font-family: 'JetBrains Mono', monospace;
+}
+.notification-container {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 10px;
+  color: #ffffff;
+  height: 90px; /* Ensure this matches marginTop */
+}
+.notification-headline {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #ffffff; /* Ensure visibility */
+}
+.notification-message {
+  margin: 0;
+  color: #ffffff; /* Ensure visibility */
+  display: flex;
+  align-items: center;
+}
+.notification-target {
+  margin: 5px 0 0;
+  font-style: italic;
+  color: #cccccc; /* Lighter gray for contrast */
+}

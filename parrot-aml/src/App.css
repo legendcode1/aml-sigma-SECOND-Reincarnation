@@ -1,4 +1,5 @@
 /* filepath: /c:/Users/Ananta Anugrah/Desktop/aml sigma SECOND Reincarnation/parrot-aml/src/App.css */
+
 html, body, #root {
   margin: 0;
   padding: 0;
@@ -20,18 +21,27 @@ html, body, #root {
   width: 100%;
 }
 
+.app-container.notification-visible .main-parent {
+  margin-top: 80px; /* Matches Notification height when visible */
+  transition: margin-top 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth push */
+}
+
+.app-container.notification-hidden .main-parent {
+  margin-top: 0; /* No gap when hidden */
+  transition: margin-top 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .reset-button {
   padding: 10px 20px;
-  background-color: #f44336; /* Red background */
-  color: var(--text-color);
+  background-color: #f44336;
+  color: white; /* Assuming --text-color is white, adjusted for clarity */
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-bottom: 20px; /* Adds some space below the button */
   position: fixed;
-  top: 20px; /* Adjust positioning to be outside the content */
-  right: 20px; /* Positioned at the top-right corner */
-  z-index: 999; /* Ensure it appears above other content */
+  top: 10px; /* Adjusted to fit within Notification when visible */
+  right: 20px;
+  z-index: 1500;
 }
 
 .reset-button:hover {
@@ -41,14 +51,14 @@ html, body, #root {
 .main-parent {
   display: flex;
   flex-direction: row;
-  height: 100%;
+  height: 100%; /* Adjusted to full height since margin handles spacing */
   width: 100%;
 }
 
 .left-bar {
   width: fit-content;
   background-color: var(--primary-color);
-  height: 100vh;
+  height: 100%;
   position: relative;
   outline: #434F59 solid 1px;
 }
