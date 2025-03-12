@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
   doc,
   getDoc,
@@ -14,29 +14,27 @@ import {
 } from 'firebase/firestore';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
-import ChatBotContainer from './ChatBot';
+import ChatBot from './ChatBot';
 import { db } from '../firebase/firebase';
 import '../StyleSheet/Panel.css';
 
-const Panel = ({ clientId, userName, children, showToggle = true }) => {
+const ChatPanel = ({ clientId, userName }) => {
   const { chatId } = useParams();
-  const location = useLocation();
-  const isChatMode = location.pathname.includes('/chat');
-
-  // Chat mode state – only used in chat mode
   const [chatDoc, setChatDoc] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [newMessage, setNewMessage] = useState('');
+
   const messagesEndRef = useRef(null);
 
-  // Fetch chat data only if in chat mode
+  // Panel state for toggling/resizing
+  const [width, setWidth] = useState(400);
+  const [isOpen, setIsOpen] = useState(true);
+  const isResizing = useRef(false);
+
+  // Fetch chat document and messages on mount
   useEffect(() => {
-    if (!isChatMode) {
-      setLoading(false);
-      return;
-    }
     const fetchChatData = async () => {
       try {
         if (!chatId) throw new Error('Chat ID is missing.');
@@ -73,12 +71,9 @@ const Panel = ({ clientId, userName, children, showToggle = true }) => {
       setError('Client ID or Chat ID is missing.');
       setLoading(false);
     }
-  }, [chatId, clientId, isChatMode]);
+  }, [chatId, clientId]);
 
-  const [width, setWidth] = useState(400);
-  const [isOpen, setIsOpen] = useState(true);
-  const isResizing = useRef(false);
-
+  // Handle resizing the panel
   const handleResizeMouseDown = (e) => {
     e.preventDefault();
     isResizing.current = true;
@@ -106,6 +101,7 @@ const Panel = ({ clientId, userName, children, showToggle = true }) => {
     setIsOpen(!isOpen);
   };
 
+  // Handle sending a message
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
@@ -117,9 +113,11 @@ const Panel = ({ clientId, userName, children, showToggle = true }) => {
         userName: userName,
       };
 
+      // Optimistically update local state
       const tempId = uuidv4();
       setMessages((prev) => [...prev, { id: tempId, ...newMsg }]);
 
+      // Save new message to Firestore
       const messagesCollectionRef = collection(
         db,
         'client',
@@ -130,6 +128,7 @@ const Panel = ({ clientId, userName, children, showToggle = true }) => {
       );
       const docRef = await addDoc(messagesCollectionRef, newMsg);
 
+      // Build payload for the backend call
       const payload = {
         session_id: uuidv4(),
         client_id: clientId,
@@ -151,6 +150,7 @@ const Panel = ({ clientId, userName, children, showToggle = true }) => {
         outputReport = response.data;
       }
 
+      // Update local state with the output
       setMessages((prev) => {
         const updated = [...prev];
         updated[updated.length - 1] = { ...updated[updated.length - 1], output: outputReport };
@@ -166,48 +166,44 @@ const Panel = ({ clientId, userName, children, showToggle = true }) => {
     }
   };
 
-  if (isChatMode && loading) return <div className="loading-messages">Loading messages...</div>;
-  if (isChatMode && error) return <div className="error-messages">{error}</div>;
+  if (loading) return <div className="loading-messages">Loading messages...</div>;
+  if (error) return <div className="error-messages">{error}</div>;
 
   return (
     <>
-      {isChatMode && showToggle && (
-        <button
-          className="toggle-button"
-          onClick={togglePanel}
-          style={{
-            width: '50px',
-            height: '50px',
-            right: isOpen ? `${width}px` : '0px',
-          }}
-        >
-          {isOpen ? '⫸' : '⫷'}
-        </button>
-      )}
+      {/* Toggle Button */}
+      <button
+        className="toggle-button"
+        onClick={togglePanel}
+        style={{
+          width: '50px',
+          height: '50px',
+          right: isOpen ? `${width}px` : '0px'
+        }}
+      >
+        {isOpen ? '⫸' : '⫷'}
+      </button>
+
+      {/* Chat Panel Container */}
       <div
         className="panel-container"
         style={{
           width: isOpen ? `${width}px` : '0px',
           right: isOpen ? '0' : '-5px',
-          overflow: isOpen ? 'visible' : 'hidden',
+          overflow: isOpen ? 'visible' : 'hidden'
         }}
       >
         {isOpen && (
           <>
             <div className="resizer" onMouseDown={handleResizeMouseDown}></div>
-            {isChatMode ? (
-              <ChatBotContainer
-                messages={messages}
-                newMessage={newMessage}
-                setNewMessage={setNewMessage}
-                handleSendMessage={handleSendMessage}
-                messagesEndRef={messagesEndRef}
-                userName={userName}
-              />
-            ) : (
-              // In moderator mode, simply render the children passed from the parent.
-              children
-            )}
+            <ChatBot
+              messages={messages}
+              newMessage={newMessage}
+              setNewMessage={setNewMessage}
+              handleSendMessage={handleSendMessage}
+              messagesEndRef={messagesEndRef}
+              userName={userName}
+            />
           </>
         )}
       </div>
@@ -215,11 +211,9 @@ const Panel = ({ clientId, userName, children, showToggle = true }) => {
   );
 };
 
-Panel.propTypes = {
+ChatPanel.propTypes = {
   clientId: PropTypes.string.isRequired,
   userName: PropTypes.string.isRequired,
-  children: PropTypes.node,
-  showToggle: PropTypes.bool,
 };
 
-export default Panel;
+export default ChatPanel;
