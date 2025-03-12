@@ -1,9 +1,21 @@
+/* Main Interface Layout */
+.main-interface {
+  flex: 1;
+  background-color: #314a57;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  vertical-align: middle;
+}
+
 .main-interface-container {
   display: flex;
   flex-direction: column;
   height: 100%;
   width: 100%;
-}
+} 
 
 /* Report and Chat Container Layout */
 .report-chat-container {
@@ -25,6 +37,7 @@
   flex: 1 1 auto;
   overflow-y: auto;
 }
+
 
 /* Resizer */
 .resizer {

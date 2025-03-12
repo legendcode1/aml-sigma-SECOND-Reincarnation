@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import '../StyleSheet/LeftBar.css';
 import { useNavigate } from 'react-router-dom';
-import { db } from '../firebase/firebase'; // Import Firestore
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore'; // Add Firestore utilities
 import { loadChatMessagesFirestore } from '../indexedDB';
+import { fetchChatHistoryByCompanyID } from '../auth/auth';
 import PropTypes from 'prop-types';
 import ChatHistoryList from './ChatHistoryList';
 import ProfileSettings from './ProfileSettings';
@@ -19,24 +18,11 @@ const LeftBar = ({ clientId }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!clientId) {
-      setError('Client ID is missing.');
-      setLoading(false);
-      return;
-    }
-
-    // Set up real-time listener for chat history
-    const chatsRef = collection(db, 'client', clientId, 'chat_history');
-    const q = query(chatsRef, orderBy('dateMade', 'desc')); // Order by creation date
-
-    const unsubscribe = onSnapshot(q, async (snapshot) => {
+    const loadChatHistory = async () => {
       try {
         setLoading(true);
-        const firestoreChats = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        await loadChatMessagesFirestore(firestoreChats); // Update IndexedDB
+        const firestoreChats = await fetchChatHistoryByCompanyID(clientId);
+        await loadChatMessagesFirestore(firestoreChats);
         setChatHistory(firestoreChats);
       } catch (err) {
         console.error('Failed to load chat history:', err);
@@ -44,14 +30,14 @@ const LeftBar = ({ clientId }) => {
       } finally {
         setLoading(false);
       }
-    }, (err) => {
-      console.error('Firestore listener error:', err);
-      setError(err.message);
-      setLoading(false);
-    });
+    };
 
-    // Cleanup subscription on unmount
-    return () => unsubscribe();
+    if (clientId) {
+      loadChatHistory();
+    } else {
+      setError('Client ID is missing.');
+      setLoading(false);
+    }
   }, [clientId]);
 
   const handlePlusClick = () => {

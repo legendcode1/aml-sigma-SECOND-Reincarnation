@@ -6,21 +6,17 @@ import ChatPanel from './Panel';
 import { Routes, Route } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
-const MainInterface = ({ clientId, userName, uid, connectWebSocket }) => {
+const MainInterface = ({ clientId, userName, uid, user }) => {
   return (
     <div className="main-interface-container">
       <Routes>
-        <Route
-          path="/"
-          element={
-            <NewReport
-              clientId={clientId}
-              userName={userName}
-              uid={uid}
-              connectWebSocket={connectWebSocket}
-            />
-          }
+        {/* Default dashboard route shows the NewReport form */}
+        <Route 
+          path="/" 
+          element={<NewReport clientId={clientId} userName={userName} uid={uid} />} 
         />
+
+        {/* When the URL is /dashboard/chat/:chatId, display Report and ChatPanel */}
         <Route
           path="chat/:chatId"
           element={
@@ -39,7 +35,6 @@ MainInterface.propTypes = {
   clientId: PropTypes.string.isRequired,
   userName: PropTypes.string.isRequired,
   uid: PropTypes.string.isRequired,
-  connectWebSocket: PropTypes.func.isRequired,
 };
 
 export default MainInterface;
