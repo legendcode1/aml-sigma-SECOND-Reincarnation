@@ -1,3 +1,4 @@
+// parrot-aml/src/Component/MainInterface.jsx
 import React from 'react';
 import '../StyleSheet/MainInterface.css';
 import NewReport from './NewReport';
@@ -6,16 +7,15 @@ import ChatPanel from './Panel';
 import { Routes, Route } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
-const MainInterface = ({ clientId, userName }) => {
+const MainInterface = ({ clientId, userName, uid }) => {
   return (
     <div className="main-interface-container">
       <Routes>
         {/* Default dashboard route shows the NewReport form */}
-        <Route 
-          path="/" 
-          element={<NewReport clientId={clientId} userName={userName} />} 
+        <Route
+          path="/"
+          element={<NewReport clientId={clientId} userName={userName} uid={uid} />}
         />
-
         {/* When the URL is /dashboard/chat/:chatId, display Report and ChatPanel */}
         <Route
           path="chat/:chatId"
@@ -34,6 +34,7 @@ const MainInterface = ({ clientId, userName }) => {
 MainInterface.propTypes = {
   clientId: PropTypes.string.isRequired,
   userName: PropTypes.string.isRequired,
+  uid: PropTypes.string.isRequired,
 };
 
 export default MainInterface;

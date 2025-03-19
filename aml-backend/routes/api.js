@@ -1,15 +1,13 @@
 // aml-backend/routes/api.js
-
-const express = require('express');
-const axios = require('axios'); // Still imported in case you need to switch later
-const { getAuthHeaders } = require('../auth'); // Imported for real API mode
+const express = require("express");
+const axios = require("axios");
+const { getAuthHeaders } = require("../auth");
 
 const router = express.Router();
 
-// Toggle to true for mock mode (to prevent using real tokens/calling external API)
+// Toggle to true for mock mode
 const USE_MOCK_API = false;
 
-// Mock data generator function (for fallback or testing)
 const generateMockReport = (data) => {
   return {
     report: `EDD Report for ${data.pep_name}:
@@ -19,13 +17,14 @@ const generateMockReport = (data) => {
 - **Occupation:** ${data.pep_occupation}
 - **Age:** ${data.pep_age}
 - **Gender:** ${data.pep_gender}
+- **UID:** ${data.UID}
 
-*This is a mock report generated for testing purposes.*`
+*This is a mock report generated for testing purposes.*`,
   };
 };
 
 // POST /report
-router.post('/report', async (req, res) => {
+router.post("/report", async (req, res) => {
   const {
     session_id,
     client_id,
@@ -33,14 +32,18 @@ router.post('/report', async (req, res) => {
     pep_occupation,
     pep_age,
     pep_gender,
+    UID,
   } = req.body;
 
   console.log("Received /report request:", req.body);
 
   // Validate required fields
-  if (!session_id || !client_id || !pep_name) {
+  if (!session_id || !client_id || !pep_name || !UID) {
     console.log("Missing required fields in /report");
-    return res.status(400).json({ error: 'Missing required fields' });
+    return res.status(400).json({
+      error:
+        "Missing required fields: session_id, client_id, pep_name, and UID are required",
+    });
   }
 
   const payload = {
@@ -50,10 +53,10 @@ router.post('/report', async (req, res) => {
     pep_occupation,
     pep_age,
     pep_gender,
+    UID,
   };
 
   if (USE_MOCK_API) {
-    // Return mock response
     const mockResponse = generateMockReport(payload);
     console.log("Mock API response:", mockResponse);
     return res.status(200).json(mockResponse);
@@ -67,33 +70,51 @@ router.post('/report', async (req, res) => {
       const response = await axios.post(
         `${process.env.AIGISLLM_BACKEND_URL}/report`,
         payload,
-        { headers }
+        {
+          headers,
+          timeout: 900000, // Updated to 15 minutes
+        }
       );
       console.log("External API response:", response.data);
 
       return res.status(200).json(response.data);
     } catch (error) {
       console.error("Full error object:", error);
+      if (error.code === "ECONNRESET") {
+        console.error("Connection reset by AegisLLM server");
+        return res
+          .status(504)
+          .json({ error: "Gateway timeout: AegisLLM connection reset" });
+      }
+      if (error.code === "ECONNABORTED" && error.message.includes("timeout")) {
+        console.error("Request timed out after 15 minutes");
+        return res.status(504).json({
+          error:
+            "Gateway timeout: Request took longer than 15 minutes. Check WebSocket updates.",
+        });
+      }
       if (error.response) {
         console.error("Error response data:", error.response.data);
         console.error("Error response status:", error.response.status);
         console.error("Error response headers:", error.response.headers);
+        return res
+          .status(error.response.status)
+          .json({ error: error.response.data });
       } else if (error.request) {
         console.error("No response received:", error.request);
+        return res
+          .status(504)
+          .json({ error: "No response received from AegisLLM" });
       } else {
         console.error("Error message:", error.message);
+        return res.status(500).json({ error: "Internal Server Error" });
       }
-      console.error("Error config:", error.config);
-
-      return res.status(error.response?.status || 500).json({
-        error: error.response?.data || 'Internal Server Error',
-      });
     }
   }
 });
 
 // POST /followup
-router.post('/followup', async (req, res) => {
+router.post("/followup", async (req, res) => {
   const {
     session_id,
     client_id,
@@ -107,10 +128,9 @@ router.post('/followup', async (req, res) => {
 
   console.log("Received /followup request:", req.body);
 
-  // Validate required fields
   if (!session_id || !client_id || !pep_name || !user_message) {
     console.log("Missing required fields in /followup");
-    return res.status(400).json({ error: 'Missing required fields' });
+    return res.status(400).json({ error: "Missing required fields" });
   }
 
   const payload = {
@@ -124,7 +144,6 @@ router.post('/followup', async (req, res) => {
   };
 
   if (USE_MOCK_API) {
-    // Return mock response
     const mockResponse = {
       report: `Follow-up EDD Report for ${pep_name}:
       
@@ -132,27 +151,22 @@ router.post('/followup', async (req, res) => {
 - **Client ID:** ${client_id}
 - **User Message:** "${user_message}"
 
-*This is a mock follow-up report generated for testing purposes.*`
+*This is a mock follow-up report generated for testing purposes.*`,
     };
     console.log("Mock API response for followup:", mockResponse);
     return res.status(200).json(mockResponse);
   } else {
     try {
-      console.log("Attempting to obtain auth headers for followup...");
       const headers = await getAuthHeaders(process.env.AIGISLLM_BACKEND_URL);
-      console.log("Auth headers obtained:", headers);
-
-      console.log("Sending POST request to external API for followup...");
       const response = await axios.post(
-        `${process.env.AIGISLLM_BACKEND_URL}/followup`,
+        `${process.env.AIGISLLM_BACKEND_URL}/report`,
         payload,
         {
           headers,
-          params: { client_id },
+          timeout: 900000, // 15 minutes (already correct)
         }
       );
       console.log("External API response for followup:", response.data);
-
       return res.status(200).json(response.data);
     } catch (error) {
       console.error("Full error object for /followup:", error);
@@ -168,7 +182,7 @@ router.post('/followup', async (req, res) => {
       console.error("Error config:", error.config);
 
       return res.status(error.response?.status || 500).json({
-        error: error.response?.data || 'Internal Server Error',
+        error: error.response?.data || "Internal Server Error",
       });
     }
   }

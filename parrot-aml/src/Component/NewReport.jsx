@@ -1,14 +1,16 @@
+// parrot-aml/src/Component/NewReport.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase/firebase';
-import { setDoc, doc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import PropTypes from 'prop-types';
 import '../StyleSheet/NewReport.css';
 import send from '../assets/newreport/send.png';
+import useWebSocket from '../utils/websocket';
 
-const NewReport = ({ clientId, userName }) => {
+const NewReport = ({ clientId, userName, uid }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
@@ -18,6 +20,8 @@ const NewReport = ({ clientId, userName }) => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [sessionId, setSessionId] = useState(null);
+  const { messages } = useWebSocket(sessionId);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -33,25 +37,29 @@ const NewReport = ({ clientId, userName }) => {
       setError('All fields are required.');
       return;
     }
+    if (!uid) {
+      setError('User ID is missing. Please log in again.');
+      return;
+    }
     setLoading(true);
     setError(null);
 
-    // Generate unique IDs for the session and chat document
-    const sessionId = uuidv4();
+    const newSessionId = uuidv4();
+    setSessionId(newSessionId); // Triggers WebSocket connection
     const chatId = uuidv4();
 
-    // Prepare the backend payload
     const payload = {
-      session_id: sessionId,
+      session_id: newSessionId,
       client_id: clientId,
       pep_name: name,
       pep_occupation: occupation,
       pep_age: age,
       pep_gender: gender,
+      UID: uid,
     };
 
     try {
-      // Create chat document (unchanged)
+      // Create chat document
       const chatDocRef = doc(db, 'client', clientId, 'chat_history', chatId);
       await setDoc(chatDocRef, {
         headline: `Report for ${name}`,
@@ -60,42 +68,42 @@ const NewReport = ({ clientId, userName }) => {
         pep_name: name,
         pep_occupation: occupation,
         pep_age: age,
-        pep_gender: gender
+        pep_gender: gender,
+        session_id: newSessionId,
+        uid: uid,
       });
-      
-      console.log('Chat document created with ID:', chatId);
-  
-      // Create initial message with specific ID 'initial-report'
+
+      // Create initial message
       const initialReportRef = doc(db, 'client', clientId, 'chat_history', chatId, 'messages', 'initial-report');
       await setDoc(initialReportRef, {
         prompt: `Initial report request for ${name}`,
-        output: '', // Will be updated after backend response
+        output: '',
         timestamp: serverTimestamp(),
       });
-      
-      console.log('Initial report message created with ID: initial-report');
-  
-      // Send payload to backend (unchanged)
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/report`, payload);
-      
+
+      // Send report request to backend
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/report`, payload);
+
       if (!response.data || !response.data.report) {
         throw new Error('Invalid response from backend.');
       }
-  
-      // Update the initial-report document with the response
+
+      // Update initial message with report
       await setDoc(initialReportRef, {
-        prompt: `Initial report request for ${name}`,
         output: response.data.report,
-        timestamp: serverTimestamp(),
       }, { merge: true });
-      
-      console.log('Initial report updated with backend response');
-  
+
       // Navigate to chat view
       navigate(`/dashboard/chat/${chatId}`);
     } catch (e) {
       console.error('Error saving report:', e);
-      setError('Failed to generate report. Please try again.');
+      if (e.response?.status === 404) {
+        setError('Report endpoint not found. Contact support.');
+      } else if (e.code === 'ECONNRESET' || e.response?.status === 504) {
+        setError('The report is taking longer than expected (up to 5 minutes). Please wait.');
+      } else {
+        setError('Failed to generate report. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -165,7 +173,25 @@ const NewReport = ({ clientId, userName }) => {
             </div>
           </div>
           {error && <div className="error-message">{error}</div>}
-          {loading && <div className="loading-message">Generating report...</div>}
+          {loading && (
+            <div className="loading-container">
+              <p>Generating report... This may take up to 15 minutes.</p>
+              {messages.length > 0 && (
+                <div className="progress-messages">
+                  <h3>Progress Updates:</h3>
+                  {messages.map((msg, index) => (
+                    <p key={index}>
+                      {msg.type === 'status'
+                        ? `Status: ${msg.message}`
+                        : msg.type === 'need_more_info'
+                          ? `Query: ${msg.query}`
+                          : JSON.stringify(msg)}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -175,6 +201,7 @@ const NewReport = ({ clientId, userName }) => {
 NewReport.propTypes = {
   clientId: PropTypes.string.isRequired,
   userName: PropTypes.string.isRequired,
+  uid: PropTypes.string.isRequired,
 };
 
 export default NewReport;
