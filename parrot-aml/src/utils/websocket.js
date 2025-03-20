@@ -15,6 +15,7 @@ const useWebSocket = (sessionId) => {
 
     websocket.onopen = () => {
       console.log(`WebSocket connected for session ${sessionId}`);
+      console.log("Connecting to WebSocket URL:", wsUrl);
     };
 
     websocket.onmessage = (event) => {

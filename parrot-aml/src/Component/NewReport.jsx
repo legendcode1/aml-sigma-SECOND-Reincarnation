@@ -21,8 +21,13 @@ const NewReport = ({ clientId, userName, uid }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [sessionId, setSessionId] = useState(null);
+
+  // Place this line at the top of the component, after state declarations
+  // It initializes the WebSocket connection and provides the messages array
   const { messages } = useWebSocket(sessionId);
 
+  // Place this function after state declarations but before handleSave
+  // It handles form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -31,6 +36,8 @@ const NewReport = ({ clientId, userName, uid }) => {
     }));
   };
 
+  // Place this function after handleInputChange
+  // It handles the report submission and WebSocket timing
   const handleSave = async () => {
     const { name, age, occupation, gender } = formData;
     if (!name || !age || !occupation || !gender) {
@@ -45,7 +52,6 @@ const NewReport = ({ clientId, userName, uid }) => {
     setError(null);
 
     const newSessionId = uuidv4();
-    setSessionId(newSessionId); // Triggers WebSocket connection
     const chatId = uuidv4();
 
     const payload = {
@@ -93,6 +99,9 @@ const NewReport = ({ clientId, userName, uid }) => {
         output: response.data.report,
       }, { merge: true });
 
+      // Start WebSocket connection after report is generated
+      setSessionId(newSessionId); // This triggers useWebSocket to connect
+
       // Navigate to chat view
       navigate(`/dashboard/chat/${chatId}`);
     } catch (e) {
@@ -100,7 +109,7 @@ const NewReport = ({ clientId, userName, uid }) => {
       if (e.response?.status === 404) {
         setError('Report endpoint not found. Contact support.');
       } else if (e.code === 'ECONNRESET' || e.response?.status === 504) {
-        setError('The report is taking longer than expected (up to 5 minutes). Please wait.');
+        setError('The report is taking longer than expected (up to 15 minutes). Please wait.');
       } else {
         setError('Failed to generate report. Please try again.');
       }
@@ -109,6 +118,8 @@ const NewReport = ({ clientId, userName, uid }) => {
     }
   };
 
+  // Place this return statement at the end of the component
+  // It defines the UI, including WebSocket message display
   return (
     <div className="new-report-container">
       <div className="search-sect-padding">
@@ -198,6 +209,7 @@ const NewReport = ({ clientId, userName, uid }) => {
   );
 };
 
+// Place this PropTypes definition after the component, before the export
 NewReport.propTypes = {
   clientId: PropTypes.string.isRequired,
   userName: PropTypes.string.isRequired,

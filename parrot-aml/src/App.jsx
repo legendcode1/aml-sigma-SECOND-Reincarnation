@@ -1,3 +1,4 @@
+// parrot-aml/src/App.jsx
 import React, { useState, useEffect } from 'react';
 import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import LeftBar from './Component/LeftBar';
@@ -13,7 +14,7 @@ const App = () => {
   const [clientId, setClientId] = useState(null);
   const [companyName, setCompanyName] = useState('');
   const [userName, setUserName] = useState('');
-  const [uid, setUid] = useState(null); // Add state for uid
+  const [uid, setUid] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
@@ -24,7 +25,7 @@ const App = () => {
       if (user) {
         console.log('Auth state changed:', user);
         setIsAuthenticated(true);
-        setUid(user.uid); // Store the uid in state
+        setUid(user.uid);
         try {
           const userData = await fetchUserDataByUID(user.uid);
           console.log('Fetched user data:', userData);
@@ -49,7 +50,7 @@ const App = () => {
           setClientId(null);
           setCompanyName('');
           setUserName('');
-          setUid(null); // Reset uid on error
+          setUid(null);
           navigate('/login');
         }
       } else {
@@ -57,7 +58,7 @@ const App = () => {
         setClientId(null);
         setCompanyName('');
         setUserName('');
-        setUid(null); // Reset uid when user is not authenticated
+        setUid(null);
         navigate('/login');
       }
       setLoading(false);
@@ -74,7 +75,7 @@ const App = () => {
       setClientId(null);
       setCompanyName('');
       setUserName('');
-      setUid(null); // Reset uid on logout
+      setUid(null);
       navigate('/login');
     } catch (error) {
       console.error('Error signing out:', error);
@@ -106,8 +107,7 @@ const App = () => {
                   <LeftBar clientId={clientId} />
                 </div>
                 <div className="main-interface">
-                  {/* Pass clientId, userName, and uid to MainInterface */}
-                  **<MainInterface clientId={clientId} userName={userName} uid={uid} />**
+                  <MainInterface clientId={clientId} userName={userName} uid={uid} />
                 </div>
               </div>
             ) : (
