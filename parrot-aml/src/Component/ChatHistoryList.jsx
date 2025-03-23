@@ -85,20 +85,17 @@ const ChatHistoryList = ({ chatHistory: initialChatHistory, onShowProfileSetting
 
   return (
     <div className="chat-items">
-      <div
-        className="moderator-link"
-        onClick={handleModeratorClick}
-        style={{ cursor: 'pointer', padding: '10px', fontWeight: 'bold', color: '#333' }}
-      >
-        Moderator Panel
+      <hr />
+      <div className="nav-buttons">
+        <div className="nav-button" onClick={handleModeratorClick}>
+          Moderator Panel
+        </div>
+        <div className="nav-button" onClick={handleProfileSettingsClick}>
+          Profile Settings
+        </div>
       </div>
-      <div
-        className="profile-settings-link"
-        onClick={handleProfileSettingsClick}
-        style={{ cursor: 'pointer', padding: '10px', fontWeight: 'bold', color: '#333' }}
-      >
-        Profile Settings
-      </div>
+      <hr />
+      <span className='chat-header'>Chat History</span>
       <AutoSizer>
         {({ height, width }) => (
           <List

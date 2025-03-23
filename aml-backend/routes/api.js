@@ -51,7 +51,7 @@ router.post("/report", async (req, res) => {
   const waitForWs = () =>
     new Promise((resolve, reject) => {
       const startTime = Date.now();
-      const timeout = 5000; // 5-second timeout
+      const timeout = 15000; // Change from 5000 to 15000
       const checkWs = () => {
         if (wsConnections[session_id] && wsConnections[session_id].ready) {
           resolve();

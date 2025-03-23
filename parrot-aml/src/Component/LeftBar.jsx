@@ -73,7 +73,6 @@ const LeftBar = ({ clientId }) => {
           style={{ cursor: 'pointer' }}
         />
       </div>
-      <hr />
       {/* Moderator Panel navigation and Profile Settings toggle are handled within ChatHistoryList */}
       {activeSection === 'chatHistory' ? (
         <ChatHistoryList

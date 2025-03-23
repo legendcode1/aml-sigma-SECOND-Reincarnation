@@ -131,3 +131,29 @@
   background-color: #e0e0e0;
 }
 
+.nav-button, .chat-header {
+  background: none;
+  border: none;
+  color: #fff;
+  text-align: left;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  padding-bottom: 10px;
+}
+
+.chat-header{
+  padding-bottom: 0;
+}
+
+.nav-buttons {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+hr {
+  color: #fff;
+}
