@@ -2,7 +2,7 @@
 const express = require("express");
 const axios = require("axios");
 const { getAuthHeaders } = require("../auth");
-const { wsConnections } = require("../wsServer"); // Import wsConnections from wsServer.js
+const { wsConnections } = require("../wsServer");
 
 const router = express.Router();
 
@@ -51,7 +51,7 @@ router.post("/report", async (req, res) => {
   const waitForWs = () =>
     new Promise((resolve, reject) => {
       const startTime = Date.now();
-      const timeout = 15000; // Change from 5000 to 15000
+      const timeout = 15000;
       const checkWs = () => {
         if (wsConnections[session_id] && wsConnections[session_id].ready) {
           resolve();
@@ -62,7 +62,7 @@ router.post("/report", async (req, res) => {
             )
           );
         } else {
-          setTimeout(checkWs, 100); // Check every 100ms
+          setTimeout(checkWs, 100);
         }
       };
       checkWs();
@@ -87,7 +87,7 @@ router.post("/report", async (req, res) => {
       console.log(
         `Waiting for WebSocket for session ${session_id} to be ready...`
       );
-      await waitForWs(); // Wait until WebSocket is ready
+      await waitForWs();
       console.log(`WebSocket for session ${session_id} is ready.`);
 
       console.log("Attempting to obtain auth headers...");
@@ -158,23 +158,29 @@ router.post("/followup", async (req, res) => {
     pep_gender,
     chat_history,
     user_message,
+    UID, // Extract UID from request body
   } = req.body;
 
   console.log("Received /followup request:", req.body);
 
-  if (!session_id || !client_id || !pep_name || !user_message) {
+  if (!session_id || !client_id || !pep_name || !user_message || !UID) {
     console.log("Missing required fields in /followup");
-    return res.status(400).json({ error: "Missing required fields" });
+    return res.status(400).json({
+      error:
+        "Missing required fields: session_id, client_id, pep_name, user_message, and UID are required",
+    });
   }
 
   const payload = {
     session_id,
+    client_id, // Include client_id in the payload
     pep_name,
     pep_occupation,
     pep_age,
     pep_gender,
     chat_history,
     user_message,
+    UID, // Include UID in the payload
   };
 
   if (USE_MOCK_API) {
@@ -184,6 +190,7 @@ router.post("/followup", async (req, res) => {
 - **Session ID:** ${session_id}
 - **Client ID:** ${client_id}
 - **User Message:** "${user_message}"
+- **UID:** ${UID}
 
 *This is a mock follow-up report generated for testing purposes.*`,
     };
