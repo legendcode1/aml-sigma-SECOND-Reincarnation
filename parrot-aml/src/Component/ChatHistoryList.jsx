@@ -1,11 +1,12 @@
 // parrot-aml/src/Component/ChatHistoryList.jsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FixedSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { Link, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import sortIcon from '/leftbar/sort.png';
-import fav from '/leftbar/star.png';
+import { db } from '../firebase/firebase';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { useWebSocketContext } from '../utils/WebSocketContext';
 
 const HighRiskBadge = () => (
   <div className="risk-badge">
@@ -14,9 +15,20 @@ const HighRiskBadge = () => (
   </div>
 );
 
-const ChatItem = ({ index, style, data }) => {
+const ChatItem = ({ index, style, data, sessions }) => {
   const item = data[index];
   const isHighRisk = ['Budi Arie Hartanto', 'Ananta Wistara Anugrah'].includes(item.headline);
+
+  // Determine the display text based on status and WebSocket sessions
+  const latestMessage = item.status === 'processing' && sessions[item.id]?.latestMessage
+    ? sessions[item.id].latestMessage
+    : item.status === 'processing'
+      ? 'Processing...' // Fallback if no WebSocket message
+      : item.dateMade
+        ? (typeof item.dateMade.toDate === 'function'
+          ? item.dateMade.toDate().toLocaleString()
+          : new Date(item.dateMade).toLocaleString())
+        : 'No date';
 
   return (
     <div style={style} className="chat-item-wrapper">
@@ -25,13 +37,7 @@ const ChatItem = ({ index, style, data }) => {
           <div className="chat-profile">
             <span className="profile-name">{item.headline || 'Unnamed Chat'}</span>
             {isHighRisk && <HighRiskBadge />}
-            <span className="chat-date">
-              {item.dateMade
-                ? (typeof item.dateMade.toDate === 'function'
-                  ? item.dateMade.toDate().toLocaleString() // Show full date and time
-                  : new Date(item.dateMade).toLocaleString())
-                : 'No date'}
-            </span>
+            <span className="chat-status">{latestMessage}</span>
           </div>
         </div>
       </Link>
@@ -43,10 +49,29 @@ ChatItem.propTypes = {
   index: PropTypes.number.isRequired,
   style: PropTypes.object.isRequired,
   data: PropTypes.array.isRequired,
+  sessions: PropTypes.object.isRequired,
 };
 
-const ChatHistoryList = ({ chatHistory, onShowProfileSettings, clientId }) => {
+const ChatHistoryList = ({ chatHistory: initialChatHistory, onShowProfileSettings, clientId }) => {
   const navigate = useNavigate();
+  const { sessions } = useWebSocketContext();
+  const [chatHistory, setChatHistory] = useState(initialChatHistory);
+
+  useEffect(() => {
+    if (!clientId) return;
+
+    const chatsRef = collection(db, 'client', clientId, 'chat_history');
+    const q = query(chatsRef, orderBy('dateMade', 'desc'));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const chats = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setChatHistory(chats);
+    }, (err) => {
+      console.error('Error fetching chat history:', err);
+    });
+
+    return () => unsubscribe();
+  }, [clientId]);
 
   const handleModeratorClick = () => {
     console.log('Moderator Panel clicked. Navigating to /dashboard/moderator');
@@ -77,7 +102,7 @@ const ChatHistoryList = ({ chatHistory, onShowProfileSettings, clientId }) => {
       <AutoSizer>
         {({ height, width }) => (
           <List
-            height={height - 60} // Adjust height to account for the links above
+            height={height - 60}
             itemCount={chatHistory.length}
             itemSize={80}
             width={width}
@@ -85,7 +110,7 @@ const ChatHistoryList = ({ chatHistory, onShowProfileSettings, clientId }) => {
             itemKey={(index, data) => data[index].id}
           >
             {({ index, style, data }) => (
-              <ChatItem index={index} style={style} data={data} />
+              <ChatItem index={index} style={style} data={data} sessions={sessions} />
             )}
           </List>
         )}

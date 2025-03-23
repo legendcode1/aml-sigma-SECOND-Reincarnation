@@ -1,66 +1,101 @@
+// parrot-aml/src/Component/Report.jsx
 import React, { useState, useEffect } from 'react';
-import '../StyleSheet/Report.css';
+import { useParams } from 'react-router-dom';
 import { db } from '../firebase/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, onSnapshot, collection, query, orderBy } from 'firebase/firestore';
+import { useWebSocketContext } from '../utils/WebSocketContext';
 import ReactMarkdown from 'react-markdown';
 import PropTypes from 'prop-types';
-import { useParams } from 'react-router-dom';
+import '../StyleSheet/Report.css';
 
 const Report = ({ clientId }) => {
   const { chatId } = useParams();
   const [initialReport, setInitialReport] = useState(null);
+  const [progressMessages, setProgressMessages] = useState([]);
+  const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { stopSession } = useWebSocketContext();
 
+  // Fetch chat status
   useEffect(() => {
-    const fetchInitialReport = async () => {
-      try {
-        setLoading(true); // Reset loading state
-        setInitialReport(null); // Clear previous report
-        setError(null); // Clear any previous errors
+    if (!chatId || !clientId) {
+      setError('Chat ID or Client ID is missing.');
+      setLoading(false);
+      return;
+    }
 
-        if (!chatId) {
-          throw new Error('Chat ID is missing.');
+    const chatDocRef = doc(db, 'client', clientId, 'chat_history', chatId);
+    const unsubscribe = onSnapshot(
+      chatDocRef,
+      (docSnapshot) => {
+        if (docSnapshot.exists()) {
+          const data = docSnapshot.data();
+          setStatus(data.status);
+          if (data.status === 'completed' || data.status === 'failed') {
+            stopSession(chatId); // Close WebSocket when done
+          }
+        } else {
+          setError('Chat document not found.');
         }
-
-        const messageRef = doc(
-          db, 
-          'client', 
-          clientId, 
-          'chat_history', 
-          chatId,
-          'messages',
-          'initial-report'
-        );
-        
-        const messageDoc = await getDoc(messageRef);
-        
-        if (!messageDoc.exists()) {
-          throw new Error('Initial report message not found.');
-        }
-
-        setInitialReport(messageDoc.data());
-
-      } catch (err) {
-        console.error('Error fetching initial report message:', err);
-        setError(err.message || 'Failed to load initial report.');
-      } finally {
+        setLoading(false);
+      },
+      (err) => {
+        setError(err.message);
         setLoading(false);
       }
-    };
+    );
 
-    fetchInitialReport();
-  }, [chatId, clientId]); // Added chatId to dependency array
+    return () => unsubscribe();
+  }, [chatId, clientId, stopSession]);
 
-  if (loading) return <div className="loading-messages">Loading initial report...</div>;
+  // Fetch initial report when status is 'completed'
+  useEffect(() => {
+    if (status !== 'completed' || !chatId || !clientId) return;
+
+    const messageRef = doc(db, 'client', clientId, 'chat_history', chatId, 'messages', 'initial-report');
+    const unsubscribe = onSnapshot(
+      messageRef,
+      (msgDoc) => {
+        if (msgDoc.exists()) {
+          setInitialReport(msgDoc.data());
+        }
+      },
+      (err) => setError(err.message)
+    );
+
+    return () => unsubscribe();
+  }, [status, chatId, clientId]);
+
+  // Fetch progress messages when status is 'processing'
+  useEffect(() => {
+    if (status !== 'processing' || !chatId || !clientId) return;
+
+    const messagesRef = collection(db, 'client', clientId, 'chat_history', chatId, 'messages');
+    const q = query(messagesRef, orderBy('timestamp', 'asc'));
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const messages = snapshot.docs
+          .map((docSnapshot) => docSnapshot.data())
+          .filter((msg) => msg.type === 'progress');
+        setProgressMessages(messages);
+      },
+      (err) => setError(err.message)
+    );
+
+    return () => unsubscribe();
+  }, [status, chatId, clientId]);
+
+  if (loading) return <div className="loading-messages">Loading...</div>;
   if (error) return <div className="error-messages">{error}</div>;
 
   return (
     <div className="report-container">
       <div className="report-section-padding">
         <div className="report-section">
-          <h1 className="chat-title">Initial Report</h1>
-          {initialReport && (
+          <h1 className="chat-title">{status === 'processing' ? 'Processing Report' : 'Initial Report'}</h1>
+          {status === 'completed' && initialReport && (
             <div className="chat-meta">
               <span>
                 Date Made:{' '}
@@ -72,14 +107,25 @@ const Report = ({ clientId }) => {
           )}
         </div>
         <hr className="no-padding-hr" />
-        {initialReport && (
+        {status === 'processing' ? (
+          <div className="progress-messages">
+            <p>Generating report... Please wait.</p>
+            {progressMessages.map((msg, index) => (
+              <p key={index}>
+                {msg.content.message || msg.content.query || JSON.stringify(msg.content)}
+              </p>
+            ))}
+          </div>
+        ) : status === 'completed' && initialReport ? (
           <div className="message-api">
-            <div className='api-message'>
+            <div className="api-message">
               <div className="message-output">
                 <ReactMarkdown>{initialReport.output || ''}</ReactMarkdown>
               </div>
             </div>
           </div>
+        ) : (
+          <div>Status: {status || 'Unknown'}</div>
         )}
       </div>
     </div>

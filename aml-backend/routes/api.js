@@ -2,6 +2,7 @@
 const express = require("express");
 const axios = require("axios");
 const { getAuthHeaders } = require("../auth");
+const { wsConnections } = require("../wsServer"); // Import wsConnections from wsServer.js
 
 const router = express.Router();
 
@@ -46,6 +47,27 @@ router.post("/report", async (req, res) => {
     });
   }
 
+  // Function to wait for WebSocket readiness
+  const waitForWs = () =>
+    new Promise((resolve, reject) => {
+      const startTime = Date.now();
+      const timeout = 5000; // 5-second timeout
+      const checkWs = () => {
+        if (wsConnections[session_id] && wsConnections[session_id].ready) {
+          resolve();
+        } else if (Date.now() - startTime > timeout) {
+          reject(
+            new Error(
+              `WebSocket for session ${session_id} not ready within ${timeout}ms`
+            )
+          );
+        } else {
+          setTimeout(checkWs, 100); // Check every 100ms
+        }
+      };
+      checkWs();
+    });
+
   const payload = {
     session_id,
     client_id,
@@ -62,6 +84,12 @@ router.post("/report", async (req, res) => {
     return res.status(200).json(mockResponse);
   } else {
     try {
+      console.log(
+        `Waiting for WebSocket for session ${session_id} to be ready...`
+      );
+      await waitForWs(); // Wait until WebSocket is ready
+      console.log(`WebSocket for session ${session_id} is ready.`);
+
       console.log("Attempting to obtain auth headers...");
       const headers = await getAuthHeaders(process.env.AIGISLLM_BACKEND_URL);
       console.log("Auth headers obtained:", headers);
@@ -72,7 +100,7 @@ router.post("/report", async (req, res) => {
         payload,
         {
           headers,
-          timeout: 900000, // Updated to 15 minutes
+          timeout: 900000, // 15 minutes
         }
       );
       console.log("External API response:", response.data);
@@ -80,6 +108,12 @@ router.post("/report", async (req, res) => {
       return res.status(200).json(response.data);
     } catch (error) {
       console.error("Full error object:", error);
+      if (error.message && error.message.includes("WebSocket for session")) {
+        console.error("WebSocket not ready:", error.message);
+        return res
+          .status(503)
+          .json({ error: "WebSocket connection not ready" });
+      }
       if (error.code === "ECONNRESET") {
         console.error("Connection reset by AegisLLM server");
         return res
@@ -163,7 +197,7 @@ router.post("/followup", async (req, res) => {
         payload,
         {
           headers,
-          timeout: 900000, // 15 minutes (already correct)
+          timeout: 900000, // 15 minutes
         }
       );
       console.log("External API response for followup:", response.data);

@@ -6,6 +6,7 @@ import MainInterface from './Component/MainInterface';
 import LoginPage from './login system/LoginPage';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { fetchUserDataByUID, fetchCompanyDataByID } from './auth/auth';
+import { WebSocketProvider } from './utils/WebSocketContext';
 import './StyleSheet/global.css';
 import './App.css';
 
@@ -82,42 +83,40 @@ const App = () => {
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-  if (isAuthenticated && !clientId) {
-    return <div>Error: Client ID is missing.</div>;
-  }
+  if (loading) return <div>Loading...</div>;
+  if (isAuthenticated && !clientId) return <div>Error: Client ID is missing.</div>;
 
   return (
-    <div className="app-container">
-      {isAuthenticated && (
-        <button onClick={handleReset} className="reset-button">
-          Reset App (Logout and Clear Data)
-        </button>
-      )}
-      <Routes>
-        <Route path="/login" element={<LoginPage companyName={companyName} />} />
-        <Route
-          path="/dashboard/*"
-          element={
-            isAuthenticated && clientId ? (
-              <div className="main-parent">
-                <div className="left-bar">
-                  <LeftBar clientId={clientId} />
+    <WebSocketProvider clientId={clientId}>
+      <div className="app-container">
+        {isAuthenticated && (
+          <button onClick={handleReset} className="reset-button">
+            Reset App (Logout and Clear Data)
+          </button>
+        )}
+        <Routes>
+          <Route path="/login" element={<LoginPage companyName={companyName} />} />
+          <Route
+            path="/dashboard/*"
+            element={
+              isAuthenticated && clientId ? (
+                <div className="main-parent">
+                  <div className="left-bar">
+                    <LeftBar clientId={clientId} />
+                  </div>
+                  <div className="main-interface">
+                    <MainInterface clientId={clientId} userName={userName} uid={uid} />
+                  </div>
                 </div>
-                <div className="main-interface">
-                  <MainInterface clientId={clientId} userName={userName} uid={uid} />
-                </div>
-              </div>
-            ) : (
-              <div>Loading dashboard...</div>
-            )
-          }
-        />
-        <Route path="*" element={<LoginPage companyName={companyName} />} />
-      </Routes>
-    </div>
+              ) : (
+                <div>Loading dashboard...</div>
+              )
+            }
+          />
+          <Route path="*" element={<LoginPage companyName={companyName} />} />
+        </Routes>
+      </div>
+    </WebSocketProvider>
   );
 };
 
