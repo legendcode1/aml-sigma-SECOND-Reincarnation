@@ -39,7 +39,6 @@
     padding: 10px 20px; /* Add padding inside the message container */
     word-wrap: break-word; /* Ensure long words break to the next line */
     color: var(--primary-color);
-    outline: #314a57 solid 1px;
   }
   
   
@@ -53,20 +52,7 @@
     align-self: flex-start; /* Align user messages to the right */
   }
   
-  .description-text,
-  .message-prompt,
-  .message-output
-  {
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 700;
-    font-size: 20px;
-    letter-spacing: 2.8px;
-    color: var(--text-color);
-    margin: 0;
-    line-height: 1.5;
-    var(--text-color)-space: pre-wrap;
-    width: 100%;
-  }
+
   
   .loading-messages,
   .error-messages {
