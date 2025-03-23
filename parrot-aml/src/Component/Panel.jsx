@@ -130,7 +130,7 @@ const ChatPanel = ({ clientId, userName }) => {
 
       // Build payload for the backend call
       const payload = {
-        session_id: uuidv4(),
+        session_id: chatId, // Use chatId for consistency with initial report
         client_id: clientId,
         pep_name: chatDoc?.pep_name || '',
         pep_occupation: chatDoc?.pep_occupation || '',
@@ -138,10 +138,11 @@ const ChatPanel = ({ clientId, userName }) => {
         pep_gender: chatDoc?.pep_gender || '',
         chat_history: messages.map((m) => m.prompt).join('\n'),
         user_message: newMessage,
+        UID: chatDoc?.uid || '', // Add UID from chatDoc
       };
 
       const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/followup?client_id=${clientId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/followup?client_id=${clientId}`,
         payload
       );
 
