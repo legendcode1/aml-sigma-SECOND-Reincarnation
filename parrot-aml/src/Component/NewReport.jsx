@@ -1,14 +1,13 @@
-// parrot-aml/src/Component/NewReport.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase/firebase';
-import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { setDoc, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import PropTypes from 'prop-types';
+import { useWebSocketContext } from '../utils/WebSocketContext';
 import '../StyleSheet/NewReport.css';
 import send from '../assets/newreport/send.png';
-import useWebSocket from '../utils/websocket';
 
 const NewReport = ({ clientId, userName, uid }) => {
   const navigate = useNavigate();
@@ -20,24 +19,13 @@ const NewReport = ({ clientId, userName, uid }) => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [sessionId, setSessionId] = useState(null);
+  const { startSession } = useWebSocketContext();
 
-  // Place this line at the top of the component, after state declarations
-  // It initializes the WebSocket connection and provides the messages array
-  const { messages } = useWebSocket(sessionId);
-
-  // Place this function after state declarations but before handleSave
-  // It handles form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Place this function after handleInputChange
-  // It handles the report submission and WebSocket timing
   const handleSave = async () => {
     const { name, age, occupation, gender } = formData;
     if (!name || !age || !occupation || !gender) {
@@ -51,11 +39,11 @@ const NewReport = ({ clientId, userName, uid }) => {
     setLoading(true);
     setError(null);
 
-    const newSessionId = uuidv4();
-    const chatId = uuidv4();
+    const chatId = uuidv4(); // chatId = sessionId
+    const chatDocRef = doc(db, 'client', clientId, 'chat_history', chatId);
 
     const payload = {
-      session_id: newSessionId,
+      session_id: chatId,
       client_id: clientId,
       pep_name: name,
       pep_occupation: occupation,
@@ -65,8 +53,7 @@ const NewReport = ({ clientId, userName, uid }) => {
     };
 
     try {
-      // Create chat document
-      const chatDocRef = doc(db, 'client', clientId, 'chat_history', chatId);
+      // Create chat document with initial status
       await setDoc(chatDocRef, {
         headline: `Report for ${name}`,
         sender: userName,
@@ -75,8 +62,9 @@ const NewReport = ({ clientId, userName, uid }) => {
         pep_occupation: occupation,
         pep_age: age,
         pep_gender: gender,
-        session_id: newSessionId,
+        session_id: chatId,
         uid: uid,
+        status: 'processing',
       });
 
       // Create initial message
@@ -87,39 +75,40 @@ const NewReport = ({ clientId, userName, uid }) => {
         timestamp: serverTimestamp(),
       });
 
+      // Start WebSocket session and wait for it to open
+      await startSession(chatId);
+
       // Send report request to backend
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/report`, payload);
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/report`, payload, {
+        timeout: 900000, // 15 minutes
+      });
 
       if (!response.data || !response.data.report) {
         throw new Error('Invalid response from backend.');
       }
 
       // Update initial message with report
-      await setDoc(initialReportRef, {
-        output: response.data.report,
-      }, { merge: true });
+      await setDoc(initialReportRef, { output: response.data.report }, { merge: true });
 
-      // Start WebSocket connection after report is generated
-      setSessionId(newSessionId); // This triggers useWebSocket to connect
+      // Update status to completed
+      await updateDoc(chatDocRef, { status: 'completed' });
 
-      // Navigate to chat view
       navigate(`/dashboard/chat/${chatId}`);
     } catch (e) {
       console.error('Error saving report:', e);
-      if (e.response?.status === 404) {
-        setError('Report endpoint not found. Contact support.');
-      } else if (e.code === 'ECONNRESET' || e.response?.status === 504) {
-        setError('The report is taking longer than expected (up to 15 minutes). Please wait.');
-      } else {
-        setError('Failed to generate report. Please try again.');
-      }
+      await updateDoc(chatDocRef, { status: 'failed' });
+      setError(
+        e.response?.status === 404
+          ? 'Report endpoint not found. Contact support.'
+          : e.code === 'ECONNABORTED' || e.response?.status === 504
+            ? 'The report is taking longer than expected (up to 15 minutes). Please wait.'
+            : 'Failed to generate report. Please try again.'
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  // Place this return statement at the end of the component
-  // It defines the UI, including WebSocket message display
   return (
     <div className="new-report-container">
       <div className="search-sect-padding">
@@ -137,79 +126,25 @@ const NewReport = ({ clientId, userName, uid }) => {
                   className="search-input"
                   required
                 />
-                <button
-                  className="search-icon"
-                  onClick={handleSave}
-                  disabled={loading}
-                  aria-label="Generate Report"
-                >
+                <button onClick={handleSave} disabled={loading} aria-label="Generate Report">
                   <img src={send} alt="Send" />
                 </button>
               </div>
             </div>
             <div className="search-bar">
-              <div className="age-input-container">
-                <input
-                  type="text"
-                  name="age"
-                  placeholder="Age"
-                  value={formData.age}
-                  onChange={handleInputChange}
-                  className="search-input"
-                  required
-                />
-              </div>
-              <div className="occupation-input-container">
-                <input
-                  type="text"
-                  name="occupation"
-                  placeholder="Occupation"
-                  value={formData.occupation}
-                  onChange={handleInputChange}
-                  className="search-input"
-                  required
-                />
-              </div>
-              <div className="gender-input-container">
-                <input
-                  type="text"
-                  name="gender"
-                  placeholder="Gender"
-                  value={formData.gender}
-                  onChange={handleInputChange}
-                  className="search-input"
-                  required
-                />
-              </div>
+              <input type="text" name="age" placeholder="Age" value={formData.age} onChange={handleInputChange} required />
+              <input type="text" name="occupation" placeholder="Occupation" value={formData.occupation} onChange={handleInputChange} required />
+              <input type="text" name="gender" placeholder="Gender" value={formData.gender} onChange={handleInputChange} required />
             </div>
           </div>
           {error && <div className="error-message">{error}</div>}
-          {loading && (
-            <div className="loading-container">
-              <p>Generating report... This may take up to 15 minutes.</p>
-              {messages.length > 0 && (
-                <div className="progress-messages">
-                  <h3>Progress Updates:</h3>
-                  {messages.map((msg, index) => (
-                    <p key={index}>
-                      {msg.type === 'status'
-                        ? `Status: ${msg.message}`
-                        : msg.type === 'need_more_info'
-                          ? `Query: ${msg.query}`
-                          : JSON.stringify(msg)}
-                    </p>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+          {loading && <div className="loading-container"><p>Generating report...</p></div>}
         </div>
       </div>
     </div>
   );
 };
 
-// Place this PropTypes definition after the component, before the export
 NewReport.propTypes = {
   clientId: PropTypes.string.isRequired,
   userName: PropTypes.string.isRequired,
