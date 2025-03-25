@@ -1,19 +1,10 @@
 // src/login system/LoginPage.jsx
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUser } from '../auth/auth'; // Import loginUser function
+import { loginUser } from '../auth/auth';
 import PropTypes from 'prop-types';
-import './LoginPage.css'; // Ensure correct path
+import './LoginPage.css';
 
-/**
- * LoginPage Component
- *
- * Handles user authentication.
- *
- * Props:
- * - companyName (string): The name of the company to display on the login page.
- */
 const LoginPage = ({ companyName }) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -21,18 +12,14 @@ const LoginPage = ({ companyName }) => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  /**
-   * Handle user login
-   */
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
     try {
-      const { user, userData, companyData, chatHistory } = await loginUser(email, password);
-      console.log('User logged in:', user);
-      // Since App.jsx listens to auth state changes, no need to navigate here
+      const { user } = await loginUser(email, password);
+      console.log('User logged in:', user.uid);
+      // Navigation handled by App.jsx
     } catch (err) {
       console.error('Login failed:', err);
       setError(err.message || 'Login failed. Please try again.');
@@ -42,41 +29,55 @@ const LoginPage = ({ companyName }) => {
   };
 
   return (
-    <div className="login-page-container">
-      <h1>Welcome to {companyName}</h1>
-      <form onSubmit={handleLogin} className="login-form">
-        <label htmlFor="email">Email:</label>
-        <input
-          type="email"
-          id="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-
-        <label htmlFor="password">Password:</label>
-        <input
-          type="password"
-          id="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-
-        {error && <div className="error-message">{error}</div>}
-        {loading ? (
-          <div className="loading-message">Logging in...</div>
-        ) : (
-          <button type="submit" className="login-button">
-            Login
-          </button>
-        )}
-      </form>
+    <div className="ImportantMessages">
+      <div className="LogoSection">
+        <img src="/logo.png" alt="Company Logo" className="CompanyLogo" /> {/* Add your logo */}
+      </div>
+      <div className="LoginPadding">
+        <h1 className="WelcomeText">Welcome to {companyName}</h1>
+        <form onSubmit={handleLogin} className="LoginSection">
+          <div className="Frame34">
+            <div className="EmailColumn">
+              <label htmlFor="email" className="EmailAddress">Email Address</label>
+              <input
+                type="email"
+                id="email"
+                className="InputField"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+            <div className="PasswordColumn">
+              <label htmlFor="password" className="Password">Password</label>
+              <input
+                type="password"
+                id="password"
+                className="InputField"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+            {error && <div className="ErrorMessage">{error}</div>}
+            <div className="SubmitSection">
+              <button
+                type="submit"
+                className="SubmitButton"
+                disabled={loading}
+              >
+                {loading ? 'Logging in...' : 'Login'}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
 
-// Prop type validation
 LoginPage.propTypes = {
   companyName: PropTypes.string.isRequired,
 };

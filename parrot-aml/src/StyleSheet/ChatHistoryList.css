@@ -1,0 +1,162 @@
+/* Define CSS custom properties for dynamic styling */
+:root {
+    --primary-bg-color: #293742;
+    --text-color: #fff;
+    --accent-color: #f44336;
+    --font-family-main: 'JetBrains Mono', monospace;
+    --divider-color: rgba(255, 255, 255, 0.3);
+  }
+  
+  /* Container for chat history */
+  .chat-items {
+    background-color: var(--primary-bg-color);
+    padding: 10px;
+    height: calc(100vh - 60px);
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Divider style */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--divider-color);
+    margin: 5px 0;
+  }
+  
+  /* Navigation buttons container */
+  .nav-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  
+  /* Navigation button styling */
+  .nav-button {
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    font-family: var(--font-family-main);
+    font-size: 18px;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+    padding: 8px 0;
+    transition: opacity 0.3s;
+  }
+  
+  .nav-button:hover {
+    opacity: 0.8;
+  }
+  
+  /* Chat header styling */
+  .chat-header {
+    display: block;
+    font-family: var(--font-family-main);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 10px;
+  }
+  
+  /* Chat item wrapper */
+  .chat-item-wrapper {
+    padding: 5px 0; /* Reduced padding to fit within 80px */
+  }
+  
+  /* Chat item link styling */
+  .chat-item-link {
+    text-decoration: none;
+  }
+  
+  /* Chat item content container */
+  .chat-item-content {
+    display: flex;
+    flex-direction: column;
+    padding: 5px 10px; /* Adjusted padding to reduce height */
+    border-radius: 4px;
+    transition: background-color 0.3s;
+    max-height: 70px; /* Fits within itemSize (80px - 10px wrapper padding) */
+    overflow: hidden; /* Prevents content from spilling over */
+  }
+  
+  .chat-item-content:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  /* Profile container inside chat item */
+  .chat-profile {
+    display: flex;
+    flex-direction: column;
+    gap: 2px; /* Reduced gap to save space */
+  }
+  
+  /* Profile name styling */
+  .profile-name {
+    color: var(--text-color);
+    font-family: var(--font-family-main);
+    font-size: 16px; /* Slightly smaller to fit */
+    font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* Chat status (latest message) styling */
+  .chat-status {
+    color: var(--text-color);
+    font-family: var(--font-family-main);
+    font-size: 12px; /* Smaller to fit */
+    opacity: 0.8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* High-risk badge styling */
+  .risk-badge {
+    position: relative;
+    width: 89px;
+    height: 20px; /* Reduced to fit within 70px total height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .risk-badge span {
+    position: absolute;
+    color: var(--text-color);
+    font-family: var(--font-family-main);
+    font-size: 13px; /* Smaller to fit */
+    font-weight: 700;
+  }
+  
+  .risk-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  /* Chat date styling (if used) */
+  .chat-date {
+    color: #ccc;
+    font-family: var(--font-family-main);
+    font-size: 12px;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .nav-button {
+      font-size: 16px;
+    }
+    .chat-header {
+      font-size: 18px;
+    }
+    .profile-name {
+      font-size: 14px;
+    }
+    .chat-status {
+      font-size: 11px;
+    }
+  }

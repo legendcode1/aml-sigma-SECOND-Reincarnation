@@ -126,19 +126,54 @@ const NewReport = ({ clientId, userName, uid }) => {
                   className="search-input"
                   required
                 />
-                <button onClick={handleSave} disabled={loading} aria-label="Generate Report">
+                <button
+                  className="search-icon"
+                  onClick={handleSave}
+                  disabled={loading}
+                  aria-label="Generate Report"
+                >
                   <img src={send} alt="Send" />
                 </button>
               </div>
             </div>
             <div className="search-bar">
-              <input type="text" name="age" placeholder="Age" value={formData.age} onChange={handleInputChange} required />
-              <input type="text" name="occupation" placeholder="Occupation" value={formData.occupation} onChange={handleInputChange} required />
-              <input type="text" name="gender" placeholder="Gender" value={formData.gender} onChange={handleInputChange} required />
+              <div className="age-input-container">
+                <input
+                  type="text"
+                  name="age"
+                  placeholder="Age"
+                  value={formData.age}
+                  onChange={handleInputChange}
+                  className="search-input"
+                  required
+                />
+              </div>
+              <div className="occupation-input-container">
+                <input
+                  type="text"
+                  name="occupation"
+                  placeholder="Occupation"
+                  value={formData.occupation}
+                  onChange={handleInputChange}
+                  className="search-input"
+                  required
+                />
+              </div>
+              <div className="gender-input-container">
+                <input
+                  type="text"
+                  name="gender"
+                  placeholder="Gender"
+                  value={formData.gender}
+                  onChange={handleInputChange}
+                  className="search-input"
+                  required
+                />
+              </div>
             </div>
           </div>
           {error && <div className="error-message">{error}</div>}
-          {loading && <div className="loading-container"><p>Generating report...</p></div>}
+          {loading && <div className="loading-message">Generating report...</div>}
         </div>
       </div>
     </div>

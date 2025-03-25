@@ -1,25 +1,26 @@
-// src/auth/auth.jsx
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+// parrot-aml/src/auth/auth.jsx
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 import {
   getFirestore,
   doc,
   getDoc,
   collection,
-  getDocs
+  getDocs,
+  setDoc,
 } from 'firebase/firestore';
 import { loadChatMessagesFirestore } from '../indexedDB';
 import axios from 'axios';
 
-// Firebase configuration
+// Firebase configuration using Vite environment variables
 const firebaseConfig = {
-  apiKey: "AIzaSyBfku8hikwXrII_Uv2u0pL6-f0a0a0mKr8",
-  authDomain: "datumcorp-aml.firebaseapp.com",
-  projectId: "datumcorp-aml",
-  storageBucket: "datumcorp-aml.appspot.com",
-  messagingSenderId: "710428028162",
-  appId: "1:710428028162:web:486e3aad77de49d0d8261b",
-  measurementId: "G-KSL9Y2V3HX",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
@@ -77,12 +78,11 @@ export const fetchChatHistoryByCompanyID = async (companyId) => {
     if (chatHistorySnapshot.empty) {
       throw new Error(`No chat history found for company ID: ${companyId}`);
     }
-    const chatHistory = chatHistorySnapshot.docs.map(doc => ({
+    const chatHistory = chatHistorySnapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     }));
     console.log('Fetched chat history:', chatHistory);
-    // Cache chat history in IndexedDB
     await loadChatMessagesFirestore(chatHistory);
     return chatHistory;
   } catch (error) {
@@ -102,11 +102,9 @@ export const loginUser = async (email, password) => {
       throw new Error('Authentication failed.');
     }
     console.log('User successfully authenticated:', user.uid);
-    // Get raw user data from Firestore
     const userData = await fetchUserDataByUID(user.uid);
     console.log('Fetched user data:', userData);
-    // Look for the company ID using either key
-    const companyId = userData.companyId || userData['company id'];
+    const companyId = userData['company id'];
     if (!companyId) {
       throw new Error('Company ID not found in user data.');
     }
@@ -116,6 +114,22 @@ export const loginUser = async (email, password) => {
     return { user, userData, companyData, chatHistory };
   } catch (error) {
     console.error('Login failed:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * Register a new user (for Moderator use).
+ */
+export const registerUser = async (email, password, userData) => {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    await setDoc(doc(db, 'users', user.uid), userData);
+    console.log('User registered successfully:', user.uid);
+    return user;
+  } catch (error) {
+    console.error('Error registering user:', error.message);
     throw error;
   }
 };
