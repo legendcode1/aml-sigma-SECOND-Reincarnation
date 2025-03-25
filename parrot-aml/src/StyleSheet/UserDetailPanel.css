@@ -1,51 +1,38 @@
+/* parrot-aml/src/StyleSheet/UserDetailPanel.css */
 .user-detail-panel {
-  width: 100%;
-  background: #293742;
   padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  box-sizing: border-box;
-  border-radius: 8px;
-  font-family: 'JetBrains Mono', monospace;
-  color: #fff;
+  color: white;
 }
 
 .user-header {
   display: flex;
   align-items: center;
-  gap: 15px;
-  width: 100%;
+  margin-bottom: 20px;
 }
 
 .avatar {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  border: 2px solid #3F4C56;
-  object-fit: cover;
+  margin-right: 15px;
 }
 
 .name-tag {
   display: flex;
   flex-direction: column;
-  gap: 5px;
 }
 
 .user-name {
   font-size: 18px;
-  font-weight: 700;
+  font-weight: bold;
 }
 
 .user-role {
   font-size: 14px;
-  font-weight: 400;
-  opacity: 0.8;
+  color: #ccc;
 }
 
 .contact-info {
-  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -54,28 +41,61 @@
 .info-row {
   display: flex;
   justify-content: space-between;
-  padding: 5px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .info-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #ccc;
+  font-weight: bold;
 }
 
 .info-value {
-  font-size: 14px;
-  font-weight: 400;
-  text-align: right;
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: #ccc;
 }
 
-.loading, .error {
-  font-size: 14px;
-  color: #fff;
-  text-align: center;
+.edit-button {
+  margin-top: 20px;
+  padding: 8px 16px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.edit-button:hover {
+  background: #45a049;
+}
+
+/* parrot-aml/src/StyleSheet/UserDetailPanel.css */
+.user-detail-panel {
+  padding: 20px;
+  color: white;
+}
+
+.prompt-graph {
+  margin-top: 20px;
+  max-height: 300px; /* Limit graph height */
+}
+
+.chat-history-section {
+  margin-top: 20px;
+}
+
+.chat-history-section table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.chat-history-section th, .chat-history-section td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #34414C;
+}
+
+.chat-history-section th {
+  background: #34414C;
+  color: white;
+}
+
+.chat-history-section td {
+  color: white;
 }

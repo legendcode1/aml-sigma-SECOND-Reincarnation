@@ -5,24 +5,25 @@
   width: 100%;
 }
 
-.moderator-main-interface {
-  flex: 1;
+.moderator-interface-section {
   background: #293742;
   overflow: auto;
 }
 
-.detail-panel-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
+.full-width {
   width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+}
+
+.half-width {
+  width: 50%;
+}
+
+.user-detail-section {
+  width: 50%;
+  background: #34414C;
+  padding: 20px;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+  overflow-y: auto;
 }
 
 .close-detail-button {

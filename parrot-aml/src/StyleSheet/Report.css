@@ -32,10 +32,52 @@
   margin: 10px 0;
 }
 
-.progress-messages {
-  font-size: 16px;
-  color: var(--text-color);
+.progress-container {
   margin-top: 20px;
+  background: var(--secondary-color);
+  padding: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.expand-button {
+  background: var(--accent-color);
+  color: var(--text-color);
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.progress-list {
+  transition: max-height 0.3s ease;
+  overflow-y: auto;
+  color: var(--text-color);
+}
+
+.progress-list.collapsed {
+  max-height: 50vh; /* 50% of viewport height when "small" */
+}
+
+.progress-list.expanded {
+  max-height: 100vh; /* Full height when expanded */
+}
+
+.progress-text {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.loading-dots::after {
+  content: '';
+  animation: dots 1.5s steps(5, end) infinite;
+}
+
+@keyframes dots {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60% { content: '...'; }
+  80%, 100% { content: ''; }
 }
 
 .message-api {
@@ -48,15 +90,12 @@
 .api-message {
   background-color: var(--primary-color);
   align-self: flex-start;
-  justify-content: center;
-  display: flex;
 }
 
 .message-output {
   font-size: 16px;
   line-height: 1.6;
   color: var(--text-color);
-  align-self: center;
 }
 
 .loading-messages,
@@ -64,5 +103,3 @@
   text-align: center;
   color: #ff0000;
 }
-
-/* Removed unused or problematic styles */

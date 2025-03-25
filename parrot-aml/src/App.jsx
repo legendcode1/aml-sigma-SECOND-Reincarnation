@@ -5,9 +5,11 @@ import LeftBar from './Component/LeftBar';
 import MainInterface from './Component/MainInterface';
 import ModeratorLayout from './Component/ModeratorLayout';
 import LoginPage from './login system/LoginPage';
-import UserDetailPanel from './Component/UserDetailPanel';
+import LoginSection from './Component/LoginSection';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { fetchUserDataByUID, fetchCompanyDataByID } from './auth/auth';
+import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from './firebase/firebase';
 import { WebSocketProvider } from './utils/WebSocketContext';
 import './StyleSheet/global.css';
 import './App.css';
@@ -22,7 +24,6 @@ const App = () => {
   const [userPhotoURL, setUserPhotoURL] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showProfilePopup, setShowProfilePopup] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -38,9 +39,7 @@ const App = () => {
           const userData = await fetchUserDataByUID(user.uid);
           console.log('Fetched user data:', userData);
           const companyId = userData['company id'];
-          if (!companyId) {
-            throw new Error('Company ID not found in user data.');
-          }
+          if (!companyId) throw new Error('Company ID not found in user data.');
           console.log('Company ID:', companyId);
           const companyData = await fetchCompanyDataByID(companyId);
           console.log('Fetched company data:', companyData);
@@ -49,6 +48,9 @@ const App = () => {
           setUserName(userData.name || 'Unknown User');
           setUserPhotoURL(userData.photoURL || '/default-profile.png');
           setUserRole(userData.role || 'User');
+
+          const userRef = doc(db, 'users', user.uid);
+          await updateDoc(userRef, { lastOnline: serverTimestamp() });
 
           if (!location.pathname.startsWith('/dashboard')) {
             navigate('/dashboard');
@@ -95,19 +97,10 @@ const App = () => {
       setUserId(null);
       setUserPhotoURL(null);
       setUserRole(null);
-      setShowProfilePopup(false);
       navigate('/login');
     } catch (error) {
       console.error('Error signing out:', error);
     }
-  };
-
-  const toggleProfilePopup = () => {
-    setShowProfilePopup(!showProfilePopup);
-  };
-
-  const handleShowDetail = (uid) => {
-    console.log('Show detail for user:', uid);
   };
 
   if (loading) return <div>Loading...</div>;
@@ -116,29 +109,16 @@ const App = () => {
   return (
     <WebSocketProvider clientId={clientId}>
       <div className="app-container">
-        {isAuthenticated && (
-          <div className="profile-section">
-            <img
-              src={userPhotoURL}
-              alt="User Profile"
-              className="profile-picture"
-              onClick={toggleProfilePopup}
-              onError={(e) => (e.target.src = '/default-profile.png')}
-            />
-            {showProfilePopup && (
-              <div className="profile-popup">
-                <UserDetailPanel
-                  clientId={clientId}
-                  userName={userName}
-                  uid={uid}
-                  userId={userId}
-                />
-                <button className="logout-button" onClick={handleLogout}>
-                  Logout
-                </button>
-              </div>
-            )}
-          </div>
+        {isAuthenticated && location.pathname.startsWith('/dashboard') && (
+          <LoginSection
+            userName={userName}
+            companyName={companyName}
+            userPhotoURL={userPhotoURL}
+            onLogout={handleLogout}
+            clientId={clientId}
+            uid={uid}
+            userId={userId}
+          />
         )}
         <Routes>
           <Route path="/login" element={<LoginPage companyName={companyName} />} />
@@ -168,11 +148,7 @@ const App = () => {
                     <LeftBar clientId={clientId} />
                   </div>
                   <div className="main-interface">
-                    <ModeratorLayout
-                      clientId={clientId}
-                      userName={userName}
-                      uid={uid}
-                    />
+                    <ModeratorLayout clientId={clientId} userName={userName} uid={uid} />
                   </div>
                 </div>
               ) : (
