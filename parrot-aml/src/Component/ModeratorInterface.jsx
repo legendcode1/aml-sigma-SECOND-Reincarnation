@@ -1,25 +1,29 @@
+// parrot-aml/src/Component/ModeratorInterface.jsx
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { collection, getDocs, query, where } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom'; // Add useNavigate
 import { db } from '../firebase/firebase';
+import RegisterUserForm from './RegisterUserForm';
 import '../StyleSheet/ModeratorInterface.css';
 
 const ModeratorInterface = ({ clientId, onShowDetail }) => {
   const [userRows, setUserRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const navigate = useNavigate(); // For URL navigation
 
-  // Fetch all users from the 'users' collection whose company id matches clientId
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const usersRef = collection(db, 'users');
         const q = query(usersRef, where('company id', '==', clientId));
         const querySnapshot = await getDocs(q);
-        const users = querySnapshot.docs.map(doc => ({
+        const users = querySnapshot.docs.map((doc) => ({
           id: doc.id,
-          uid: doc.id, // assuming the document ID is the user UID
-          ...doc.data()
+          uid: doc.id,
+          ...doc.data(),
         }));
         setUserRows(users);
         setLoading(false);
@@ -35,36 +39,72 @@ const ModeratorInterface = ({ clientId, onShowDetail }) => {
     }
   }, [clientId]);
 
+  const handleUserRegistered = async () => {
+    try {
+      const usersRef = collection(db, 'users');
+      const q = query(usersRef, where('company id', '==', clientId));
+      const querySnapshot = await getDocs(q);
+      setUserRows(querySnapshot.docs.map((doc) => ({ id: doc.id, uid: doc.id, ...doc.data() })));
+      setShowForm(false);
+      navigate('/dashboard/moderator'); // Navigate back to user list
+    } catch (err) {
+      console.error('Error refreshing users:', err);
+      setError(err.message);
+    }
+  };
+
+  const toggleForm = () => {
+    setShowForm(true);
+    navigate('/dashboard/moderator/form'); // Navigate to form view
+  };
+
   if (loading) return <div className="loading">Loading users...</div>;
   if (error) return <div className="error-message">Error: {error}</div>;
 
   return (
     <div className="ModeratorInterface">
-      <div className="Graph">
-        <div className="GraphContent">Graph<br /></div>
-      </div>
-      <div className="UserListContainer">
-        <div className="UserListHeader">
-          <div className="header-cell">User</div>
-          <div className="header-cell">Occupation</div>
-          <div className="header-cell">Status</div>
-          <div className="header-cell">Last Online</div>
-          <div className="header-cell">Actions</div>
-        </div>
-        {userRows.map((row) => (
-          <div key={row.id} className="user-row">
-            <div className="row-cell">{row.name || 'Unnamed User'}</div>
-            <div className="row-cell">{row.occupation || 'N/A'}</div>
-            <div className="row-cell">{row.role || 'N/A'}</div>
-            <div className="row-cell">{row.lastOnline || 'N/A'}</div>
-            <div className="row-cell">
-              <button onClick={() => onShowDetail(row.uid)} className="more-button">
-                More
-              </button>
-            </div>
+      {showForm ? (
+        <RegisterUserForm
+          clientId={clientId}
+          onUserRegistered={handleUserRegistered}
+          onGoBack={() => {
+            setShowForm(false);
+            navigate('/dashboard/moderator');
+          }}
+        />
+      ) : (
+        <>
+          <div className="Graph">
+            <div className="GraphContent">Graph<br /></div>
           </div>
-        ))}
-      </div>
+          <div className="UserListContainer">
+            <div className="UserListHeader">
+              <div className="header-cell">User</div>
+              <div className="header-cell">Occupation</div>
+              <div className="header-cell">Status</div>
+              <div className="header-cell">Last Online</div>
+              <div className="header-cell actions-cell">
+                <button className="add-user-button" onClick={toggleForm}>
+                  Add User
+                </button>
+              </div>
+            </div>
+            {userRows.map((row) => (
+              <div key={row.id} className="user-row">
+                <div className="row-cell">{row.name || 'Unnamed User'}</div>
+                <div className="row-cell">{row.occupation || 'N/A'}</div>
+                <div className="row-cell">{row.role || 'N/A'}</div>
+                <div className="row-cell">{row.lastOnline || 'N/A'}</div>
+                <div className="row-cell">
+                  <button onClick={() => onShowDetail(row.uid)} className="more-button">
+                    More
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 };

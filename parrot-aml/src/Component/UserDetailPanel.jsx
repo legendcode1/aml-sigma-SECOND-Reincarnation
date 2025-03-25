@@ -30,41 +30,40 @@ const UserDetailPanel = ({ clientId, userName, uid, userId }) => {
       }
     );
 
-    // Cleanup the listener when the component unmounts
     return () => unsubscribe();
   }, [userId]);
 
-  if (loading) return <div>Loading user details...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (loading) return <div className="loading">Loading user details...</div>;
+  if (error) return <div className="error">Error: {error}</div>;
 
   return (
     <div className="user-detail-panel">
-      <h2>User Details</h2>
-      {userData && (
-        <div>
-          <p><strong>Name:</strong> {userData.name || 'N/A'}</p>
-          <p><strong>Email:</strong> {userData.email || 'N/A'}</p>
-          <p><strong>Occupation:</strong> {userData.occupation || 'N/A'}</p>
-          <p><strong>Company ID:</strong> {userData['company id'] || 'N/A'}</p>
-          <p><strong>Phone:</strong> {userData.phone || 'N/A'}</p>
-          <p>
-            <strong>Profile Image:</strong>{' '}
-            {userData.photoURL ? (
-              <img
-                src={`${userData.photoURL}?t=${Date.now()}`}
-                alt="Profile"
-                style={{ width: '100px' }}
-                onError={(e) => {
-                  e.target.onerror = null; // Prevent infinite loop
-                  e.target.src = '/path/to/fallback-image.png'; // Replace with a real fallback image path
-                }}
-              />
-            ) : (
-              'N/A'
-            )}
-          </p>
+      <div className="user-header">
+        <img
+          src={userData?.photoURL || '/default-profile.png'}
+          alt="Profile"
+          className="avatar"
+          onError={(e) => (e.target.src = '/default-profile.png')}
+        />
+        <div className="name-tag">
+          <span className="user-name">{userData?.name || 'N/A'}</span>
+          <span className="user-role">{userData?.occupation || 'N/A'}</span>
         </div>
-      )}
+      </div>
+      <div className="contact-info">
+        <div className="info-row">
+          <span className="info-label">Email:</span>
+          <span className="info-value">{userData?.email || 'N/A'}</span>
+        </div>
+        <div className="info-row">
+          <span className="info-label">Company ID:</span>
+          <span className="info-value">{userData?.['company id'] || 'N/A'}</span>
+        </div>
+        <div className="info-row">
+          <span className="info-label">Phone:</span>
+          <span className="info-value">{userData?.phone || 'N/A'}</span>
+        </div>
+      </div>
     </div>
   );
 };
@@ -76,4 +75,4 @@ UserDetailPanel.propTypes = {
   userId: PropTypes.string.isRequired,
 };
 
-export default UserDetailPanel;
+export default UserDetailPanel; 
