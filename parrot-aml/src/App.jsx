@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import LeftBar from './Component/LeftBar';
 import MainInterface from './Component/MainInterface';
-import ModeratorInterface from './Component/ModeratorInterface';
+import ModeratorLayout from './Component/ModeratorLayout';
 import LoginPage from './login system/LoginPage';
 import UserDetailPanel from './Component/UserDetailPanel';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
@@ -143,7 +143,7 @@ const App = () => {
         <Routes>
           <Route path="/login" element={<LoginPage companyName={companyName} />} />
           <Route
-            path="/dashboard/*" // Updated to handle all subroutes
+            path="/dashboard/*"
             element={
               isAuthenticated && clientId ? (
                 <div className="main-parent">
@@ -160,7 +160,7 @@ const App = () => {
             }
           />
           <Route
-            path="/dashboard/moderator"
+            path="/dashboard/moderator/*"
             element={
               isAuthenticated && clientId && userRole === 'Moderator' ? (
                 <div className="main-parent">
@@ -168,9 +168,10 @@ const App = () => {
                     <LeftBar clientId={clientId} />
                   </div>
                   <div className="main-interface">
-                    <ModeratorInterface
+                    <ModeratorLayout
                       clientId={clientId}
-                      onShowDetail={handleShowDetail}
+                      userName={userName}
+                      uid={uid}
                     />
                   </div>
                 </div>

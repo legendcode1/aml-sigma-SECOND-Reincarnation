@@ -1,6 +1,7 @@
 // parrot-aml/src/Component/Report.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import remarkGfm from "remark-gfm";
 import { db } from '../firebase/firebase';
 import { doc, onSnapshot, collection, query, orderBy } from 'firebase/firestore';
 import { useWebSocketContext } from '../utils/WebSocketContext';
@@ -99,9 +100,11 @@ const Report = ({ clientId }) => {
             <div className="chat-meta">
               <span>
                 Date Made:{' '}
-                {initialReport.timestamp
-                  ? new Date(initialReport.timestamp.seconds * 1000).toLocaleString()
-                  : 'N/A'}
+                {initialReport.timestamp && initialReport.timestamp.toDate
+                  ? initialReport.timestamp.toDate().toLocaleString()
+                  : initialReport.timestamp
+                    ? new Date(initialReport.timestamp).toLocaleString()
+                    : 'N/A'}
               </span>
             </div>
           )}
@@ -120,7 +123,7 @@ const Report = ({ clientId }) => {
           <div className="message-api">
             <div className="api-message">
               <div className="message-output">
-                <ReactMarkdown>{initialReport.output || ''}</ReactMarkdown>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{initialReport.output || ''}</ReactMarkdown>
               </div>
             </div>
           </div>
