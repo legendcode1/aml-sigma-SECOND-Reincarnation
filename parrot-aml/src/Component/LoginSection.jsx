@@ -1,33 +1,31 @@
-// filepath: /c:/Users/Ananta Anugrah/Desktop/aml sigma SECOND Reincarnation/parrot-aml/src/Component/LoginSection.jsx
-import React, { useEffect, useState } from 'react';
+// parrot-aml/src/Component/LoginSection.jsx
+import React, { useState } from 'react';
+import UserDetailPanel from './UserDetailPanel';
 import '../StyleSheet/LoginSection.css';
 
-const LoginSection = ({ loginText = "Login", onClick = () => console.log("Login clicked"), onReset }) => {
-  const [companyName, setCompanyName] = useState("Unknown Company");
-  const [userName, setUserName] = useState("SIGMA");
+const LoginSection = ({ userName, companyName, userPhotoURL, onLogout, clientId, uid, userId }) => {
+  const [showPopup, setShowPopup] = useState(false);
 
-  // Fetch user data from localStorage when the component mounts
-  useEffect(() => {
-    const storedUserName = localStorage.getItem('user_name');
-    const storedCompanyName = localStorage.getItem('company_name');
-
-    // Log values for debugging
-    console.log("Stored userName:", storedUserName);
-    console.log("Stored companyName:", storedCompanyName);
-
-    if (storedUserName) {
-      setUserName(storedUserName); // Update user name if available
-    }
-
-    if (storedCompanyName) {
-      setCompanyName(storedCompanyName); // Update company name if available
-    }
-  }, []);
+  const togglePopup = () => setShowPopup(!showPopup);
 
   return (
-    <div className="login-section" onClick={onClick}>
-      <span className="login-text">{userName} from {companyName}</span> {/* Display dynamic userName and companyName */}
-      <button className="reset-button" onClick={onReset}>Reset</button>
+    <div className="login-section">
+      <img
+        src={userPhotoURL}
+        alt="User Profile"
+        className="profile-picture"
+        onClick={togglePopup}
+        onError={(e) => (e.target.src = '/default-profile.png')}
+      />
+      {showPopup && (
+        <div className="profile-popup">
+          <span className="login-text">{userName} from {companyName}</span>
+          <UserDetailPanel clientId={clientId} userName={userName} uid={uid} userId={userId} />
+          <button className="logout-button" onClick={onLogout}>
+            Logout
+          </button>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,3 +1,4 @@
+// parrot-aml/src/Component/ChatBotContainer.jsx
 import React, { useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import PropTypes from 'prop-types';
@@ -42,7 +43,6 @@ const ChatBotContainer = ({
   messagesEndRef,
   userName,
 }) => {
-  // Auto-scroll on messages update
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
