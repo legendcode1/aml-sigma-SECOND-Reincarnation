@@ -3,11 +3,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import remarkGfm from "remark-gfm";
 import { db } from '../firebase/firebase';
-import { doc, onSnapshot, collection, query, orderBy } from 'firebase/firestore';
+import { doc, onSnapshot, collection, query, orderBy, updateDoc } from 'firebase/firestore';
 import { useWebSocketContext } from '../utils/WebSocketContext';
 import ReactMarkdown from 'react-markdown';
 import PropTypes from 'prop-types';
 import '../StyleSheet/Report.css';
+
+const isProgressCompleted = (messages) => {
+  return messages.some(msg => {
+    const content = (msg.content?.message || msg.content?.query || '').toLowerCase().trim();
+    return content.includes('report generation completed');
+  });
+};
 
 const Report = ({ clientId }) => {
   const { chatId } = useParams();
@@ -20,7 +27,6 @@ const Report = ({ clientId }) => {
   const { stopSession } = useWebSocketContext();
   const progressRef = useRef(null);
 
-  // Fetch chat status
   useEffect(() => {
     if (!chatId || !clientId) {
       setError('Chat ID or Client ID is missing.');
@@ -34,7 +40,8 @@ const Report = ({ clientId }) => {
       (docSnapshot) => {
         if (docSnapshot.exists()) {
           const data = docSnapshot.data();
-          setStatus(data.status);
+          setStatus(data.status || 'processing');
+          console.log('Chat status updated:', data.status || 'processing');
           if (data.status === 'completed' || data.status === 'failed') {
             stopSession(chatId);
           }
@@ -52,19 +59,20 @@ const Report = ({ clientId }) => {
     return () => unsubscribe();
   }, [chatId, clientId, stopSession]);
 
-  // Fetch initial report when status is 'completed' or progress indicates completion
   useEffect(() => {
-    if ((!chatId || !clientId) || (status !== 'completed' && !progressMessages.some(msg =>
-      (msg.content.message || msg.content.query || '').includes('Report generation completed.')
-    ))) return;
+    if ((!chatId || !clientId) || (status !== 'completed' && !isProgressCompleted(progressMessages))) {
+      console.log('Not fetching initial report: conditions not met');
+      return;
+    }
 
+    console.log('Attempting to fetch initial report');
     const messageRef = doc(db, 'client', clientId, 'chat_history', chatId, 'messages', 'initial-report');
     const unsubscribe = onSnapshot(
       messageRef,
       (msgDoc) => {
         if (msgDoc.exists()) {
           setInitialReport(msgDoc.data());
-          console.log('Initial Report Fetched:', msgDoc.data()); // Debug log
+          console.log('Initial Report Fetched:', msgDoc.data());
         } else {
           console.log('Initial report document not found.');
         }
@@ -78,7 +86,6 @@ const Report = ({ clientId }) => {
     return () => unsubscribe();
   }, [status, chatId, clientId, progressMessages]);
 
-  // Fetch progress messages when status is 'processing'
   useEffect(() => {
     if (status !== 'processing' || !chatId || !clientId) return;
 
@@ -88,34 +95,59 @@ const Report = ({ clientId }) => {
       q,
       (snapshot) => {
         const messages = snapshot.docs
-          .map((docSnapshot) => docSnapshot.data())
-          .filter((msg) => msg.type === 'progress');
+          .map(docSnapshot => docSnapshot.data())
+          .filter(msg => msg.type === 'progress');
         setProgressMessages(messages);
+
+        if (isProgressCompleted(messages)) {
+          const chatDocRef = doc(db, 'client', clientId, 'chat_history', chatId);
+          updateDoc(chatDocRef, { status: 'completed' })
+            .then(() => {
+              console.log('Status successfully updated to "completed" in Firestore');
+            })
+            .catch(err => {
+              console.error('Failed to update status to "completed":', err);
+              setError('Failed to update report status.');
+            });
+          stopSession(chatId);
+        }
+
         if (progressRef.current) {
-          progressRef.current.scrollTop = progressRef.current.scrollHeight; // Auto-scroll to bottom
+          progressRef.current.scrollTop = progressRef.current.scrollHeight;
         }
       },
       (err) => setError(err.message)
     );
 
     return () => unsubscribe();
-  }, [status, chatId, clientId]);
+  }, [status, chatId, clientId, stopSession]);
 
   const toggleExpand = () => setIsExpanded(!isExpanded);
 
   if (loading) return <div className="loading-messages">Loading...</div>;
   if (error) return <div className="error-messages">{error}</div>;
 
-  const isReportCompleted = status === 'completed' || progressMessages.some(msg =>
-    (msg.content.message || msg.content.query || '').includes('Report Generation Completed')
-  );
+  const isReportCompleted = status === 'completed' || isProgressCompleted(progressMessages);
+
+  let mode;
+  if (status === 'processing' && !isReportCompleted) {
+    mode = 'processing';
+  } else if (isReportCompleted && !initialReport) {
+    mode = 'loading';
+  } else if (isReportCompleted && initialReport) {
+    mode = 'completed';
+  } else {
+    mode = 'unknown';
+  }
 
   return (
     <div className="report-container">
       <div className="report-section-padding">
         <div className="report-section">
-          <h1 className="chat-title">{isReportCompleted ? 'Initial Report' : 'Processing Report'}</h1>
-          {isReportCompleted && initialReport && (
+          <h1 className="chat-title">
+            {mode === 'completed' ? 'Initial Report' : mode === 'processing' ? 'Processing Report' : 'Report Status'}
+          </h1>
+          {mode === 'completed' && (
             <div className="chat-meta">
               <span>
                 Date Made:{' '}
@@ -129,7 +161,7 @@ const Report = ({ clientId }) => {
           )}
         </div>
         <hr className="no-padding-hr" />
-        {isReportCompleted && initialReport ? (
+        {mode === 'completed' ? (
           <div className="message-api">
             <div className="api-message">
               <div className="message-output">
@@ -137,19 +169,18 @@ const Report = ({ clientId }) => {
               </div>
             </div>
           </div>
-        ) : status === 'processing' ? (
+        ) : mode === 'loading' ? (
+          <div className="loading-report">Loading report...</div>
+        ) : mode === 'processing' ? (
           <div className="progress-container">
             <button onClick={toggleExpand} className="expand-button">
               {isExpanded ? 'Collapse Progress' : 'Expand Progress'}
             </button>
-            <div
-              className={`progress-list ${isExpanded ? 'expanded' : 'collapsed'}`}
-              ref={progressRef}
-            >
+            <div className={`progress-list ${isExpanded ? 'expanded' : 'collapsed'}`} ref={progressRef}>
               {progressMessages.length > 0 ? (
                 progressMessages.map((msg, index) => (
                   <p key={index} className="progress-text">
-                    {msg.content.message || msg.content.query || 'Processing...'}
+                    {msg.content?.message || msg.content?.query || 'Processing...'}
                   </p>
                 ))
               ) : (

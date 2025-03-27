@@ -14,7 +14,7 @@ import {
 } from 'firebase/firestore';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
-import ChatBot from './ChatBot';
+import ChatBot from './ChatBot'; // Corrected import path
 import { db } from '../firebase/firebase';
 import '../StyleSheet/Panel.css';
 
@@ -25,6 +25,7 @@ const ChatPanel = ({ clientId, userName }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [newMessage, setNewMessage] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const messagesEndRef = useRef(null);
 
@@ -33,7 +34,7 @@ const ChatPanel = ({ clientId, userName }) => {
   const [isOpen, setIsOpen] = useState(true);
   const isResizing = useRef(false);
 
-  // Fetch chat document and messages on mount
+  // Fetch chat data
   useEffect(() => {
     const fetchChatData = async () => {
       try {
@@ -58,22 +59,22 @@ const ChatPanel = ({ clientId, userName }) => {
           ...doc.data(),
         }));
         setMessages(fetchedMessages);
-        setLoading(false);
       } catch (err) {
+        console.error('Error fetching chat data:', err);
         setError(err.message || 'Failed to load chat history.');
+      } finally {
         setLoading(false);
       }
     };
 
-    if (clientId && chatId) {
-      fetchChatData();
-    } else {
+    if (clientId && chatId) fetchChatData();
+    else {
       setError('Client ID or Chat ID is missing.');
       setLoading(false);
     }
   }, [chatId, clientId]);
 
-  // Handle resizing the panel
+  // Handle panel resizing
   const handleResizeMouseDown = (e) => {
     e.preventDefault();
     isResizing.current = true;
@@ -97,15 +98,16 @@ const ChatPanel = ({ clientId, userName }) => {
     document.addEventListener('mouseup', handleMouseUp);
   };
 
-  const togglePanel = () => {
-    setIsOpen(!isOpen);
-  };
+  const togglePanel = () => setIsOpen(!isOpen);
 
   // Handle sending a message
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
+
+    setIsProcessing(true);
     try {
+      console.log('Sending follow-up message:', newMessage);
       const newMsg = {
         prompt: newMessage,
         output: '',
@@ -113,11 +115,11 @@ const ChatPanel = ({ clientId, userName }) => {
         userName: userName,
       };
 
-      // Optimistically update local state
+      // Optimistically update UI
       const tempId = uuidv4();
       setMessages((prev) => [...prev, { id: tempId, ...newMsg }]);
 
-      // Save new message to Firestore
+      // Save to Firestore
       const messagesCollectionRef = collection(
         db,
         'client',
@@ -127,48 +129,46 @@ const ChatPanel = ({ clientId, userName }) => {
         'messages'
       );
       const docRef = await addDoc(messagesCollectionRef, newMsg);
+      console.log('Message saved to Firestore with ID:', docRef.id);
 
-      // Build payload for the backend call
+      // Prepare API payload
       const payload = {
-        session_id: chatId, // Use chatId for consistency with initial report
-        client_id: clientId,
+        session_id: chatId,
         pep_name: chatDoc?.pep_name || '',
         pep_occupation: chatDoc?.pep_occupation || '',
         pep_age: chatDoc?.pep_age || '',
         pep_gender: chatDoc?.pep_gender || '',
-        chat_history: messages.map((m) => m.prompt).join('\n'),
         user_message: newMessage,
-        UID: chatDoc?.uid || '', // Add UID from chatDoc
+        chat_history: messages.map((m) => m.prompt).join('\n'),
       };
+      console.log('Sending payload to /followup:', payload);
 
+      // Make API call
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/followup?client_id=${clientId}`,
         payload
       );
+      console.log('Received response from /followup:', response.data);
 
-      let outputReport = response.data.report;
-      if (!outputReport && typeof response.data === 'string') {
-        outputReport = response.data;
-      }
+      let outputReport = response.data.report || response.data;
+      if (typeof outputReport === 'string') {
+        setMessages((prev) => {
+          const updated = [...prev];
+          updated[updated.length - 1] = { ...updated[updated.length - 1], output: outputReport };
+          return updated;
+        });
 
-      // Update local state with the output
-      setMessages((prev) => {
-        const updated = [...prev];
-        updated[updated.length - 1] = { ...updated[updated.length - 1], output: outputReport };
-        return updated;
-      });
-
-      if (outputReport !== undefined && outputReport !== null) {
         await updateDoc(docRef, { output: outputReport });
+        console.log('Updated Firestore with bot response');
       }
       setNewMessage('');
     } catch (err) {
-      console.error('Error sending follow-up message:', err);
+      console.error('Error in handleSendMessage:', err);
+      setError('Failed to send message. Please try again.');
+    } finally {
+      setIsProcessing(false);
     }
   };
-
-  if (loading) return <div className="loading-messages">Loading messages...</div>;
-  if (error) return <div className="error-messages">{error}</div>;
 
   return (
     <>
@@ -179,7 +179,7 @@ const ChatPanel = ({ clientId, userName }) => {
         style={{
           width: '50px',
           height: '50px',
-          right: isOpen ? `${width}px` : '0px'
+          right: isOpen ? `${width}px` : '0px',
         }}
       >
         {isOpen ? '⫸' : '⫷'}
@@ -191,20 +191,28 @@ const ChatPanel = ({ clientId, userName }) => {
         style={{
           width: isOpen ? `${width}px` : '0px',
           right: isOpen ? '0' : '-5px',
-          overflow: isOpen ? 'visible' : 'hidden'
+          overflow: isOpen ? 'visible' : 'hidden',
         }}
       >
         {isOpen && (
           <>
             <div className="resizer" onMouseDown={handleResizeMouseDown}></div>
-            <ChatBot
-              messages={messages}
-              newMessage={newMessage}
-              setNewMessage={setNewMessage}
-              handleSendMessage={handleSendMessage}
-              messagesEndRef={messagesEndRef}
-              userName={userName}
-            />
+            {loading ? (
+              <div className="loading-messages">Loading messages...</div>
+            ) : (
+              <>
+                {error && <div className="error-messages">{error}</div>}
+                <ChatBot
+                  messages={messages}
+                  newMessage={newMessage}
+                  setNewMessage={setNewMessage}
+                  handleSendMessage={handleSendMessage}
+                  messagesEndRef={messagesEndRef}
+                  userName={userName}
+                  isProcessing={isProcessing}
+                />
+              </>
+            )}
           </>
         )}
       </div>

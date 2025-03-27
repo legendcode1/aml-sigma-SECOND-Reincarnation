@@ -4,11 +4,9 @@ import '../StyleSheet/LeftBar.css';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase/firebase';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
-import { loadChatMessagesFirestore } from '../indexedDB';
 import PropTypes from 'prop-types';
 import ChatHistoryList from './ChatHistoryList';
 import ProfileSettings from './ProfileSettings';
-
 import plusIcon from '/leftbar/plus.svg';
 import datum from '/leftbar/datum.png';
 
@@ -29,26 +27,30 @@ const LeftBar = ({ clientId }) => {
     const chatsRef = collection(db, 'client', clientId, 'chat_history');
     const q = query(chatsRef, orderBy('dateMade', 'desc'));
 
-    const unsubscribe = onSnapshot(q, async (snapshot) => {
-      try {
-        setLoading(true);
-        const firestoreChats = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        await loadChatMessagesFirestore(firestoreChats);
-        setChatHistory(firestoreChats);
-      } catch (err) {
-        console.error('Failed to load chat history:', err);
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        try {
+          const firestoreChats = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+            status: doc.data().status || 'processing', // Ensure status is always present
+          }));
+          setChatHistory(firestoreChats);
+          console.log('LeftBar chat history updated:', firestoreChats);
+        } catch (err) {
+          console.error('Failed to load chat history:', err);
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+      },
+      (err) => {
+        console.error('Firestore listener error:', err);
         setError(err.message);
-      } finally {
         setLoading(false);
       }
-    }, (err) => {
-      console.error('Firestore listener error:', err);
-      setError(err.message);
-      setLoading(false);
-    });
+    );
 
     return () => unsubscribe();
   }, [clientId]);
@@ -73,7 +75,6 @@ const LeftBar = ({ clientId }) => {
           style={{ cursor: 'pointer' }}
         />
       </div>
-      {/* Moderator Panel navigation and Profile Settings toggle are handled within ChatHistoryList */}
       {activeSection === 'chatHistory' ? (
         <ChatHistoryList
           chatHistory={chatHistory}

@@ -151,36 +151,41 @@ router.post("/report", async (req, res) => {
 router.post("/followup", async (req, res) => {
   const {
     session_id,
-    client_id,
     pep_name,
     pep_occupation,
     pep_age,
     pep_gender,
-    chat_history,
     user_message,
-    UID, // Extract UID from request body
+    chat_history,
   } = req.body;
 
-  console.log("Received /followup request:", req.body);
+  const { client_id } = req.query; // Extract client_id from query parameters
 
-  if (!session_id || !client_id || !pep_name || !user_message || !UID) {
+  console.log("Received /followup request:", { ...req.body, client_id });
+
+  // Validate required fields
+  if (
+    !session_id ||
+    !client_id ||
+    !pep_name ||
+    !user_message ||
+    !chat_history
+  ) {
     console.log("Missing required fields in /followup");
     return res.status(400).json({
       error:
-        "Missing required fields: session_id, client_id, pep_name, user_message, and UID are required",
+        "Missing required fields: session_id, client_id, pep_name, user_message, and chat_history are required",
     });
   }
 
   const payload = {
     session_id,
-    client_id, // Include client_id in the payload
     pep_name,
     pep_occupation,
     pep_age,
     pep_gender,
-    chat_history,
     user_message,
-    UID, // Include UID in the payload
+    chat_history,
   };
 
   if (USE_MOCK_API) {
@@ -190,7 +195,6 @@ router.post("/followup", async (req, res) => {
 - **Session ID:** ${session_id}
 - **Client ID:** ${client_id}
 - **User Message:** "${user_message}"
-- **UID:** ${UID}
 
 *This is a mock follow-up report generated for testing purposes.*`,
     };
@@ -200,7 +204,7 @@ router.post("/followup", async (req, res) => {
     try {
       const headers = await getAuthHeaders(process.env.AIGISLLM_BACKEND_URL);
       const response = await axios.post(
-        `${process.env.AIGISLLM_BACKEND_URL}/report`,
+        `${process.env.AIGISLLM_BACKEND_URL}/followup?client_id=${client_id}`, // Add client_id as query param
         payload,
         {
           headers,
@@ -215,13 +219,7 @@ router.post("/followup", async (req, res) => {
         console.error("Error response data:", error.response.data);
         console.error("Error response status:", error.response.status);
         console.error("Error response headers:", error.response.headers);
-      } else if (error.request) {
-        console.error("No response received:", error.request);
-      } else {
-        console.error("Error message:", error.message);
       }
-      console.error("Error config:", error.config);
-
       return res.status(error.response?.status || 500).json({
         error: error.response?.data || "Internal Server Error",
       });

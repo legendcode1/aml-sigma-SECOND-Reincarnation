@@ -1,21 +1,22 @@
 // parrot-aml/src/Component/ModeratorInterface.jsx
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { db } from '../firebase/firebase';
 import RegisterUserForm from './RegisterUserForm';
-import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend } from 'chart.js';
 import '../StyleSheet/ModeratorInterface.css';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend);
 
 const ModeratorInterface = ({ clientId, onShowDetail, userName }) => {
   const [userRows, setUserRows] = useState([]);
   const [promptData, setPromptData] = useState([]);
   const [timeRange, setTimeRange] = useState('day');
-  const [loading, setLoading] = useState(true);
+  const [loadingUsers, setLoadingUsers] = useState(true);
+  const [loadingGraph, setLoadingGraph] = useState(true);
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const navigate = useNavigate();
@@ -25,12 +26,11 @@ const ModeratorInterface = ({ clientId, onShowDetail, userName }) => {
     setShowForm(location.pathname === '/dashboard/moderator/form');
   }, [location.pathname]);
 
-  // parrot-aml/src/Component/ModeratorInterface.jsx
+  // Fetch users for the table
   useEffect(() => {
-    const fetchData = async () => {
-      console.log('Starting data fetch for ModeratorInterface...');
+    const fetchUsers = async () => {
+      console.log('Fetching users...');
       try {
-        // Fetch users
         const userQuery = query(collection(db, 'users'), where('company id', '==', clientId));
         const userSnapshot = await getDocs(userQuery);
         const users = userSnapshot.docs.map((doc) => {
@@ -46,60 +46,46 @@ const ModeratorInterface = ({ clientId, onShowDetail, userName }) => {
           };
         });
         setUserRows(users);
-        console.log('Users fetched:', users);
-
-        // Fetch prompts for all users
-        const chatHistoryRef = collection(db, 'client', clientId, 'chat_history');
-        const chatHistorySnapshot = await getDocs(chatHistoryRef);
-        const allPrompts = [];
-
-        for (const chatDoc of chatHistorySnapshot.docs) {
-          const chatId = chatDoc.id;
-
-          // Fetch initial-report
-          const initialReportRef = doc(db, 'client', clientId, 'chat_history', chatId, 'messages', 'initial-report');
-          const initialReportDoc = await getDoc(initialReportRef);
-          if (initialReportDoc.exists() && initialReportDoc.data().uid) {
-            allPrompts.push({
-              ...initialReportDoc.data(),
-              timestamp: initialReportDoc.data().timestamp,
-            });
-          }
-
-          // Fetch followups
-          const messagesRef = collection(db, 'client', clientId, 'chat_history', chatId, 'messages');
-          const messagesQuery = query(messagesRef, where('type', '==', 'followup'));
-          const messagesSnapshot = await getDocs(messagesQuery);
-          messagesSnapshot.forEach((msgDoc) => {
-            if (msgDoc.data().uid) {
-              allPrompts.push({
-                ...msgDoc.data(),
-                timestamp: msgDoc.data().timestamp,
-              });
-            }
-          });
-        }
-
-        console.log('All Prompts fetched:', allPrompts);
-
-        const aggregatedData = aggregatePrompts(allPrompts, timeRange);
-        setPromptData(aggregatedData);
-        setLoading(false);
-        console.log('Data fetch completed for ModeratorInterface.');
+        setLoadingUsers(false);
       } catch (err) {
-        console.error('Error fetching data:', err);
+        console.error('Error fetching users:', err);
         setError(err.message);
-        setLoading(false);
+        setLoadingUsers(false);
       }
     };
 
-    if (clientId) fetchData();
-  }, [clientId, timeRange]);
+    if (clientId) fetchUsers();
+  }, [clientId]);
 
+  // Fetch and aggregate prompts based on dateMade
+  useEffect(() => {
+    const fetchPrompts = async () => {
+      console.log('Fetching prompt data with clientId:', clientId);
+      try {
+        const chatHistoryRef = collection(db, 'client', clientId, 'chat_history');
+        const chatHistorySnapshot = await getDocs(chatHistoryRef);
+        const allPrompts = chatHistorySnapshot.docs.map((doc) => ({
+          timestamp: doc.data().dateMade, // Use dateMade directly
+        }));
+
+        const aggregatedData = aggregatePrompts(allPrompts, timeRange);
+        setPromptData(aggregatedData);
+        setLoadingGraph(false);
+      } catch (err) {
+        console.error('Error fetching prompts:', err);
+        setError(err.message);
+        setLoadingGraph(false);
+      }
+    };
+
+    if (clientId && !loadingUsers) fetchPrompts();
+  }, [clientId, timeRange, loadingUsers]);
+
+  // Aggregate prompts by date
   const aggregatePrompts = (prompts, range) => {
     const now = new Date();
     const startDate = getStartDate(range, now);
-    const filteredPrompts = prompts.filter((p) => p.timestamp.toDate() >= startDate);
+    const filteredPrompts = prompts.filter((p) => p.timestamp && p.timestamp.toDate() >= startDate);
 
     const grouped = filteredPrompts.reduce((acc, prompt) => {
       const dateKey = getDateKey(prompt.timestamp.toDate(), range);
@@ -110,6 +96,7 @@ const ModeratorInterface = ({ clientId, onShowDetail, userName }) => {
     return Object.entries(grouped).map(([date, count]) => ({ date, count }));
   };
 
+  // Determine the start date for the time range
   const getStartDate = (range, now) => {
     switch (range) {
       case 'day': return new Date(now.setHours(0, 0, 0, 0));
@@ -121,6 +108,7 @@ const ModeratorInterface = ({ clientId, onShowDetail, userName }) => {
     }
   };
 
+  // Format date keys for grouping
   const getDateKey = (date, range) => {
     switch (range) {
       case 'day': return date.toLocaleDateString();
@@ -132,34 +120,89 @@ const ModeratorInterface = ({ clientId, onShowDetail, userName }) => {
     }
   };
 
+  // Chart data for the Line component
   const chartData = {
     labels: promptData.map((d) => d.date),
     datasets: [{
-      label: 'Total Prompts',
+      label: 'Total Reports',
       data: promptData.map((d) => d.count),
-      backgroundColor: 'rgba(75, 192, 192, 0.6)',
+      borderColor: 'rgba(75, 192, 192, 1)', // Line color
+      backgroundColor: 'rgba(75, 192, 192, 0.6)', // Point color
+      tension: 0.4, // Smooth curves
+      fill: false, // No fill under the line
     }],
   };
 
-  if (loading) return <div className="loading">Loading...</div>;
+  if (loadingUsers) return <div className="loading">Loading users...</div>;
   if (error) return <div className="error-message">Error: {error}</div>;
 
   return (
     <div className="ModeratorInterface">
-      {/* Rest of the component remains unchanged */}
-      <div className="moderator-content">
-        <div className="graph-section">
-          <select value={timeRange} onChange={(e) => setTimeRange(e.target.value)}>
-            <option value="day">Day</option>
-            <option value="month">Month</option>
-            <option value="year">Year</option>
-            <option value="3years">3 Years</option>
-            <option value="ytd">YTD</option>
-          </select>
-          <Bar data={chartData} options={{ responsive: true, plugins: { title: { display: true, text: `Prompts per ${timeRange}` } } }} />
+      {showForm ? (
+        <RegisterUserForm
+          clientId={clientId}
+          onUserRegistered={() => navigate('/dashboard/moderator')}
+          onGoBack={() => setShowForm(false)}
+        />
+      ) : (
+        <div className="moderator-content">
+          <div className="graph-section">
+            <select
+              value={timeRange}
+              onChange={(e) => {
+                console.log('Time range changed to:', e.target.value); // Debug log
+                setTimeRange(e.target.value);
+              }}
+            >
+              <option value="day">Day</option>
+              <option value="month">Month</option>
+              <option value="year">Year</option>
+              <option value="3years">3 Years</option>
+              <option value="ytd">YTD</option>
+            </select>
+            {loadingGraph ? (
+              <div className="loading">Loading graph...</div>
+            ) : (
+              <Line
+                data={chartData}
+                options={{
+                  responsive: true,
+                  plugins: {
+                    title: {
+                      display: true,
+                      text: `Reports per ${timeRange}`,
+                    },
+                  },
+                }}
+              />
+            )}
+          </div>
+          <div className="user-list-section">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Last Online</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {userRows.map((user) => (
+                  <tr key={user.uid}>
+                    <td>{user.name}</td>
+                    <td>{user.lastOnline}</td>
+                    <td>
+                      <button onClick={() => onShowDetail(user.uid)} className="more-button">
+                        More
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-        {/* User list table remains unchanged */}
-      </div>
+      )}
     </div>
   );
 };

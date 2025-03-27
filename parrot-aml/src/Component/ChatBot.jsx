@@ -1,4 +1,3 @@
-// parrot-aml/src/Component/ChatBotContainer.jsx
 import React, { useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import PropTypes from 'prop-types';
@@ -42,6 +41,7 @@ const ChatBotContainer = ({
   handleSendMessage,
   messagesEndRef,
   userName,
+  isProcessing, // Added prop for progress indicator
 }) => {
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -52,7 +52,7 @@ const ChatBotContainer = ({
   return (
     <div className="chat-section-padding">
       {messages
-        .filter((msg) => msg.id !== "initial-report")
+        .filter((msg) => msg.id !== 'initial-report')
         .map((msg) => (
           <div key={msg.id} className="message-bubble">
             {msg.prompt && (
@@ -62,6 +62,10 @@ const ChatBotContainer = ({
           </div>
         ))}
       <div ref={messagesEndRef} />
+      {isProcessing && (
+        <div className="processing-indicator">Processing follow-up...</div>
+      )}{' '}
+      {/* Progress indicator */}
       <form onSubmit={handleSendMessage} className="chat-input-form">
         <input
           type="text"
@@ -69,8 +73,11 @@ const ChatBotContainer = ({
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Type your follow-up message..."
           className="chat-input"
+          disabled={isProcessing} // Disable input during processing
         />
-        <button type="submit" className="send-button">Send</button>
+        <button type="submit" className="send-button" disabled={isProcessing}>
+          {isProcessing ? 'Sending...' : 'Send'} {/* Dynamic button text */}
+        </button>
       </form>
     </div>
   );
@@ -83,6 +90,7 @@ ChatBotContainer.propTypes = {
   handleSendMessage: PropTypes.func.isRequired,
   messagesEndRef: PropTypes.object.isRequired,
   userName: PropTypes.string.isRequired,
+  isProcessing: PropTypes.bool.isRequired, // Added prop type
 };
 
 export default ChatBotContainer;

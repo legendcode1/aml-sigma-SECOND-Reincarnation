@@ -1,56 +1,29 @@
-/* Main Interface Layout */
-.main-interface {
-  flex: 1;
-  background-color: #314a57;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0;
-  vertical-align: middle;
-}
-
+/* Container for the main interface */
 .main-interface-container {
+  position: relative; /* Makes this a reference for absolute positioning */
+  height: 100vh; /* Full height of the viewport */
+  width: 100%; /* Full width of the viewport */
+  overflow: hidden; /* Prevents overflow issues */
   display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-} 
+  flex-direction: column; /* Stacks content and login section vertically */
+}
 
-/* Report and Chat Container Layout */
-.report-chat-container {
+/* Main content area */
+.main-content {
+  margin-top: 10px;
+  flex: 1; /* Takes up available space above the login section */
+  overflow-y: auto; /* Allows scrolling if content overflows */
+}
+
+/* Login section container */
+.login-section-container {
+  position: absolute; /* Keeps it positioned relative to .main-interface-container */
+  top: 10px; /* Moves it slightly down from the top edge */
+  right: 10px; /* Aligns it to the right edge */
+  width: fit-content; /* Shrinks to fit the content */
+  background: var(--primary-color); /* Keeps your background color */
+  padding: 10px; /* Adds some breathing room */
   display: flex;
-  flex-direction: row;
-  height: 100vh;
-  width: 100%;
-  overflow: hidden;
-}
-
-/* Report Section */
-.report-chat-container > :first-child {
-  flex: 0 0 auto;
-  overflow-y: auto;
-}
-
-/* Chat History Section */
-.report-chat-container > :last-child {
-  flex: 1 1 auto;
-  overflow-y: auto;
-}
-
-
-/* Resizer */
-.resizer {
-  width: 5px;
-  cursor: ew-resize;
-  background-color: #aaa;
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  transition: background-color 0.2s ease;
-}
-
-.resizer:hover {
-  background-color: #888;
+  justify-content: flex-end; /* Aligns content to the right (though unnecessary with fit-content) */
+  z-index: 1000; /* Stays above other content */
 }

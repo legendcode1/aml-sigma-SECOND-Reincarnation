@@ -3,9 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import LeftBar from './Component/LeftBar';
 import MainInterface from './Component/MainInterface';
-import ModeratorLayout from './Component/ModeratorLayout';
 import LoginPage from './login system/LoginPage';
-import LoginSection from './Component/LoginSection';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { fetchUserDataByUID, fetchCompanyDataByID } from './auth/auth';
 import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
@@ -109,17 +107,6 @@ const App = () => {
   return (
     <WebSocketProvider clientId={clientId}>
       <div className="app-container">
-        {isAuthenticated && location.pathname.startsWith('/dashboard') && (
-          <LoginSection
-            userName={userName}
-            companyName={companyName}
-            userPhotoURL={userPhotoURL}
-            onLogout={handleLogout}
-            clientId={clientId}
-            uid={uid}
-            userId={userId}
-          />
-        )}
         <Routes>
           <Route path="/login" element={<LoginPage companyName={companyName} />} />
           <Route
@@ -131,28 +118,18 @@ const App = () => {
                     <LeftBar clientId={clientId} />
                   </div>
                   <div className="main-interface">
-                    <MainInterface clientId={clientId} userName={userName} uid={uid} />
+                    <MainInterface
+                      clientId={clientId}
+                      userName={userName}
+                      uid={uid}
+                      userPhotoURL={userPhotoURL}
+                      onLogout={handleLogout}
+                      companyName={companyName}
+                    />
                   </div>
                 </div>
               ) : (
                 <div>Loading dashboard...</div>
-              )
-            }
-          />
-          <Route
-            path="/dashboard/moderator/*"
-            element={
-              isAuthenticated && clientId && userRole === 'Moderator' ? (
-                <div className="main-parent">
-                  <div className="left-bar">
-                    <LeftBar clientId={clientId} />
-                  </div>
-                  <div className="main-interface">
-                    <ModeratorLayout clientId={clientId} userName={userName} uid={uid} />
-                  </div>
-                </div>
-              ) : (
-                <div>You do not have permission to access this page.</div>
               )
             }
           />
